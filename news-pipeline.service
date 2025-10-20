@@ -7,16 +7,15 @@ Type=oneshot
 User=ec2-user
 Group=ec2-user
 WorkingDirectory=/var/www/news
-ExecStart=/bin/bash /var/www/news/run_pipeline.sh
+ExecStart=/bin/bash /var/www/news/daily_pipeline.sh
+EnvironmentFile=/var/www/news/.env
 StandardOutput=journal
 StandardError=journal
-StandardError=journal
-Environment="DEEPSEEK_API_KEY=sk-3fa37d1185514b7fbcd4c1ab8b7643db"
 Environment="PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
 # Ensure proper permissions
 PermissionsStartOnly=true
-ExecStartPre=+/bin/mkdir -p /var/www/news/output /var/www/news/logs
+ExecStartPre=+/bin/mkdir -p /var/www/news/logs
 ExecStartPre=+/bin/chown ec2-user:ec2-user /var/www/news
 
 [Install]

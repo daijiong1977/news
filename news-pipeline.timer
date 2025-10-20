@@ -1,11 +1,10 @@
 [Unit]
-Description=Daily News Pipeline Timer (2 AM every day)
+Description=Daily News Pipeline Timer (1 AM EST every day)
 Requires=news-pipeline.service
 
 [Timer]
-# Run at 2:00 AM every day
-OnCalendar=daily
-OnCalendar=*-*-* 02:00:00
+# Run at 1:00 AM EST (6:00 AM UTC) every day
+OnCalendar=*-*-* 06:00:00
 Persistent=true
 
 [Install]
