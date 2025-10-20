@@ -19,11 +19,18 @@ CORS(app)
 # Configuration
 EMAIL_API_BASE_URL = os.environ.get('EMAIL_API_BASE_URL', 'https://emailapi.6ray.com')
 EMAIL_API_KEY = os.environ.get('EMAIL_API_KEY', '')
-DB_PATH = '/Users/jidai/news/subscriptions.db'
-ARTICLES_JSON = '/Users/jidai/news/articles_data_with_summaries.json'
+# Use environment variable or derive from script location; fallback to /var/www/news or current dir
+_script_dir = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.environ.get('DB_PATH', os.path.join(_script_dir, 'subscriptions.db'))
+ARTICLES_JSON = os.environ.get('ARTICLES_JSON', os.path.join(_script_dir, 'articles_data_with_summaries.json'))
 
 def init_db():
     """Initialize enhanced database schema"""
+    # Ensure the directory exists
+    db_dir = os.path.dirname(DB_PATH)
+    if db_dir and not os.path.exists(db_dir):
+        os.makedirs(db_dir, exist_ok=True)
+    
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     
