@@ -598,7 +598,7 @@
             }
             
             try {
-                const response = await fetch('/articles_data_with_summaries.json');
+                const response = await fetch('/output/articles_data.json');
                 if (!response.ok) throw new Error('Failed to load articles');
                 
                 const articles = await response.json();
@@ -609,56 +609,27 @@
                     return;
                 }
                 
-                // Fetch difficulty-specific content from API
-                console.log(`[loadArticle] Fetching ${currentDifficulty} content for article ${articleId}`);
-                const langCode = currentLanguage === 'en' ? 'en' : 'zh';
-                const apiUrl = `http://localhost:5001/api/article-content?article_id=${articleId}&difficulty=${currentDifficulty}&language=${langCode}`;
-                console.log(`[loadArticle] API URL: ${apiUrl}`);
+                // Use difficulty-specific content from JSON
+                console.log(`[loadArticle] Using ${currentDifficulty} content for article ${articleId}`);
                 
-                const apiResponse = await fetch(apiUrl);
+                // Map difficulty levels to summary field names
+                const summaryFieldMap = {
+                    'easy': 'summary_easy',
+                    'medium': 'summary_medium',
+                    'hard': 'summary_hard'
+                };
                 
-                if (apiResponse.ok) {
-                    const difficultyContent = await apiResponse.json();
-                    console.log(`[loadArticle] ✓ Got difficulty content from API, summary length: ${difficultyContent.summary ? difficultyContent.summary.length : 0}`);
-                    console.log(`[loadArticle] Summary preview: ${difficultyContent.summary ? difficultyContent.summary.substring(0, 80) : 'N/A'}`);
-                    
-                    // Override article content with difficulty-specific content
-                    article.difficulty_summary = difficultyContent.summary || '';
-                    article.difficulty_keywords = difficultyContent.keywords || [];
-                    article.difficulty_background = difficultyContent.background || '';
-                    article.difficulty_pro = difficultyContent.pro_arguments || '';
-                    article.difficulty_con = difficultyContent.con_arguments || '';
-                    console.log(`[loadArticle] Stored: summary=${article.difficulty_summary ? 'YES' : 'NO'}, keywords=${article.difficulty_keywords.length}, bg=${article.difficulty_background ? 'YES' : 'NO'}`);
-                } else {
-                    console.log(`[loadArticle] ✗ API returned ${apiResponse.status}, using JSON content`);
-                    // Fallback to JSON content
-                    article.difficulty_summary = currentLanguage === 'en' ? article.summary_en : article.summary_zh;
-                    article.difficulty_keywords = article.keywords || [];
-                    article.difficulty_background = '';
-                    article.difficulty_pro = '';
-                    article.difficulty_con = '';
-                }
+                const summaryField = summaryFieldMap[currentDifficulty] || 'summary_hard';
+                article.difficulty_summary = article[summaryField] || '';
+                article.difficulty_keywords = article.keywords || [];
+                article.difficulty_background = '';
+                article.difficulty_pro = '';
+                article.difficulty_con = '';
                 
-                // Load questions from database by difficulty level
-                console.log(`[loadArticle] Fetching questions for article ${articleId}, difficulty: ${currentDifficulty}`);
-                const questionsUrl = `http://localhost:5001/api/quiz-questions?article_id=${articleId}&difficulty=${currentDifficulty}`;
+                console.log(`[loadArticle] Loaded: summary=${article.difficulty_summary ? 'YES' : 'NO'}, keywords=${article.difficulty_keywords.length}`);
                 
-                try {
-                    const questionsResponse = await fetch(questionsUrl);
-                    if (questionsResponse.ok) {
-                        const questionsData = await questionsResponse.json();
-                        const allQuestions = questionsData.questions || [];
-                        console.log(`[loadArticle] ✓ Got ${allQuestions.length} questions from API for ${currentDifficulty} difficulty`);
-                        
-                        selectedQuestions = allQuestions.sort(() => Math.random() - 0.5).slice(0, 5);
-                    } else {
-                        console.log(`[loadArticle] ✗ Questions API returned ${questionsResponse.status}, using empty questions`);
-                        selectedQuestions = [];
-                    }
-                } catch (error) {
-                    console.error(`[loadArticle] Error fetching questions:`, error);
-                    selectedQuestions = [];
-                }
+                // No questions loaded from API (not available in static mode)
+                selectedQuestions = [];
                 
                 selectedQuestions.forEach((q, i) => answers[i] = null);
                 
