@@ -141,6 +141,8 @@
         function changeArticleLanguage(articleId, lang, button) {
             currentLanguage = lang;
             localStorage.setItem('selectedLanguage', lang);
+            console.log(`[changeArticleLanguage] Changed to: ${lang}`);
+            
             const buttons = button.parentElement.querySelectorAll('.article-lang-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
@@ -150,6 +152,7 @@
                 const keywords = categoryMap[category] || categoryMap['world'];
                 return keywords.some(keyword => article.source.toLowerCase().includes(keyword.toLowerCase()));
             });
+            console.log(`[changeArticleLanguage] Rendering ${filtered.length} articles with language: ${lang}`);
             renderArticles(filtered);
         }
 
@@ -180,6 +183,9 @@
                 let displaySummary = article[summaryField] || article.summary_en || '';
                 if (currentLanguage === 'zh') {
                     displaySummary = article.summary_zh || article[summaryField] || article.summary_en || '';
+                    console.log(`[renderArticles] Article ${article.id}: Using summary_zh (${displaySummary.length} chars)`);
+                } else {
+                    console.log(`[renderArticles] Article ${article.id}: Using summary_en (${displaySummary.length} chars)`);
                 }
                 
                 const keywordsHtml = keywords && keywords.length > 0 ? `
