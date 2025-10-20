@@ -35,8 +35,23 @@ def init_database():
         """)
         print("✓ Categories table created")
         
-        # 2. Difficulty levels table
-        print("[2/11] Creating difficulty_levels table...")
+        # 2. Feeds table
+        print("[2/13] Creating feeds table...")
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS feeds (
+                feed_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                feed_name TEXT NOT NULL,
+                feed_url TEXT NOT NULL,
+                category_id INTEGER NOT NULL,
+                active BOOLEAN DEFAULT 1,
+                created_at TEXT,
+                FOREIGN KEY (category_id) REFERENCES categories(category_id)
+            )
+        """)
+        print("✓ Feeds table created")
+        
+        # 3. Difficulty levels table
+        print("[3/13] Creating difficulty_levels table...")
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS difficulty_levels (
                 difficulty_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -47,8 +62,8 @@ def init_database():
         """)
         print("✓ Difficulty levels table created")
         
-        # 3. Languages table
-        print("[3/11] Creating languages table...")
+        # 4. Languages table
+        print("[4/13] Creating languages table...")
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS languages (
                 language_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -58,7 +73,7 @@ def init_database():
         print("✓ Languages table created")
         
         # 4. Articles table
-        print("[4/11] Creating articles table...")
+        print("[4/13] Creating articles table...")
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS articles (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -79,7 +94,7 @@ def init_database():
         print("✓ Articles table created")
         
         # 5. Article images table
-        print("[5/11] Creating article_images table...")
+        print("[5/13] Creating article_images table...")
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS article_images (
                 image_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -94,7 +109,7 @@ def init_database():
         print("✓ Article images table created")
         
         # 6. Article summaries table
-        print("[6/11] Creating article_summaries table...")
+        print("[6/13] Creating article_summaries table...")
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS article_summaries (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -111,7 +126,7 @@ def init_database():
         print("✓ Article summaries table created")
         
         # 7. Keywords table
-        print("[7/11] Creating keywords table...")
+        print("[7/13] Creating keywords table...")
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS keywords (
                 word_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -126,7 +141,7 @@ def init_database():
         print("✓ Keywords table created")
         
         # 8. Questions table
-        print("[8/11] Creating questions table...")
+        print("[8/13] Creating questions table...")
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS questions (
                 question_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -141,7 +156,7 @@ def init_database():
         print("✓ Questions table created")
         
         # 9. Choices table
-        print("[9/11] Creating choices table...")
+        print("[9/13] Creating choices table...")
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS choices (
                 choice_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -156,7 +171,7 @@ def init_database():
         print("✓ Choices table created")
         
         # 10. Comments table (for perspectives)
-        print("[10/12] Creating comments table...")
+        print("[10/13] Creating comments table...")
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS comments (
                 comment_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -356,6 +371,36 @@ def populate_lookup_tables(conn, cursor):
                 print(f"  ✓ Added category: {category_name} (prompt: {prompt_name})")
             except sqlite3.IntegrityError:
                 print(f"  → Category '{category_name}' already exists")
+        
+        # Populate feeds table
+        print("\n[4/4] Populating feeds table...")
+        feeds_data = [
+            ('US News', 'https://feeds.nytimes.com/services/xml/rss/nyt/US.xml', 'US News'),
+            ('Swimming', 'https://www.swimmingworldmagazine.com/feed/', 'Swimming'),
+            ('Technology', 'https://feeds.arstechnica.com/arstechnica/index', 'Technology'),
+            ('Science', 'https://feeds.arstechnica.com/arstechnica/science', 'Science'),
+            ('Politics', 'https://feeds.nytimes.com/services/xml/rss/nyt/Politics.xml', 'Politics'),
+            ('PBS', 'https://www.pbs.org/newshour/feeds/rss/headlines', 'PBS')
+        ]
+        
+        for feed_name, feed_url, category_name in feeds_data:
+            try:
+                # Get category_id for this feed
+                cursor.execute("""
+                    SELECT category_id FROM categories WHERE category_name = ?
+                """, (category_name,))
+                result = cursor.fetchone()
+                if result:
+                    category_id = result[0]
+                    cursor.execute("""
+                        INSERT INTO feeds (feed_name, feed_url, category_id, created_at)
+                        VALUES (?, ?, ?, ?)
+                    """, (feed_name, feed_url, category_id, now))
+                    print(f"  ✓ Added feed: {feed_name} -> {category_name}")
+                else:
+                    print(f"  ✗ Category '{category_name}' not found for feed '{feed_name}'")
+            except sqlite3.IntegrityError as e:
+                print(f"  → Feed '{feed_name}' already exists: {e}")
         
         conn.commit()
         print("\n✓ All lookup tables populated successfully!")

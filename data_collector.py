@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 Data Collector - RSS Feed Crawler
-Collects articles from various RSS feeds and stores them in articles table.
-Maps sources to categories automatically.
+Collects articles from various RSS feeds stored in the database and stores them in articles table.
+Maps sources to categories automatically from feeds table.
 """
 
 import sqlite3
@@ -14,41 +14,18 @@ import pathlib
 
 DB_FILE = pathlib.Path("articles.db")
 
-# RSS Feed sources and category mapping
-RSS_FEEDS = {
-    "US News": {
-        "url": "https://feeds.nytimes.com/services/xml/rss/nyt/US.xml",
-        "category": "US News"
-    },
-    "Swimming": {
-        "url": "https://www.swimmingworldmagazine.com/feed/",
-        "category": "Swimming"
-    },
-    "Technology": {
-        "url": "https://feeds.arstechnica.com/arstechnica/index",
-        "category": "Technology"
-    },
-    "Science": {
-        "url": "https://feeds.arstechnica.com/arstechnica/science",
-        "category": "Science"
-    },
-    "Politics": {
-        "url": "https://feeds.nytimes.com/services/xml/rss/nyt/Politics.xml",
-        "category": "Politics"
-    },
-    "PBS": {
-        "url": "https://www.pbs.org/newshour/feeds/rss/headlines",
-        "category": "PBS"
-    }
-}
 
-
-def get_category_id(conn, category_name):
-    """Get category_id from database."""
+def get_feeds_from_db(conn):
+    """Query all active feeds from database."""
     cursor = conn.cursor()
-    cursor.execute("SELECT category_id FROM categories WHERE category_name = ?", (category_name,))
-    result = cursor.fetchone()
-    return result[0] if result else None
+    cursor.execute("""
+        SELECT f.feed_id, f.feed_name, f.feed_url, f.category_id, c.category_name
+        FROM feeds f
+        JOIN categories c ON f.category_id = c.category_id
+        WHERE f.active = 1
+        ORDER BY f.feed_name
+    """)
+    return cursor.fetchall()
 
 
 def article_exists(conn, url):
@@ -156,7 +133,7 @@ def parse_rss_feed(feed_url, source_name, category_id, max_articles=1):
 
 
 def collect_articles(num_per_source=1):
-    """Collect articles from RSS feeds."""
+    """Collect articles from RSS feeds stored in database."""
     
     if not DB_FILE.exists():
         print(f"✗ Database not found: {DB_FILE}")
@@ -169,20 +146,24 @@ def collect_articles(num_per_source=1):
     print("="*70)
     print(f"Target: {num_per_source} article(s) per source")
     
+    # Get feeds from database
+    feeds = get_feeds_from_db(conn)
+    
+    if not feeds:
+        print("✗ No active feeds found in database")
+        conn.close()
+        return False
+    
+    print(f"Found {len(feeds)} active feed(s)")
+    
     collected = 0
     duplicates = 0
     
-    for source_name, feed_info in RSS_FEEDS.items():
-        print(f"\n[{source_name}]")
-        
-        # Get category_id
-        category_id = get_category_id(conn, feed_info['category'])
-        if not category_id:
-            print(f"  ✗ Category not found: {feed_info['category']}")
-            continue
+    for feed_id, feed_name, feed_url, category_id, category_name in feeds:
+        print(f"\n[{feed_name}]")
         
         # Fetch RSS feed
-        articles = parse_rss_feed(feed_info['url'], source_name, category_id, num_per_source)
+        articles = parse_rss_feed(feed_url, feed_name, category_id, num_per_source)
         
         # Insert articles
         for article in articles:
