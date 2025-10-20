@@ -452,27 +452,30 @@ def process_with_deepseek(conn: sqlite3.Connection, test_mode: bool = False) -> 
         
         try:
             # Create prompt for Deepseek
-            prompt = f"""Analyze this article and provide summaries for three reading levels:
+            prompt = f"""Analyze this article and provide summaries in BOTH English and Chinese (Simplified).
 
 ARTICLE TITLE: {title}
 
 ARTICLE CONTENT:
 {content}
 
-Please provide:
-1. ELEMENTARY (ages 8-11): Simple summary using easy words
-2. MIDDLE (ages 12-14): Medium-complexity summary
-3. HIGH (ages 15+): Advanced summary with context
+Please provide ONE summary for each language at the SAME reading level (elementary/simple level).
 
 Format your response as JSON:
 {{
     "summaries": {{
-        "elementary": "...",
-        "middle": "...",
-        "high": "..."
+        "elementary_en": "Simple summary in English using easy words (ages 8-11)",
+        "elementary_zh": "简单的中文摘要,用简单的词语(8-11岁)"
     }},
     "language": "en"
-}}"""
+}}
+
+IMPORTANT NOTES:
+- Write the English summary at elementary/simple level
+- Write the Chinese summary at the SAME simple/elementary level
+- Use clear, easy language in both versions
+- Keep both summaries roughly the same length
+- Both should be appropriate for children to understand"""
             
             # Call Deepseek API
             headers = {
@@ -811,7 +814,9 @@ def generate_articles_data(conn: sqlite3.Connection) -> None:
             a.image_url,
             GROUP_CONCAT(CASE WHEN s.difficulty = 'elementary' THEN s.summary END) as summary_elementary,
             GROUP_CONCAT(CASE WHEN s.difficulty = 'middle' THEN s.summary END) as summary_middle,
-            GROUP_CONCAT(CASE WHEN s.difficulty = 'high' THEN s.summary END) as summary_high
+            GROUP_CONCAT(CASE WHEN s.difficulty = 'high' THEN s.summary END) as summary_high,
+            GROUP_CONCAT(CASE WHEN s.difficulty = 'elementary_en' THEN s.summary END) as summary_elementary_en,
+            GROUP_CONCAT(CASE WHEN s.difficulty = 'elementary_zh' THEN s.summary END) as summary_elementary_zh
         FROM articles a
         LEFT JOIN article_summaries s ON a.id = s.article_id
         WHERE a.deepseek_processed = 1
@@ -824,7 +829,7 @@ def generate_articles_data(conn: sqlite3.Connection) -> None:
     # Build articles data with language support and all difficulty levels
     articles_data = []
     for row in articles:
-        article_id, title, date, source, content, image_local, image_url, summary_elem, summary_mid, summary_high = row
+        article_id, title, date, source, content, image_local, image_url, summary_elem, summary_mid, summary_high, summary_elem_en, summary_elem_zh = row
         
         # Use local image if available, otherwise use original URL, fallback to placeholder
         if image_local:
@@ -847,8 +852,8 @@ def generate_articles_data(conn: sqlite3.Connection) -> None:
             "summary_easy": summary_elem or "",
             "summary_medium": summary_mid or "",
             "summary_hard": summary_high or "",
-            "summary_en": summary_elem or "",  # English = Easy version
-            "summary_zh": summary_high or summary_mid or "",  # Chinese button = Hard version (most detailed)
+            "summary_en": summary_elem_en or summary_elem or "",  # English version (if generated from Deepseek)
+            "summary_zh": summary_elem_zh or "",  # Chinese version (if generated from Deepseek)
             "keywords": keywords_list
         })
     
