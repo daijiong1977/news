@@ -65,7 +65,10 @@ SOURCES = {
 DB_FILE = pathlib.Path("articles.db")
 OUTPUT_DIR = pathlib.Path("output")
 CONTENT_DIR = pathlib.Path("content")
-IMAGES_DIR = pathlib.Path("images")
+IMAGES_DIR = pathlib.Path("output/images")
+
+# Create images directory if it doesn't exist
+IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
 # Try to import deepseek key from environment
 DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "sk-3fa37d1185514b7fbcd4c1ab8b7643db")
@@ -167,10 +170,11 @@ def fetch_rss_feed(url: str, max_articles: int = 5) -> list[dict[str, str]]:
         return []
 
 
-def fetch_article_content(url: str) -> str:
-    """Fetch full article content from URL."""
+def fetch_article_content(url: str) -> tuple[str, Optional[str]]:
+    """Fetch full article content from URL and extract first image."""
     import urllib.request
     from html.parser import HTMLParser
+    import re
     
     try:
         headers = {
@@ -179,6 +183,22 @@ def fetch_article_content(url: str) -> str:
         req = urllib.request.Request(url, headers=headers)
         with urllib.request.urlopen(req, timeout=10) as response:
             html_data = response.read().decode('utf-8', errors='ignore')
+        
+        # Extract first image URL
+        image_url = None
+        img_pattern = r'<img[^>]+src=["\']([^"\']+)["\']'
+        img_matches = re.findall(img_pattern, html_data)
+        
+        if img_matches:
+            # Take the first image that looks legit (not tiny tracking pixel)
+            for img in img_matches:
+                if 'http' in img and len(img) > 50:
+                    image_url = img
+                    break
+            
+            # If still no good image, take the first one
+            if not image_url and img_matches:
+                image_url = img_matches[0]
         
         # Simple content extraction - get all text from <p> tags
         class ParagraphExtractor(HTMLParser):
@@ -218,11 +238,52 @@ def fetch_article_content(url: str) -> str:
         parser.feed(html_data)
         content = "\n\n".join(parser.paragraphs[:10])  # Take first 10 paragraphs
         
-        return content if content else "Content extraction failed"
+        return (content if content else "Content extraction failed", image_url)
     
     except Exception as e:
         print(f"  Error fetching article content: {e}", file=sys.stderr)
-        return ""
+        return ("", None)
+
+
+def download_and_save_image(image_url: str, article_id: int) -> Optional[str]:
+    """Download image from URL and save locally, return relative path."""
+    if not image_url or not image_url.startswith('http'):
+        return None
+    
+    try:
+        import urllib.request
+        from pathlib import Path
+        
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        }
+        req = urllib.request.Request(image_url, headers=headers)
+        
+        with urllib.request.urlopen(req, timeout=5) as response:
+            image_data = response.read()
+        
+        # Determine file extension from URL or content-type
+        ext = '.jpg'
+        if '.png' in image_url.lower():
+            ext = '.png'
+        elif '.gif' in image_url.lower():
+            ext = '.gif'
+        elif '.webp' in image_url.lower():
+            ext = '.webp'
+        
+        # Save image locally
+        image_filename = f"article_{article_id}{ext}"
+        image_path = IMAGES_DIR / image_filename
+        
+        with open(image_path, 'wb') as f:
+            f.write(image_data)
+        
+        # Return relative URL path for web access
+        return f"/output/images/{image_filename}"
+    
+    except Exception as e:
+        print(f"  ⚠ Failed to download image from {image_url}: {e}", file=sys.stderr)
+        return None
 
 
 def crawl_sources(conn: sqlite3.Connection, test_mode: bool = False, limit: Optional[int] = None) -> int:
@@ -282,9 +343,9 @@ def crawl_sources(conn: sqlite3.Connection, test_mode: bool = False, limit: Opti
 
 
 def fetch_article_details(conn: sqlite3.Connection, test_mode: bool = False) -> int:
-    """Fetch full content for crawled articles."""
+    """Fetch full content and images for crawled articles."""
     print("\n" + "="*80, file=sys.stderr)
-    print("STEP 2: FETCHING ARTICLE CONTENT", file=sys.stderr)
+    print("STEP 2: FETCHING ARTICLE CONTENT & IMAGES", file=sys.stderr)
     print("="*80, file=sys.stderr)
     
     cursor = conn.cursor()
@@ -301,18 +362,25 @@ def fetch_article_details(conn: sqlite3.Connection, test_mode: bool = False) -> 
     for article_id, url, title in articles:
         print(f"  Fetching: {title[:60]}...", file=sys.stderr)
         
-        content = fetch_article_content(url)
+        content, image_url = fetch_article_content(url)
         
         if content:
+            # Try to download image
+            local_image_url = None
+            if image_url:
+                local_image_url = download_and_save_image(image_url, article_id)
+                if local_image_url:
+                    print(f"    ✓ Downloaded image", file=sys.stderr)
+            
             cursor.execute("""
-                UPDATE articles SET content = ? WHERE id = ?
-            """, (content, article_id))
+                UPDATE articles SET content = ?, image_url = ?, image_local = ? WHERE id = ?
+            """, (content, image_url, local_image_url, article_id))
             conn.commit()
             processed += 1
         
         time.sleep(0.3)  # Be respectful
     
-    print(f"✓ Fetched content for {processed} articles", file=sys.stderr)
+    print(f"✓ Fetched content and images for {processed} articles", file=sys.stderr)
     return processed
 
 
@@ -710,6 +778,8 @@ def generate_articles_data(conn: sqlite3.Connection) -> None:
             a.pub_date as date,
             a.source,
             a.content,
+            a.image_local,
+            a.image_url,
             GROUP_CONCAT(CASE WHEN s.difficulty = 'elementary' THEN s.summary END) as summary_elementary,
             GROUP_CONCAT(CASE WHEN s.difficulty = 'middle' THEN s.summary END) as summary_middle,
             GROUP_CONCAT(CASE WHEN s.difficulty = 'high' THEN s.summary END) as summary_high
@@ -725,7 +795,15 @@ def generate_articles_data(conn: sqlite3.Connection) -> None:
     # Build articles data with language support and all difficulty levels
     articles_data = []
     for row in articles:
-        article_id, title, date, source, content, summary_elem, summary_mid, summary_high = row
+        article_id, title, date, source, content, image_local, image_url, summary_elem, summary_mid, summary_high = row
+        
+        # Use local image if available, otherwise use original URL, fallback to placeholder
+        if image_local:
+            final_image = image_local
+        elif image_url:
+            final_image = image_url
+        else:
+            final_image = f"https://picsum.photos/400/300?random={article_id}"
         
         # Extract keywords from title (simplified)
         title_words = [w for w in title.split() if len(w) > 4]
@@ -736,7 +814,7 @@ def generate_articles_data(conn: sqlite3.Connection) -> None:
             "title": title,
             "date": date or dt.datetime.now().strftime("%Y-%m-%d"),
             "source": source,
-            "image": f"https://picsum.photos/400/300?random={article_id}",  # Real image from placeholder service
+            "image": final_image,  # Real downloaded image or fallback to placeholder
             "summary_easy": summary_elem or "",
             "summary_medium": summary_mid or "",
             "summary_hard": summary_high or "",
