@@ -13,3 +13,5 @@ secrets.json
 articles.db
 subscriptions.db
 /tmp/*.log
+output/
+logs/
