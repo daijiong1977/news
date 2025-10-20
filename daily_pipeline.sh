@@ -71,6 +71,13 @@ print(f"  Article analysis: {analysis}")
 print(f"  Total records: {summaries + keywords + questions + choices + comments + background + analysis}")
 PYSCRIPT
 
+    # Step 5: Send email report (if EMAIL_API_KEY is configured)
+    if [ -n "$EMAIL_API_KEY" ]; then
+        echo ""
+        echo "[SEND] Email report..."
+        bash send_email_report.sh
+    fi
+
 } 2>&1 | tee "$LOG_FILE"
 
 echo "Log saved to: $LOG_FILE"
