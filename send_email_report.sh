@@ -3,16 +3,21 @@
 # Send Email Report of Daily Pipeline Results
 # Uses the email API at https://emailapi.6ray.com
 
-# Configuration
-EMAIL_API_URL="https://emailapi.6ray.com/send-email"
-API_KEY="$EMAIL_API_KEY"  # Should be set from environment
-RECIPIENT_EMAIL="${1:-jidai@6ray.com}"  # Default recipient, or pass as argument
-
-# Get current database stats
 cd /var/www/news
 
-DB_STATS=$(python3 << 'PYSCRIPT'
+RECIPIENT_EMAIL="${1:-jidai@6ray.com}"
+
+python3 << 'PYSCRIPT'
 import sqlite3
+import os
+import json
+import urllib.request
+from datetime import datetime
+
+API_KEY = os.environ.get('EMAIL_API_KEY')
+RECIPIENT = os.environ.get('EMAIL_RECIPIENT', 'jidai@6ray.com')
+
+# Get database stats
 c = sqlite3.connect('articles.db').cursor()
 total = c.execute('SELECT COUNT(*) FROM articles').fetchone()[0]
 processed = c.execute('SELECT COUNT(*) FROM articles WHERE deepseek_processed=1').fetchone()[0]
@@ -23,28 +28,21 @@ comments = c.execute('SELECT COUNT(*) FROM comments').fetchone()[0]
 background = c.execute('SELECT COUNT(*) FROM background_read').fetchone()[0]
 analysis = c.execute('SELECT COUNT(*) FROM article_analysis').fetchone()[0]
 
-print(f"Total Articles: {total}")
-print(f"Processed: {processed}")
-print(f"Summaries: {summaries}")
-print(f"Keywords: {keywords}")
-print(f"Questions: {questions}")
-print(f"Comments: {comments}")
-print(f"Background: {background}")
-print(f"Analysis: {analysis}")
-total_records = summaries + keywords + questions + comments + background + analysis
-print(f"Total Records: {total_records}")
-PYSCRIPT
-)
+# Format message
+message = f"""News Pipeline Report
 
-# Format email body
-TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
-EMAIL_BODY="News Pipeline Report
-=====================
-
-Generated: $TIMESTAMP
+Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
 Database Status:
-$DB_STATS
+  Total Articles: {total}
+  Processed: {processed}
+  Summaries: {summaries}
+  Keywords: {keywords}
+  Questions: {questions}
+  Comments: {comments}
+  Background: {background}
+  Analysis: {analysis}
+  Total Records: {summaries + keywords + questions + comments + background + analysis}
 
 Server: 18.223.121.227
 Database: /var/www/news/articles.db
@@ -53,23 +51,31 @@ Pipeline Status: ACTIVE
 Next Run: Tomorrow at 1:00 AM EST
 
 ---
-Automated Report from Daily News Pipeline"
+Automated Report from Daily News Pipeline"""
 
 # Send email
-if [ -z "$API_KEY" ]; then
-    echo "ERROR: EMAIL_API_KEY environment variable not set"
-    exit 1
-fi
+payload = {
+    "to_email": RECIPIENT,
+    "subject": f"Daily News Pipeline Report - {datetime.now().strftime('%Y-%m-%d')}",
+    "message": message,
+    "from_name": "News Pipeline"
+}
 
-RESPONSE=$(curl -s -X POST "$EMAIL_API_URL" \
-  -H "Content-Type: application/json" \
-  -H "X-API-Key: $API_KEY" \
-  -d "{
-    \"to_email\": \"$RECIPIENT_EMAIL\",
-    \"subject\": \"Daily News Pipeline Report - $TIMESTAMP\",
-    \"message\": \"$EMAIL_BODY\",
-    \"from_name\": \"News Pipeline\"
-  }")
+try:
+    url = 'https://emailapi.6ray.com/send-email'
+    data = json.dumps(payload).encode('utf-8')
+    req = urllib.request.Request(url, data=data, method='POST')
+    req.add_header('Content-Type', 'application/json')
+    req.add_header('X-API-Key', API_KEY)
+    
+    with urllib.request.urlopen(req) as response:
+        result = json.loads(response.read().decode('utf-8'))
+        if response.status == 200:
+            print(f"✓ Email sent successfully to {RECIPIENT}")
+            print(f"  Email ID: {result.get('email_id', 'N/A')}")
+        else:
+            print(f"✗ Error: {result}")
+except Exception as e:
+    print(f"✗ Failed: {str(e)}")
 
-echo "Email Report sent to: $RECIPIENT_EMAIL"
-echo "Response: $RESPONSE"
+PYSCRIPT
