@@ -74,12 +74,18 @@
                     <button class="category-btn" onclick="filterByCategory('tech')">💻 Tech</button>
                     <button class="category-btn" onclick="filterByCategory('sports')">🏊 Sports</button>
                 </div>
-                <div class="difficulty-selector">
-                    <select id="difficulty-filter" onchange="filterByDifficulty(this.value)">
-                        <option value="hard">High</option>
-                        <option value="medium">Mid</option>
-                        <option value="easy">Easy</option>
-                    </select>
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <div class="difficulty-selector">
+                        <select id="difficulty-filter" onchange="filterByDifficulty(this.value)">
+                            <option value="hard">High</option>
+                            <option value="medium">Mid</option>
+                            <option value="easy">Easy</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="article-lang-btn" id="global-en-btn" style="background: #667eea; color: white;" onclick="setGlobalLanguage('en', this)">EN</button>
+                        <button class="article-lang-btn" id="global-zh-btn" onclick="setGlobalLanguage('zh', this)">CN</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -153,6 +159,26 @@
                 return keywords.some(keyword => article.source.toLowerCase().includes(keyword.toLowerCase()));
             });
             console.log(`[changeArticleLanguage] Rendering ${filtered.length} articles with language: ${lang}`);
+            renderArticles(filtered);
+        }
+
+        function setGlobalLanguage(lang, button) {
+            currentLanguage = lang;
+            localStorage.setItem('selectedLanguage', lang);
+            console.log(`[setGlobalLanguage] Global language changed to: ${lang}`);
+            
+            // Update global buttons
+            document.getElementById('global-en-btn').classList.remove('active');
+            document.getElementById('global-zh-btn').classList.remove('active');
+            button.classList.add('active');
+            
+            // Re-render all displayed articles
+            const category = currentCategory || 'world';
+            const filtered = allArticles.filter(article => {
+                const keywords = categoryMap[category] || categoryMap['world'];
+                return keywords.some(keyword => article.source.toLowerCase().includes(keyword.toLowerCase()));
+            });
+            console.log(`[setGlobalLanguage] Re-rendering ${filtered.length} articles with language: ${lang}`);
             renderArticles(filtered);
         }
 
