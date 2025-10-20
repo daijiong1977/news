@@ -43,7 +43,7 @@ def init_database():
                 feed_name TEXT NOT NULL,
                 feed_url TEXT NOT NULL,
                 category_id INTEGER NOT NULL,
-                active BOOLEAN DEFAULT 1,
+                enable BOOLEAN DEFAULT 1,
                 created_at TEXT,
                 FOREIGN KEY (category_id) REFERENCES categories(category_id)
             )

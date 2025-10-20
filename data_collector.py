@@ -16,13 +16,13 @@ DB_FILE = pathlib.Path("articles.db")
 
 
 def get_feeds_from_db(conn):
-    """Query all active feeds from database."""
+    """Query all enabled feeds from database."""
     cursor = conn.cursor()
     cursor.execute("""
         SELECT f.feed_id, f.feed_name, f.feed_url, f.category_id, c.category_name
         FROM feeds f
         JOIN categories c ON f.category_id = c.category_id
-        WHERE f.active = 1
+        WHERE f.enable = 1
         ORDER BY f.feed_name
     """)
     return cursor.fetchall()
