@@ -205,7 +205,8 @@
                 
                 return `
                 <div class="article-card">
-                    <div class="article-image placeholder">
+                    <img src="${article.image}" alt="${article.title}" class="article-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="article-image placeholder" style="display: none;">
                         📰
                     </div>
                     <div class="article-content">
