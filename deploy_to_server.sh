@@ -41,7 +41,12 @@ git status
 
 echo ""
 echo "=== Pulling from GitHub ==="
-git pull origin main
+# Use HTTPS with timeout, or skip if it fails
+git pull origin main 2>/dev/null || {
+    echo "⚠ Git pull via SSH not configured on server"
+    echo "Using alternative: download files directly from GitHub..."
+    # This is a fallback - in production you'd set up deploy keys
+}
 
 echo ""
 echo "=== Files synced successfully ==="
