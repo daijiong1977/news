@@ -678,6 +678,64 @@ def generate_index_page(conn: sqlite3.Connection) -> None:
     print(f"✓ Generated index page: {index_file}", file=sys.stderr)
 
 
+def generate_articles_data(conn: sqlite3.Connection) -> None:
+    """Generate articles_data.json for the main interface."""
+    print(f"\nGenerating articles_data.json...", file=sys.stderr)
+    
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT 
+            a.id,
+            a.title,
+            a.pub_date as date,
+            a.source,
+            a.content,
+            GROUP_CONCAT(CASE WHEN s.difficulty = 'elementary' THEN s.summary END) as summary_elementary,
+            GROUP_CONCAT(CASE WHEN s.difficulty = 'middle' THEN s.summary END) as summary_middle,
+            GROUP_CONCAT(CASE WHEN s.difficulty = 'high' THEN s.summary END) as summary_high
+        FROM articles a
+        LEFT JOIN article_summaries s ON a.id = s.article_id
+        WHERE a.deepseek_processed = 1
+        GROUP BY a.id
+        ORDER BY a.processed_at DESC
+    """)
+    
+    articles = cursor.fetchall()
+    
+    # Build articles data with language support
+    articles_data = []
+    for row in articles:
+        article_id, title, date, source, content, summary_elem, summary_mid, summary_high = row
+        
+        # Use elementary level as default English summary
+        summary_en = summary_elem or summary_mid or summary_high or ""
+        
+        # For now, use middle as Chinese translation placeholder
+        summary_zh = summary_mid or summary_elem or ""
+        
+        # Extract keywords from title (simplified)
+        title_words = [w for w in title.split() if len(w) > 4]
+        keywords_list = title_words[:5] if title_words else ["News", "Article"]
+        
+        articles_data.append({
+            "id": article_id,
+            "title": title,
+            "date": date or dt.datetime.now().strftime("%Y-%m-%d"),
+            "source": source,
+            "image": f"output/article_{article_id}.html",  # Link to article
+            "summary_en": summary_en,
+            "summary_zh": summary_zh,
+            "keywords": keywords_list
+        })
+    
+    # Write JSON file
+    data_file = OUTPUT_DIR / "articles_data.json"
+    with open(data_file, "w", encoding="utf-8") as f:
+        json.dump(articles_data, f, ensure_ascii=False, indent=2)
+    
+    print(f"✓ Generated articles_data.json: {data_file} ({len(articles_data)} articles)", file=sys.stderr)
+
+
 def main() -> None:
     """Run the full pipeline."""
     parser = argparse.ArgumentParser(
@@ -725,6 +783,7 @@ def main() -> None:
         if not args.skip_pages:
             generate_pages(conn, test_mode=args.test)
             generate_index_page(conn)
+            generate_articles_data(conn)
         
         print("\n" + "="*80, file=sys.stderr)
         print("✓ PIPELINE COMPLETE", file=sys.stderr)

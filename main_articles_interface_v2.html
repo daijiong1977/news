@@ -298,7 +298,7 @@
                 
                 document.getElementById('difficulty-filter').value = currentDifficulty;
                 
-                const response = await fetch('/articles_data.json');
+                const response = await fetch('/output/articles_data.json');
                 if (!response.ok) throw new Error('Failed to load articles');
                 allArticles = await response.json();
                 
