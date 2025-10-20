@@ -286,6 +286,35 @@ def download_and_save_image(image_url: str, article_id: int) -> Optional[str]:
         return None
 
 
+def download_all_images(conn: sqlite3.Connection) -> None:
+    """Download all article images that don't have local copies."""
+    print("\n" + "="*80, file=sys.stderr)
+    print("DOWNLOADING ARTICLE IMAGES", file=sys.stderr)
+    print("="*80, file=sys.stderr)
+    
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT id, image_url FROM articles 
+        WHERE image_url IS NOT NULL AND image_local IS NULL
+        AND deepseek_processed = 1
+    """)
+    
+    articles = cursor.fetchall()
+    print(f"Found {len(articles)} articles with images to download...", file=sys.stderr)
+    
+    downloaded = 0
+    for article_id, image_url in articles:
+        local_path = download_and_save_image(image_url, article_id)
+        if local_path:
+            cursor.execute("UPDATE articles SET image_local = ? WHERE id = ?", (local_path, article_id))
+            conn.commit()
+            downloaded += 1
+            print(f"  ✓ Downloaded image {downloaded}/{len(articles)}", file=sys.stderr)
+        time.sleep(0.2)
+    
+    print(f"✓ Downloaded {downloaded} article images", file=sys.stderr)
+
+
 def crawl_sources(conn: sqlite3.Connection, test_mode: bool = False, limit: Optional[int] = None) -> int:
     """Crawl all configured RSS sources and store in database."""
     print("\n" + "="*80, file=sys.stderr)
@@ -876,6 +905,9 @@ def main() -> None:
         
         # Step 4: Generate pages
         if not args.skip_pages:
+            # Download all article images first
+            download_all_images(conn)
+            
             generate_pages(conn, test_mode=args.test)
             generate_index_page(conn)
             generate_articles_data(conn)
