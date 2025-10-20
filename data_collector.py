@@ -37,7 +37,7 @@ RSS_FEEDS = {
         "category": "Politics"
     },
     "PBS": {
-        "url": "https://www.pbs.org/newshour/feed",
+        "url": "https://www.pbs.org/newshour/feeds/rss/headlines",
         "category": "PBS"
     }
 }
