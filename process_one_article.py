@@ -20,7 +20,7 @@ if not api_key:
     sys.exit(1)
 
 # Configuration
-DB_PATH = '/Users/jidai/news/articles.db'
+DB_PATH = os.path.join(os.getcwd(), 'articles.db')
 API_URL = 'https://api.deepseek.com/chat/completions'
 OUTPUT_DIR = os.getcwd()
 
