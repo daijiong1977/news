@@ -1,0 +1,45 @@
+{
+  "rss_sources": [
+    {
+      "name": "PBS NewsHour",
+      "url": "https://www.pbs.org/newshour/feeds/rss/headlines",
+      "enabled": true
+    },
+    {
+      "name": "Swimming World Magazine",
+      "url": "https://www.swimmingworldmagazine.com/news/feed/",
+      "enabled": true
+    },
+    {
+      "name": "TechRadar",
+      "url": "https://www.techradar.com/rss",
+      "enabled": true
+    },
+    {
+      "name": "Science Daily",
+      "url": "https://www.sciencedaily.com/rss/top.xml",
+      "enabled": true
+    },
+    {
+      "name": "BBC News",
+      "url": "http://feeds.bbc.co.uk/news/rss.xml",
+      "enabled": false
+    }
+  ],
+  "smtp": {
+    "enabled": false,
+    "gmail_address": "your-email@gmail.com",
+    "gmail_app_password": ""
+  },
+  "recipients": [
+    "recipient1@example.com",
+    "recipient2@example.com"
+  ],
+  "digest_settings": {
+    "articles_per_source": 5,
+    "hours_lookback": 24,
+    "include_images": true,
+    "output_html": "daily_digest.html",
+    "output_json": "daily_digest.json"
+  }
+}

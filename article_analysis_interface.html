@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article Analysis Interface - Learning Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ==================== ARTICLE PREVIEW SECTION ==================== */
+        .article-preview {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        .preview-header {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 30px;
+            padding: 40px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .preview-content h1 {
+            font-size: 2em;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+
+        .preview-meta {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .preview-image {
+            width: 300px;
+            height: 200px;
+            border-radius: 8px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .preview-snippet {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-style: italic;
+            padding: 15px;
+            background: rgba(255,255,255,0.5);
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+        }
+
+        .language-toggle {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .lang-btn {
+            padding: 8px 16px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .lang-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .lang-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        /* ==================== SUMMARY SECTION ==================== */
+        .section {
+            background: white;
+            padding: 40px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 8px;
+            height: 30px;
+            background: #667eea;
+            border-radius: 4px;
+        }
+
+        .summary-text {
+            line-height: 1.9;
+            color: #333;
+            font-size: 1.15em;
+            text-align: justify;
+            font-weight: 500;
+        }
+
+        /* ==================== KEYWORDS SECTION ==================== */
+        .keywords-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .keyword-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s;
+        }
+
+        .keyword-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .keyword-word {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .keyword-explanation {
+            font-size: 0.9em;
+            line-height: 1.4;
+            opacity: 0.95;
+        }
+
+        /* ==================== BACKGROUND READING SECTION ==================== */
+        .background-box {
+            background: #f8f9ff;
+            padding: 25px;
+            border-left: 5px solid #667eea;
+            border-radius: 8px;
+            line-height: 1.9;
+            color: #333;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        /* ==================== DIVE BUTTON ==================== */
+        .dive-button-container {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .dive-button {
+            padding: 18px 50px;
+            font-size: 1.1em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s;
+        }
+
+        .dive-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        .dive-button:active {
+            transform: translateY(-1px);
+        }
+
+        /* ==================== DETAILED ANALYSIS SECTION (Hidden initially) ==================== */
+        .detailed-section {
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .detailed-section.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ==================== QUIZ SECTION ==================== */
+        .quiz-container {
+            background: white;
+            padding: 40px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .quiz-question {
+            margin-bottom: 40px;
+            padding: 25px;
+            background: #f8f9ff;
+            border-radius: 8px;
+            border-left: 5px solid #667eea;
+        }
+
+        .quiz-question-number {
+            font-size: 0.9em;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .quiz-question-text {
+            font-size: 1.1em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .quiz-options {
+            display: grid;
+            gap: 12px;
+        }
+
+        .quiz-option {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quiz-option:hover {
+            background: #f0f4ff;
+            border-color: #667eea;
+        }
+
+        .quiz-option input[type="radio"] {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .quiz-option label {
+            flex: 1;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .quiz-option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .quiz-option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+
+        /* ==================== TWO-SIDED DISCUSSION ==================== */
+        .discussion-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .perspective {
+            background: #f8f9ff;
+            padding: 25px;
+            border-radius: 8px;
+            border-top: 4px solid #667eea;
+        }
+
+        .perspective h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .perspective ul {
+            margin-left: 20px;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        .perspective li {
+            margin-bottom: 10px;
+        }
+
+        .synthesis-box {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 5px solid #667eea;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        /* ==================== USER RESPONSE SECTION ==================== */
+        .response-section {
+            background: white;
+            padding: 40px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.05em;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea.form-input {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1em;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-reset {
+            background: #e0e0e0;
+            color: #2c3e50;
+        }
+
+        .btn-reset:hover {
+            background: #d0d0d0;
+        }
+
+        /* ==================== RESULTS SECTION ==================== */
+        .results-section {
+            background: white;
+            padding: 40px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+        }
+
+        .score-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .score-percentage {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .score-label {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .feedback-box {
+            background: #f8f9ff;
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 5px solid #667eea;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .correction {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 6px;
+            border-left: 4px solid #dc3545;
+        }
+
+        .correction-title {
+            font-weight: bold;
+            color: #dc3545;
+            margin-bottom: 10px;
+        }
+
+        .original-text {
+            padding: 10px;
+            background: #fff3cd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-family: monospace;
+        }
+
+        .corrected-text {
+            padding: 10px;
+            background: #d4edda;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-family: monospace;
+        }
+
+        .better-suggestion {
+            padding: 10px;
+            background: #cfe2ff;
+            border-radius: 4px;
+            font-style: italic;
+        }
+
+        .retry-button {
+            margin-top: 20px;
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 768px) {
+            .preview-header {
+                grid-template-columns: 1fr;
+            }
+
+            .preview-image {
+                width: 100%;
+                height: 250px;
+            }
+
+            .discussion-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ==================== ARTICLE PREVIEW ==================== -->
+        <div class="article-preview">
+            <div class="preview-header">
+                <div class="preview-content">
+                    <h1>World Cup Westmont - Day Three Finals: Lani Pallister Pops Aussie Record in 1500 Freestyle</h1>
+                    <div class="preview-meta">
+                        <div class="meta-item">📅 October 19, 2025</div>
+                        <div class="meta-item">🏊 Swimming World Magazine</div>
+                    </div>
+                    <p class="preview-snippet">
+                        "Just one session remains of the World Cup stop. Lani Pallister achieved a remarkable performance in the women's 1500-meter freestyle event, setting a new Australian national record."
+                    </p>
+                    <div class="language-toggle">
+                        <button class="lang-btn active" onclick="showLanguage('en')">English Summary</button>
+                        <button class="lang-btn" onclick="showLanguage('zh')">中文摘要</button>
+                    </div>
+                </div>
+                <img src="images/article_6_7e2075ef.jpg" alt="Lani Pallister" class="preview-image">
+            </div>
+        </div>
+
+        <!-- ==================== SUMMARY SECTION ==================== -->
+        <div class="section">
+            <div class="section-title">📖 AI-Generated Summary</div>
+            <div id="summary-en" class="summary-text">
+During the World Cup swimming competition in Westmont, Australian swimmer Lani Pallister achieved a remarkable performance in the women's 1500-meter freestyle event, setting a new Australian national record with a time of 15:13.83. This achievement places her as the second-fastest performer in history for this distance, trailing only American swimming legend Katie Ledecky, who holds the world record at 15:08.24. Pallister's performance represented a significant improvement of nearly eight seconds from her previous Australian record of 15:21.43, which she had established at the 2022 World Short Course Championships in Melbourne. The competition featured several other notable performances, including American Regan Smith equaling her world record in the 100-meter backstroke and setting an American record in the 200-meter butterfly, while Australian teammate Mollie O'Callaghan broke the world record in the 200-meter freestyle. In the 1500-meter freestyle final, Pallister finished well ahead of second-place finisher Erika Fairweather of New Zealand, who clocked 15:30.22. The event was part of the third day of finals at the World Cup stop in Westmont, with one remaining session scheduled. Other notable swimmers competing included Americans Shaine Casas, who won the 400-meter individual medley, and Carson Foster, who placed second in that event. The competition demonstrated the high level of international swimming talent currently competing on the World Cup circuit, with multiple national and world records being challenged throughout the event.
+            </div>
+            <div id="summary-zh" class="summary-text" style="display: none;">
+在韦斯特蒙特举行的世界杯游泳比赛中，澳大利亚游泳选手拉尼·帕利斯特在女子1500米自由泳项目中取得了卓越表现，以15分13秒83的成绩创造了新的澳大利亚国家纪录。这一成就使她成为该项目历史上第二快的选手，仅次于保持世界纪录（15分08秒24）的美国游泳传奇人物凯蒂·莱德基。帕利斯特的表现相比她在2022年墨尔本世界短池游泳锦标赛上创造的15分21秒43的澳大利亚纪录提高了近八秒。比赛期间还有其他值得注意的表现，包括美国选手里根·史密斯在100米仰泳中追平了自己的世界纪录，并在200米蝶泳中创造了美国纪录，而澳大利亚队友莫莉·奥卡拉汉则打破了200米自由泳的世界纪录。在1500米自由泳决赛中，帕利斯特遥遥领先于获得第二的新西兰选手埃里卡·费尔韦瑟（成绩为15分30秒22）。这是韦斯特蒙特世界杯分站赛第三天的决赛项目，还剩下一场比赛日程。其他参赛的著名游泳选手包括赢得400米个人混合泳的美国选手谢恩·卡萨斯，以及在该项目中获得第二名的卡森·福斯特。比赛展示了当前世界杯巡回赛中国际游泳人才的高水平，整个赛事期间多个国家和世界纪录受到挑战。
+            </div>
+        </div>
+
+        <!-- ==================== KEYWORDS SECTION ==================== -->
+        <div class="section">
+            <div class="section-title">🔑 Key Terms & Concepts</div>
+            <div class="keywords-grid">
+                <div class="keyword-card">
+                    <div class="keyword-word">1500-meter freestyle</div>
+                    <div class="keyword-explanation">The longest swimming event in Olympic competition, requiring exceptional endurance and pacing strategy. Pallister's record-breaking performance demonstrates her superior stamina and technical proficiency.</div>
+                </div>
+
+                <div class="keyword-card">
+                    <div class="keyword-word">Australian record</div>
+                    <div class="keyword-explanation">The fastest time ever achieved by an Australian swimmer in a particular event. Pallister's breaking of this record by nearly eight seconds represents a significant milestone in Australian swimming history.</div>
+                </div>
+
+                <div class="keyword-card">
+                    <div class="keyword-word">World Cup stop</div>
+                    <div class="keyword-explanation">An individual competition within the FINA Swimming World Cup series, which consists of multiple meets across different global locations where swimmers earn points toward overall series standings.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== BACKGROUND READING ==================== -->
+        <div class="section">
+            <div class="section-title">📚 Background Reading</div>
+            <div class="background-box">
+The FINA Swimming World Cup is an international series of swimming competitions organized by World Aquatics (formerly FINA) that takes place annually across multiple global locations. These events feature both short course (25-meter pool) and long course (50-meter Olympic-size pool) competitions, with swimmers earning points based on their performances to qualify for overall series rankings and prize money. The 1500-meter freestyle is one of swimming's most demanding events, requiring exceptional cardiovascular endurance and mental fortitude. Historically dominated by swimmers like American Katie Ledecky, who holds the world record, this distance event has seen increasing competition from athletes worldwide. Australian swimming has a rich history in distance events, with swimmers like Kieren Perkins and Grant Hackett achieving legendary status. National records in swimming represent the fastest time ever achieved by a swimmer from that country and are significant milestones in an athlete's career. The ranking of 'performers in history' refers to where a swimmer's time places them among all athletes who have ever competed in that event.
+            </div>
+        </div>
+
+        <!-- ==================== DIVE BUTTON ==================== -->
+        <div class="dive-button-container">
+            <button class="dive-button" onclick="diveIntoArticle()">🏊 Dive into the Article</button>
+            <div style="font-size: 0.9em; color: #667eea; margin-top: 10px; font-style: italic;">
+                💡 Opens detailed analysis in a new tab with full AI summary, smart questions, and two-sided discussion
+            </div>
+        </div>
+
+        <!-- ==================== DETAILED ANALYSIS SECTION ==================== -->
+        <div id="detailed-analysis" class="detailed-section">
+
+            <!-- ==================== QUIZ SECTION ==================== -->
+            <div class="quiz-container">
+                <div class="section-title">❓ Test Your Understanding (5 Questions)</div>
+                
+                <form id="quiz-form">
+                    <!-- Question 1 -->
+                    <div class="quiz-question">
+                        <div class="quiz-question-number">Question 1 of 5</div>
+                        <div class="quiz-question-text">What specific Australian record did Lani Pallister break during the World Cup competition?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-option">
+                                <input type="radio" id="q1a" name="q1" value="A">
+                                <label for="q1a">100-meter butterfly record</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" id="q1b" name="q1" value="B">
+                                <label for="q1b">1500-meter freestyle record</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" id="q1c" name="q1" value="C">
+                                <label for="q1c">200-meter individual medley record</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" id="q1d" name="q1" value="D">
+                                <label for="q1d">400-meter freestyle record</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 2 -->
+                    <div class="quiz-question">
+                        <div class="quiz-question-number">Question 2 of 5</div>
+                        <div class="quiz-question-text">What was Lani Pallister's exact time in the 1500-meter freestyle that set the new Australian record?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-option">
+                                <input type="radio" id="q2a" name="q2" value="A">
+                                <label for="q2a">15:08.24</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" id="q2b" name="q2" value="B">
+                                <label for="q2b">15:13.83</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" id="q2c" name="q2" value="C">
+                                <label for="q2c">15:21.43</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" id="q2d" name="q2" value="D">
+                                <label for="q2d">15:30.22</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 3 -->
+                    <div class="quiz-question">
+                        <div class="quiz-question-number">Question 3 of 5</div>
+                        <div class="quiz-question-text">How did Pallister's new record time compare to her previous Australian record?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-option">
+                                <input type="radio" id="q3a" name="q3" value="A">
+                                <label for="q3a">It was nearly eight seconds faster</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" id="q3b" name="q3" value="B">
+                                <label for="q3b">It was two seconds slower</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" id="q3c" name="q3" value="C">
+                                <label for="q3c">It was exactly the same time</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" id="q3d" name="q3" value="D">
+                                <label for="q3d">It was fifteen seconds faster</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 4 -->
+                    <div class="quiz-question">
+                        <div class="quiz-question-number">Question 4 of 5</div>
+                        <div class="quiz-question-text">Why is Pallister's achievement significant in the context of swimming history?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-option">
+                                <input type="radio" id="q4a" name="q4" value="A">
+                                <label for="q4a">She became the first Australian to swim the 1500 freestyle</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" id="q4b" name="q4" value="B">
+                                <label for="q4b">She became the second-fastest performer in history for the event</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" id="q4c" name="q4" value="C">
+                                <label for="q4c">She broke the world record by a large margin</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" id="q4d" name="q4" value="D">
+                                <label for="q4d">She qualified for her first Olympic Games</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 5 -->
+                    <div class="quiz-question">
+                        <div class="quiz-question-number">Question 5 of 5</div>
+                        <div class="quiz-question-text">Why is the 1500-meter freestyle considered particularly challenging in competitive swimming?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-option">
+                                <input type="radio" id="q5a" name="q5" value="A">
+                                <label for="q5a">It requires specialized sprint training techniques</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" id="q5b" name="q5" value="B">
+                                <label for="q5b">It demands exceptional endurance and pacing strategy</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" id="q5c" name="q5" value="C">
+                                <label for="q5c">It involves multiple stroke changes throughout the race</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" id="q5d" name="q5" value="D">
+                                <label for="q5d">It is the shortest Olympic swimming distance</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 40px; text-align: center;">
+                        <button type="button" class="btn btn-submit" onclick="submitQuiz()">Check Answers (100% must pass)</button>
+                        <button type="reset" class="btn btn-reset" style="margin-left: 15px;" onclick="resetQuiz()">Clear Answers</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ==================== TWO-SIDED DISCUSSION ==================== -->
+            <div class="section">
+                <div class="section-title">⚖️ Two-Sided Discussion</div>
+                
+                <div class="discussion-grid">
+                    <div class="perspective">
+                        <h3>✅ Record-breaking Perspective</h3>
+                        <ul>
+                            <li>Frequent record-breaking shows continuous advancement in training methodologies and athletic performance</li>
+                            <li>New technologies and improved understanding of sports science are pushing human performance boundaries in swimming</li>
+                        </ul>
+                    </div>
+
+                    <div class="perspective">
+                        <h3>🤔 Alternative Perspective</h3>
+                        <ul>
+                            <li>Modern swimming records may reflect specialized competition conditions that advantage record attempts</li>
+                            <li>The focus on records might overshadow the development of consistent championship performance across multiple events</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="synthesis-box">
+                    <strong>🔄 Synthesis:</strong><br><br>
+The tension between these perspectives highlights the complex nature of evaluating swimming achievements in the modern era. Pallister's remarkable eight-second improvement on her own national record certainly represents significant athletic development, potentially reflecting advancements in distance swimming training, technique refinement, and race strategy. However, questions remain about how different competition contexts—World Cup events versus major championships—might influence performance outcomes. The World Cup circuit's structure, with its focus on individual performances across multiple meets, may create optimal conditions for record attempts through careful event selection and preparation. Meanwhile, the historical significance of becoming the second-fastest performer ever must be balanced against the need for consistent championship performances when facing the world's best competitors simultaneously. This balanced approach honors the sport's history of achievement while safeguarding its future.
+                </div>
+            </div>
+
+            <!-- ==================== USER RESPONSE SECTION ==================== -->
+            <div class="response-section">
+                <div class="section-title">💬 Your Thoughts & Analysis</div>
+                
+                <div style="background: #fff3cd; padding: 15px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid #ffc107;">
+                    <strong>📝 Instructions:</strong> Answer the quiz above. Then share your own argument below about whether you agree with the discussion. The AI will check your spelling, grammar, and provide feedback.
+                </div>
+
+                <form id="response-form" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">Your Argument (Optional - can be NULL):</label>
+                        <textarea id="user-argument" class="form-input" placeholder="Share your thoughts on the record-breaking achievement and the two perspectives discussed..."></textarea>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-submit">Submit for AI Evaluation</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ==================== RESULTS SECTION ==================== -->
+            <div id="results-section" class="results-section">
+                <div class="section-title">📊 Your Results</div>
+                
+                <div class="score-box">
+                    <div class="score-percentage" id="score-percentage">0%</div>
+                    <div class="score-label" id="score-label">Loading...</div>
+                </div>
+
+                <div id="results-details"></div>
+
+                <div class="feedback-box" id="ai-feedback" style="display: none;">
+                    <strong>🤖 AI Evaluation of Your Argument:</strong>
+                    <div id="feedback-content" style="margin-top: 15px;"></div>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn btn-submit retry-button" onclick="retryQuiz()">Retry Quiz</button>
+                    <button class="btn btn-reset" style="margin-left: 15px;" onclick="backToArticle()">Back to Article</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const correctAnswers = {
+            q1: 'B',
+            q2: 'B',
+            q3: 'A',
+            q4: 'B',
+            q5: 'B'
+        };
+
+        function showLanguage(lang) {
+            document.getElementById('summary-en').style.display = lang === 'en' ? 'block' : 'none';
+            document.getElementById('summary-zh').style.display = lang === 'zh' ? 'block' : 'none';
+            
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function diveIntoArticle() {
+            // Open detailed article page in new tab
+            const articleId = 6;  // This would be dynamic in production
+            const detailPageUrl = `article_pages/article_${articleId}.html`;
+            window.open(detailPageUrl, `article_${articleId}`, 'width=1200,height=800');
+        }
+
+        function submitQuiz() {
+            let correct = 0;
+            let answered = 0;
+            const results = [];
+
+            for (let i = 1; i <= 5; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (selected) {
+                    answered++;
+                    const isCorrect = selected.value === correctAnswers[`q${i}`];
+                    if (isCorrect) correct++;
+                    
+                    results.push({
+                        question: i,
+                        selected: selected.value,
+                        correct: correctAnswers[`q${i}`],
+                        isCorrect: isCorrect
+                    });
+                }
+            }
+
+            if (answered < 5) {
+                alert('Please answer all 5 questions before submitting!');
+                return;
+            }
+
+            const percentage = (correct / 5) * 100;
+            
+            // Show results
+            document.getElementById('quiz-form').style.display = 'none';
+            document.getElementById('results-section').classList.add('active');
+            
+            document.getElementById('score-percentage').textContent = Math.round(percentage) + '%';
+            
+            if (percentage === 100) {
+                document.getElementById('score-label').textContent = '🎉 Perfect Score! Excellent understanding!';
+                document.getElementById('score-label').style.color = '#28a745';
+            } else if (percentage >= 80) {
+                document.getElementById('score-label').textContent = '👍 Good Job! You have the basics down. Want to retry?';
+                document.getElementById('score-label').style.color = '#ffc107';
+            } else {
+                document.getElementById('score-label').textContent = '📚 Keep Learning. Review the material and try again!';
+                document.getElementById('score-label').style.color = '#dc3545';
+            }
+
+            // Show detailed results
+            let resultsHTML = '<div style="margin-top: 20px;">';
+            results.forEach(r => {
+                resultsHTML += `
+                    <div style="background: ${r.isCorrect ? '#d4edda' : '#f8d7da'}; padding: 15px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid ${r.isCorrect ? '#28a745' : '#dc3545'};">
+                        <strong>Question ${r.question}:</strong> ${r.isCorrect ? '✅ Correct!' : '❌ Incorrect'}
+                        <div style="margin-top: 10px; color: #555;">Your answer: <strong>${r.selected}</strong></div>
+                        ${!r.isCorrect ? `<div style="margin-top: 8px; color: #555;">Correct answer: <strong>${r.correct}</strong></div>` : ''}
+                    </div>
+                `;
+            });
+            resultsHTML += '</div>';
+            document.getElementById('results-details').innerHTML = resultsHTML;
+
+            // Show argument feedback form if score >= 80
+            if (percentage >= 80) {
+                document.getElementById('ai-feedback').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('response-form').style.display = 'block';
+                }, 500);
+            }
+
+            // Scroll to results
+            document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetQuiz() {
+            document.getElementById('quiz-form').reset();
+        }
+
+        function retryQuiz() {
+            document.getElementById('quiz-form').style.display = 'block';
+            document.getElementById('results-section').classList.remove('active');
+            document.getElementById('response-form').style.display = 'none';
+            resetQuiz();
+            document.getElementById('quiz-form').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function backToArticle() {
+            document.getElementById('detailed-analysis').classList.remove('active');
+            document.querySelector('.article-preview').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Handle user argument submission
+        document.getElementById('response-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const argument = document.getElementById('user-argument').value;
+            
+            if (!argument.trim()) {
+                alert('Please write your argument or leave it empty to skip.');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('ai-feedback').style.display = 'block';
+            document.getElementById('feedback-content').innerHTML = '<div class="loading"><span class="spinner"></span>Analyzing your argument with AI...</div>';
+
+            // Simulate AI evaluation (in production, this would call backend)
+            setTimeout(() => {
+                const feedback = generateMockAIFeedback(argument);
+                document.getElementById('feedback-content').innerHTML = feedback;
+                document.getElementById('response-form').style.display = 'none';
+            }, 2000);
+        });
+
+        function generateMockAIFeedback(argument) {
+            // Mock AI feedback
+            let feedback = '<strong>Grammar & Spelling Check:</strong><br>';
+            
+            // Simulate finding issues
+            const issues = [];
+            if (argument.includes('thier')) issues.push('their');
+            if (argument.includes('recieve')) issues.push('receive');
+            if (argument.includes('occured')) issues.push('occurred');
+
+            if (issues.length === 0) {
+                feedback += '<p style="color: #28a745; margin: 10px 0;">✅ No spelling or grammar errors detected!</p>';
+            } else {
+                feedback += '<p>Found corrections:</p>';
+                issues.forEach(issue => {
+                    feedback += `
+                        <div class="correction">
+                            <div class="correction-title">Spelling Correction</div>
+                            <div class="original-text">Incorrect: ${issue}</div>
+                            <div class="corrected-text">Correct: ${issue}</div>
+                            <div class="better-suggestion"><strong>Better version:</strong> Consider the context and use in a more sophisticated way.</div>
+                        </div>
+                    `;
+                });
+            }
+
+            feedback += '<br><strong>Content Analysis:</strong><br>';
+            feedback += '<p>Your argument demonstrates good understanding of the article content. You effectively incorporate multiple perspectives and back up your reasoning with specific examples from the text.</p>';
+
+            feedback += '<br><strong>Suggestions for Improvement:</strong><br>';
+            feedback += '<ul style="margin-left: 20px; color: #555;">';
+            feedback += '<li>Consider citing specific numbers or data points from the article</li>';
+            feedback += '<li>Strengthen your conclusion with a clear statement about what you learned</li>';
+            feedback += '<li>Add transition words to improve flow between ideas</li>';
+            feedback += '</ul>';
+
+            return feedback;
+        }
+    </script>
+</body>
+</html>

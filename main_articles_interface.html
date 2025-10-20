@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Articles - Enhanced Learning</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .articles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+        
+        .article-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .article-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .article-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #f0f0f0;
+        }
+        
+        .article-content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .article-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .article-date {
+            font-size: 0.85em;
+            color: #999;
+        }
+        
+        .article-source {
+            font-size: 0.85em;
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .language-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .lang-btn {
+            padding: 4px 10px;
+            border: 1px solid #ddd;
+            background: white;
+            color: #333;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        
+        .lang-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .article-title {
+            font-size: 1.15em;
+            color: #333;
+            margin-bottom: 12px;
+            font-weight: 700;
+            line-height: 1.3;
+            min-height: 50px;
+        }
+        
+        .article-summary {
+            font-size: 0.95em;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            flex-grow: 1;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+        }
+        
+        .article-keywords {
+            margin-bottom: 15px;
+        }
+        
+        .keywords-label {
+            font-size: 0.85em;
+            color: #999;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .keywords-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .keyword-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            background: #f0f0f0;
+            color: #667eea;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            border: 1px solid #ddd;
+        }
+        
+        .article-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: auto;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #764ba2;
+            transform: scale(1.02);
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+        }
+        
+        .empty-state h2 {
+            margin-bottom: 10px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 1.1em;
+        }
+        
+        .filter-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            color: white;
+        }
+        
+        .filter-section label {
+            margin-right: 15px;
+            font-weight: 600;
+        }
+        
+        .filter-section select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: none;
+            background: white;
+            color: #333;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .articles-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .article-title {
+                font-size: 1.05em;
+            }
+            
+            .article-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📰 News Articles</h1>
+            <p>Enhanced Learning with AI-Generated Summaries</p>
+        </div>
+        
+        <div class="filter-section">
+            <label for="sourceFilter">Filter by Source:</label>
+            <select id="sourceFilter" onchange="filterArticles()">
+                <option value="">All Sources</option>
+                <option value="New York Times">New York Times</option>
+                <option value="PBS NewsHour">PBS NewsHour</option>
+                <option value="Science Daily">Science Daily</option>
+                <option value="Swimming World">Swimming World</option>
+                <option value="TechRadar">TechRadar</option>
+            </select>
+        </div>
+        
+        <div id="articles-container" class="articles-grid"></div>
+        <div id="empty-state" class="empty-state" style="display: none;">
+            <h2>📂 No articles found</h2>
+            <p>Try adjusting your filters or check back later</p>
+        </div>
+    </div>
+    
+    <script>
+        let allArticles = [];
+        let currentLanguage = 'en';
+        
+        function renderArticles(articlesToRender) {
+            const container = document.getElementById('articles-container');
+            const emptyState = document.getElementById('empty-state');
+            
+            if (articlesToRender.length === 0) {
+                container.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            container.style.display = 'grid';
+            emptyState.style.display = 'none';
+            
+            container.innerHTML = articlesToRender.map(article => `
+                <div class="article-card">
+                    ${article.image ? `<img src="${article.image}" alt="${article.title}" class="article-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22350%22 height=%22200%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22350%22 height=%22200%22/%3E%3C/svg%3E'">` : '<div class="article-image" style="display: flex; align-items: center; justify-content: center; background: #f0f0f0; color: #999;">📰 No Image</div>'}
+                    <div class="article-content">
+                        <div class="article-meta">
+                            <div>
+                                <span class="article-date">${new Date(article.date).toLocaleDateString()}</span>
+                                <span style="margin: 0 5px; color: #ddd;">•</span>
+                                <span class="article-source">${article.source}</span>
+                            </div>
+                            <div class="language-buttons">
+                                <button class="lang-btn ${currentLanguage === 'en' ? 'active' : ''}" onclick="switchLanguage('en', ${article.id})">EN</button>
+                                <button class="lang-btn ${currentLanguage === 'zh' ? 'active' : ''}" onclick="switchLanguage('zh', ${article.id})">中文</button>
+                            </div>
+                        </div>
+                        
+                        <h3 class="article-title">${article.title}</h3>
+                        
+                        <div class="article-summary" id="summary-${article.id}">
+                            ${currentLanguage === 'en' ? article.summary_en : article.summary_zh}
+                        </div>
+                        
+                        ${article.keywords ? `
+                        <div class="article-keywords">
+                            <span class="keywords-label">🔑 Keywords</span>
+                            <div class="keywords-list">
+                                ${article.keywords.slice(0, 3).map(kw => `<span class="keyword-badge">${kw}</span>`).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        <div class="article-actions">
+                            <button class="btn btn-primary" onclick="window.open('article_pages/article_${article.id}.html', '_blank')">
+                                📖 Read Analysis
+                            </button>
+                            <button class="btn btn-secondary" onclick="window.open('article_pages/article_${article.id}_original.html', '_blank')">
+                                📄 Original
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function switchLanguage(lang, articleId) {
+            currentLanguage = lang;
+            
+            // Update button states
+            document.querySelectorAll(`#articles-container .lang-btn`).forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update all summaries
+            allArticles.forEach(article => {
+                const summaryElement = document.getElementById(`summary-${article.id}`);
+                if (summaryElement) {
+                    summaryElement.textContent = lang === 'en' ? article.summary_en : article.summary_zh;
+                }
+            });
+        }
+        
+        function filterArticles() {
+            const sourceFilter = document.getElementById('sourceFilter').value;
+            let filtered = allArticles;
+            
+            if (sourceFilter) {
+                filtered = allArticles.filter(a => a.source === sourceFilter);
+            }
+            
+            renderArticles(filtered);
+        }
+        
+        // Initialize - fetch articles from database
+        async function initializeArticles() {
+            try {
+                // Fetch from local JSON file
+                const response = await fetch('/articles_data.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                allArticles = await response.json();
+                renderArticles(allArticles);
+            } catch (error) {
+                console.error('Error loading articles:', error);
+                document.getElementById('articles-container').innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <h2>⚠️ Error loading articles</h2>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Load articles on page load
+        document.addEventListener('DOMContentLoaded', initializeArticles);
+    </script>
+</body>
+</html>

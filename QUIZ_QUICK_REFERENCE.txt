@@ -1,0 +1,124 @@
+# Quiz Questions - Quick Reference Card
+
+## 🎮 What Changed?
+
+**Before:** Questions & answers mixed in JSON  
+**After:** Questions & answers in **separate database columns** 🎯
+
+---
+
+## 📊 Database Table: `quiz_questions`
+
+```
+Columns:
+├─ id (unique question ID)
+├─ article_id (from which article)
+├─ question_number (1-5)
+├─ question_type (main_idea | new_word | sat_style)
+├─ question_text (the question)
+├─ option_a (choice A)  
+├─ option_b (choice B)
+├─ option_c (choice C)
+├─ option_d (choice D)
+├─ correct_answer ⭐ SEPARATE (A/B/C/D)
+└─ explanation (why it's correct)
+```
+
+---
+
+## 🚀 Quick Commands
+
+| Command | Purpose |
+|---------|---------|
+| `python3 deepseek_processor.py --quiz 16` | Get 5 questions for article 16 |
+| `python3 deepseek_processor.py --quiz-id 42` | Get one question by ID 42 |
+| `python3 deepseek_processor.py --all-quiz` | Get ALL questions (build game) |
+| `python3 deepseek_processor.py --quiz-type sat_style` | Get only hard questions |
+| `python3 deepseek_processor.py --quiz-type main_idea` | Get only easy questions |
+| `python3 deepseek_processor.py --quiz-type new_word` | Get only vocabulary questions |
+
+---
+
+## 💡 Game Logic Example
+
+```python
+import json
+result = subprocess.run(
+    ["python3", "deepseek_processor.py", "--quiz", "16"],
+    capture_output=True, text=True
+)
+questions = json.loads(result.stdout)
+
+for q in questions:
+    # Display question
+    print(q['question'])
+    print(f"A) {q['options'][0]}")
+    print(f"B) {q['options'][1]}")
+    print(f"C) {q['options'][2]}")
+    print(f"D) {q['options'][3]}")
+    
+    # Get answer
+    user_ans = input("Answer: ")
+    
+    # Check (correct_answer is separate!)
+    if user_ans.upper() == q['correct_answer']:
+        print("✓ Correct!")
+    else:
+        print(f"✗ Wrong. Answer: {q['correct_answer']}")
+        print(q['explanation'])
+```
+
+---
+
+## 📋 JSON Response Format
+
+```json
+[
+  {
+    "id": 42,
+    "article_id": 16,
+    "question_number": 1,
+    "type": "main_idea",
+    "question": "What is the main topic?",
+    "options": ["Option A", "Option B", "Option C", "Option D"],
+    "correct_answer": "B",
+    "explanation": "Option B correctly..."
+  }
+]
+```
+
+---
+
+## 🎯 Use Cases
+
+| Use Case | Command |
+|----------|---------|
+| Single article quiz | `--quiz 16` |
+| Question bank | `--all-quiz > questions.json` |
+| Difficulty levels | `--quiz-type sat_style` |
+| One question | `--quiz-id 42` |
+| Statistics | `SELECT COUNT(*) FROM quiz_questions` |
+
+---
+
+## ✨ Perfect For
+
+✅ Web quiz games  
+✅ Mobile apps  
+✅ Educational platforms  
+✅ Leaderboards  
+✅ Difficulty levels  
+✅ Shuffled answers  
+✅ Question banks  
+✅ Quizzes with explanations  
+
+---
+
+## 📚 More Info
+
+See **QUIZ_GAME_GUIDE.md** for:
+- Full schema details
+- SQL queries
+- Web integration
+- Python examples
+- Statistics tracking

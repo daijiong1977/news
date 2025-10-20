@@ -1,0 +1,183 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                    DAILY NEWS DIGEST SYSTEM ARCHITECTURE                   ║
+║                         Built & Ready to Use ✓                             ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          CONFIGURATION LAYER                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  setup_config.py  ◄──────────────►  config.json                             │
+│  (Interactive CLI)                  (Saved Settings)                        │
+│                                                                              │
+│  Configure:                                                                 │
+│   • 3-5 RSS feed sources (name, URL, enabled)                              │
+│   • Gmail SMTP (email, app password)                                        │
+│   • Email recipients (list of emails)                                       │
+│   • Digest settings (articles count, time window)                           │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      ▲
+                                      │
+                                      │ reads
+                                      │
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          GENERATION LAYER                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  generate_daily_digest.py                                                   │
+│  (Main Engine)                                                              │
+│                                                                              │
+│  ┌──────────────┐     ┌──────────────┐     ┌──────────────┐               │
+│  │ Fetch RSS    │────►│ Extract Full │────►│ Format to    │               │
+│  │ Feeds (3)    │     │ Content (18) │     │ HTML & JSON  │               │
+│  └──────────────┘     └──────────────┘     └──────────────┘               │
+│                                                      │                      │
+│  • Parallel fetch all enabled sources               │                      │
+│  • Get top N articles (configurable)                │                      │
+│  • Filter by 24-hour window (configurable)          │                      │
+│  • Extract full article from original links         │                      │
+│  • Normalize timestamps to ISO 8601                 │                      │
+│  • Preserve source attribution                      ▼                      │
+│                                                                              │
+│                        Output Files:                                        │
+│                     daily_digest.html               daily_digest.json      │
+│                     (HTML for viewing)              (JSON for integration) │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                ┌─────────────────────┴─────────────────────┐
+                │                                             │
+                ▼                                             ▼
+┌─────────────────────────────┐           ┌──────────────────────────────┐
+│     DISPLAY LAYER           │           │     EMAIL LAYER              │
+├─────────────────────────────┤           ├──────────────────────────────┤
+│                             │           │                              │
+│ Browser/Reader:            │           │ Send Email Flag:            │
+│ • Open in browser          │           │ --send-email                │
+│ • Responsive design        │           │                              │
+│ • Clickable links          │           │ Uses Gmail SMTP:            │
+│ • Professional styling     │           │ • App password auth         │
+│                             │           │ • Multiple recipients       │
+│ daily_digest.html          │           │ • HTML formatted message    │
+│                             │           │ • Connection testing        │
+│                             │           │                              │
+└─────────────────────────────┘           └──────────────────────────────┘
+                                                     │
+                                                     ▼
+                                          Your Email Recipients
+                                                 inbox ◄
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         AUTOMATION LAYER (Optional)                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  schedule_digest.py  ◄────────────────►  Cron Job                          │
+│  (Scheduling Helper)                     (System Scheduler)                │
+│                                                                              │
+│  Run at: 9:00 AM daily                                                      │
+│  Command:                                                                   │
+│    0 9 * * * cd /path && python3 generate_daily_digest.py --send-email    │
+│                                                                              │
+│  Logs to: digest.log                                                        │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                            DATA FLOW EXAMPLE                               ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+1. CONFIGURATION:
+   User runs: python3 setup_config.py
+   ▼
+   Configures RSS sources:
+   • PBS NewsHour: https://www.pbs.org/newshour/feeds/rss/headlines
+   • Swimming World: https://www.swimmingworldmagazine.com/news/feed/
+   • Plus 1-3 more sources
+   ▼
+   Saved to: config.json
+
+2. GENERATION (Manual or Automated):
+   User runs: python3 generate_daily_digest.py [--send-email]
+   ▼
+   For each enabled source:
+   • Fetch RSS feed
+   • Get items from last 24 hours
+   • Select top 3 articles
+   • For each article:
+     - Fetch original link
+     - Extract full content
+     - Normalize timestamp
+     - Add source tag
+   ▼
+   Output:
+   • daily_digest.html (for viewing)
+   • daily_digest.json (for integration)
+
+3. DELIVERY:
+   User opens: open daily_digest.html
+   ▼
+   Reads beautifully formatted digest
+   ▼
+   Optionally sends via: python3 generate_daily_digest.py --send-email
+   ▼
+   Email delivered to all configured recipients
+
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                           FILES CREATED                                   ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+📋 CONFIGURATION & SETUP:
+   • config.json                 - Main configuration file (your settings)
+   • setup_config.py             - Interactive configuration tool
+
+🔧 CORE ENGINE:
+   • generate_daily_digest.py    - Main digest generator
+   • schedule_digest.py          - Cron scheduler helper
+
+📚 DOCUMENTATION:
+   • QUICKSTART.md               - 5-minute getting started
+   • README_DIGEST.md            - Complete documentation
+   • SYSTEM_SUMMARY.md           - Feature summary & examples
+   • SYSTEM_ARCHITECTURE.txt     - This file
+
+📊 OUTPUT (Generated Daily):
+   • daily_digest.html           - Beautiful HTML for reading
+   • daily_digest.json           - Structured JSON data
+   • digest.log                  - Cron execution log (if automated)
+
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                        QUICK COMMAND REFERENCE                            ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+📝 SETUP & CONFIGURATION:
+   python3 setup_config.py              # Configure everything interactively
+
+📰 GENERATE DIGEST:
+   python3 generate_daily_digest.py     # Just generate HTML/JSON
+   python3 generate_daily_digest.py --send-email  # Generate + email
+
+🕐 AUTOMATION:
+   python3 schedule_digest.py           # Set up daily 9 AM cron job
+
+📖 VIEW DOCUMENTATION:
+   cat QUICKSTART.md                    # Quick reference
+   cat README_DIGEST.md                 # Full documentation
+   cat SYSTEM_SUMMARY.md                # Features & examples
+
+👁️ VIEW OUTPUTS:
+   open daily_digest.html               # View in browser
+   cat daily_digest.json | python3 -m json.tool  # View JSON
+
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                              STATUS: READY ✓                              ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+All components configured and tested.
+Start with: python3 generate_daily_digest.py
+Then: open daily_digest.html
+

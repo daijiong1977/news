@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cal Baptist Men Repeat, Rice Women Win MPSF Open Water Championships - Research Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+        
+        .meta {
+            font-size: 0.95em;
+            opacity: 0.9;
+            margin-top: 15px;
+        }
+        
+        .meta span {
+            margin: 0 15px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            font-size: 1.6em;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            display: inline-block;
+        }
+        
+        .language-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .toggle-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .summary-box {
+            background: #f8f9ff;
+            padding: 25px;
+            border-left: 5px solid #667eea;
+            border-radius: 8px;
+            line-height: 1.8;
+            font-size: 1.05em;
+            color: #333;
+        }
+        
+        .summary-box.hidden {
+            display: none;
+        }
+        
+        .research-keywords {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .keyword-card {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border: 2px solid #667eea40;
+            padding: 20px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .keyword-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+        }
+        
+        .keyword-card h4 {
+            color: #667eea;
+            font-size: 1.2em;
+            margin-bottom: 8px;
+        }
+        
+        .keyword-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #667eea;
+            color: white;
+            border-radius: 12px;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+        }
+        
+        .keyword-card p {
+            font-size: 0.95em;
+            color: #555;
+            line-height: 1.6;
+        }
+        
+        .research-context {
+            background: #f0f4ff;
+            padding: 25px;
+            border-left: 5px solid #764ba2;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .research-context h4 {
+            color: #764ba2;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .research-context p {
+            color: #555;
+            line-height: 1.7;
+            font-size: 0.95em;
+        }
+        
+        .critical-analysis {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .analysis-box {
+            background: #fff9f0;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid #ff9800;
+        }
+        
+        .analysis-box.limitations {
+            background: #fff3e0;
+            border-left-color: #ff6f00;
+        }
+        
+        .analysis-box h4 {
+            color: #ff9800;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+        
+        .analysis-box.limitations h4 {
+            color: #ff6f00;
+        }
+        
+        .analysis-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .analysis-box li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            color: #555;
+            font-size: 0.95em;
+        }
+        
+        .analysis-box li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #ff9800;
+            font-weight: bold;
+        }
+        
+        .analysis-box.limitations li:before {
+            content: "⚠";
+            color: #ff6f00;
+        }
+        
+        .questions-grid {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .question-card {
+            background: #f9f9f9;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .question-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+        }
+        
+        .question-card h4 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .question-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        
+        .cognitive-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .option {
+            padding: 12px;
+            margin: 10px 0;
+            background: #f0f0f0;
+            border-radius: 6px;
+            border-left: 4px solid #ddd;
+        }
+        
+        .option.correct {
+            background: #e8f5e9;
+            border-left-color: #4caf50;
+        }
+        
+        .option-label {
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .discussion {
+            background: #f5f5f5;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .discussion h4 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .side {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 6px;
+        }
+        
+        .side h5 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+        
+        .side p {
+            color: #555;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+        
+        .footer {
+            background: #f8f9f9;
+            padding: 20px;
+            text-align: center;
+            color: #999;
+            font-size: 0.9em;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .back-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:hover {
+            background: #764ba2;
+            transform: translateX(-5px);
+        }
+        
+        @media (max-width: 768px) {
+            .critical-analysis {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.6em;
+            }
+            
+            .section-title {
+                font-size: 1.3em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Cal Baptist Men Repeat, Rice Women Win MPSF Open Water Championships</h1>
+            <div class="meta">
+                <span>📅 2025-10-19T21:31:59+00:00</span>
+                <span>📰 Swimming World Magazine</span>
+            </div>
+        </div>
+        
+        <div class="content">
+            <button class="back-button" onclick="window.history.back()">← Back to Article List</button>
+            
+            <!-- Summary Section -->
+            <div class="section">
+                <div class="section-title">📋 Research Summary</div>
+                <div class="language-toggle">
+                    <button class="toggle-btn active" onclick="showLanguage('en')">English</button>
+                    <button class="toggle-btn" onclick="showLanguage('zh')">中文</button>
+                </div>
+                <div class="summary-box" id="summary-en">
+                    Summary not available
+                </div>
+                <div class="summary-box hidden" id="summary-zh">
+                    摘要不可用
+                </div>
+            </div>
+            
+            <!-- Research Keywords Section -->
+            <div class="section">
+                <div class="section-title">🔬 Research Keywords</div>
+                <div class="research-keywords">
+
+                    <div class="keyword-card">
+                        <h4>Open Water Swimming</h4>
+                        <span class="keyword-badge">Frequency: 4</span>
+                        <p>Open water swimming represents a distinct discipline within aquatic sports research, characterized by environmental variables absent in pool swimming. Academic studies focus on physiological adaptations to cold water, navigation cognition, drafting strategies, and race pacing in unpredictable conditions. Research in sports medicine examines hypothermia risks, energy expenditure models, and the biomechanics of wave negotiation. The discipline's inclusion in Olympic programs has accelerated scientific investigation into performance optimization and safety protocols.</p>
+                    </div>
+
+                    <div class="keyword-card">
+                        <h4>Team Dynamics</h4>
+                        <span class="keyword-badge">Frequency: 3</span>
+                        <p>In sports psychology and organizational behavior research, team dynamics investigate how group cohesion, leadership structures, and role specialization affect collective performance. Studies examine how relay teams develop shared mental models and non-verbal communication systems. Research in collegiate athletics specifically analyzes how recruiting strategies, training periodization, and competitive scheduling influence team development trajectories and championship performance consistency.</p>
+                    </div>
+
+                    <div class="keyword-card">
+                        <h4>Performance Stratification</h4>
+                        <span class="keyword-badge">Frequency: 2</span>
+                        <p>Performance stratification refers to the statistical distribution of competitive results within athlete populations. Research in sports analytics models performance gaps using power laws and extreme value theory. Studies examine how small time differentials at elite levels reflect significant physiological and technical differences. This concept helps researchers understand talent identification thresholds and the relationship between training investment and performance returns in developing athletic programs.</p>
+                    </div>
+
+                    <div class="keyword-card">
+                        <h4>Collegiate Athletics</h4>
+                        <span class="keyword-badge">Frequency: 3</span>
+                        <p>Collegiate athletics research examines the intersection of academic institutions and competitive sports programs. Studies analyze recruitment patterns, scholarship allocation, academic-performance balances, and program sustainability. Research in sports economics investigates the return on investment of athletic programs, while educational studies examine how athletic participation affects student development and institutional identity.</p>
+                    </div>
+
+                    <div class="keyword-card">
+                        <h4>Endurance Capacity</h4>
+                        <span class="keyword-badge">Frequency: 2</span>
+                        <p>Endurance capacity research in sports physiology focuses on aerobic and anaerobic threshold development, lactate clearance efficiency, and metabolic adaptation to prolonged exertion. Studies specifically in swimming examine stroke efficiency maintenance over distance, oxygen consumption kinetics, and pacing strategy optimization. Research connects endurance metrics to race performance outcomes and training intervention effectiveness.</p>
+                    </div>
+
+                    <div class="keyword-card">
+                        <h4>Race Strategy</h4>
+                        <span class="keyword-badge">Frequency: 2</span>
+                        <p>Race strategy research combines sports psychology, biomechanics, and tactical analysis to understand decision-making during competition. Studies examine pacing models, positioning tactics, and adaptation to environmental conditions. In open water swimming specifically, research investigates navigation efficiency, drafting benefits, and surge timing relative to competitors. Computational models help optimize strategy based on course characteristics and competitor behaviors.</p>
+                    </div>
+
+                </div>
+            </div>
+            
+            <!-- Research Context Section -->
+            <div class="section">
+                <div class="section-title">🎓 Research Context</div>
+
+                <div class="research-context">
+                    <p>Open water swimming has evolved from a recreational activity to a scientifically-studied discipline with distinct physiological, psychological, and tactical dimensions. Historically, research focused on channel swimming and extreme endurance events, but the sport's inclusion in major games has accelerated academic interest. The Mountain Pacific Sports Federation (MPSF) represents one of the NCAA's most competitive conferences for aquatic sports, with member institutions spanning diverse geographical and training environments. Research in collegiate open water swimming emerged significantly after the NCAA's increased recognition of the discipline, with studies examining how pool swimming backgrounds transfer to open water performance. The physiological literature establishes that open water swimming demands superior thermoregulation, navigational cognition, and energy management compared to pool swimming. Historical performance data shows progressive improvement in open water times as training methodologies incorporate sport-specific elements. The team championship format used in MPSF competitions represents an interesting hybrid of individual and collective performance metrics that merits examination through organizational psychology frameworks. Research on program development trajectories suggests that breakthrough performances like Rice's first women's title typically follow multi-year building periods with specific investment patterns in coaching, recruitment, and facility resources.</p>
+                </div>
+
+            </div>
+            
+            <div class="section">
+                <div class="section-title">📊 Critical Analysis</div>
+                <div class="critical-analysis">
+
+                    <div class="analysis-box">
+                        <h4>✓ Strengths</h4>
+                        <ul>
+                            <li>The article provides complete team scoring data allowing for quantitative analysis of program competitiveness and depth</li>
+                            <li>Detailed individual and relay results enable examination of performance distribution patterns within teams</li>
+
+                        </ul>
+                    </div>
+                    
+                    <div class="analysis-box limitations">
+                        <h4>⚠ Limitations</h4>
+                        <ul>
+                            <li>No physiological or biomechanical data is provided to contextualize performance outcomes</li>
+                            <li>Absence of environmental conditions (water temperature, currents) limits understanding of performance influencers</li>
+
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+            
+            <!-- Questions Section -->
+            <div class="section">
+                <div class="section-title">❓ Key Discussion Questions</div>
+                <div class="questions-grid">
+
+                </div>
+            </div>
+            
+            <!-- Two-Sided Discussion -->
+            <div class="section">
+                <div class="section-title">🤝 Two-Sided Discussion</div>
+                <div class="discussion">
+
+                    <p style="color: #999;">No discussion perspectives available yet.</p>
+
+                </div>
+            </div>
+            
+            <!-- User Feedback Section -->
+            <div class="section">
+                <div class="section-title">💬 Your Analysis</div>
+                <div style="background: #f5f5f5; padding: 25px; border-radius: 10px;">
+                    <p style="margin-bottom: 15px; color: #666;">Share your own perspective or argument:</p>
+                    <textarea id="userAnalysis" style="width: 100%; min-height: 120px; padding: 15px; border: 2px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 0.95em; resize: vertical;"></textarea>
+                    <button onclick="submitAnalysis()" style="margin-top: 15px; padding: 12px 30px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 1em;">Submit Your Analysis</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>📄 Generated on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | Article ID: {article_id} | Research-Enhanced Version</p>
+        </div>
+    </div>
+    
+    <script>
+        function showLanguage(lang) {{
+            document.getElementById('summary-en').classList.toggle('hidden', lang !== 'en');
+            document.getElementById('summary-zh').classList.toggle('hidden', lang !== 'zh');
+            
+            document.querySelectorAll('.toggle-btn').forEach(btn => {{
+                btn.classList.remove('active');
+            }});
+            event.target.classList.add('active');
+        }}
+        
+        function submitAnalysis() {{
+            const analysis = document.getElementById('userAnalysis').value;
+            if (!analysis.trim()) {{
+                alert('Please enter your analysis');
+                return;
+            }}
+            alert('Your analysis has been recorded!\nSubmitted: ' + analysis.substring(0, 50) + '...');
+            document.getElementById('userAnalysis').value = '';
+        }}
+    </script>
+</body>
+</html>

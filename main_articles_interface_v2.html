@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily News Digest</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: white; padding: 25px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); }
+        .header-top { display: flex; justify-content: flex-start; align-items: center; gap: 20px; flex-wrap: nowrap; }
+        .header h1 { font-size: 1.8em; color: #333; margin-right: auto; }
+        .difficulty-selector { display: flex; gap: 8px; align-items: center; }
+        .difficulty-selector select { padding: 10px 15px; border: 2px solid #667eea; border-radius: 6px; font-weight: 600; background: white; color: #333; cursor: pointer; }
+        .category-buttons { display: flex; gap: 8px; flex-wrap: nowrap; align-items: center; }
+        .category-btn { padding: 8px 14px; border: 2px solid #ddd; background: white; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.3s; font-size: 0.95em; }
+        .category-btn:hover { border-color: #667eea; }
+        .category-btn.active { background: #667eea; color: white; border-color: #667eea; }
+        #articles-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 25px; margin-bottom: 40px; }
+        @media (min-width: 1200px) { #articles-container { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 768px) and (max-width: 1199px) { #articles-container { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 767px) { #articles-container { grid-template-columns: 1fr; } }
+        .article-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column; height: auto; transition: all 0.3s ease; max-width: 100%; }
+        .article-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); }
+        .article-image { width: 100%; height: 280px; object-fit: cover; background: #f0f0f0; }
+        .article-image.placeholder { display: flex; align-items: center; justify-content: center; font-size: 4em; background: #e8e8e8; }
+        .article-content { padding: 24px; flex-grow: 1; display: flex; flex-direction: column; }
+        .article-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; gap: 16px; flex-wrap: wrap; font-size: 0.95em; }
+        .article-date { font-size: 0.95em; color: #666; font-weight: 500; }
+        .article-source { font-size: 0.95em; color: #666; font-weight: 500; }
+        .article-title { font-size: 1.25em; font-weight: 700; color: #333; margin-bottom: 14px; line-height: 1.4; }
+        .article-summary { color: #666; font-size: 0.95em; line-height: 1.6; margin-bottom: 16px; flex-grow: 1; }
+        .article-keywords { margin-top: auto; padding-top: 14px; border-top: 1px solid #eee; }
+        .keywords-label { font-size: 0.85em; font-weight: 600; color: #999; margin-bottom: 8px; display: block; }
+        .keyword-tag { display: inline-block; background: #f0f0f0; padding: 5px 12px; margin-right: 8px; margin-bottom: 6px; border-radius: 18px; font-size: 0.8em; color: #555; cursor: help; transition: all 0.2s; border: 1px solid #ddd; position: relative; }
+        .keyword-tag:hover { background: #667eea; color: white; border-color: #667eea; }
+        .keyword-tooltip { display: none; position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 14px; border-radius: 6px; font-size: 0.85em; line-height: 1.5; white-space: normal; max-width: 1120px; word-wrap: break-word; z-index: 100; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); }
+        .keyword-tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: #333; }
+        .keyword-tag:hover .keyword-tooltip { display: block; }
+        .difficulty-badge { display: none; }
+        .btn-more { display: none; }
+        .btn-more:hover { background: #5568d3; }
+        .empty-state { grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: white; }
+        .empty-state h2 { font-size: 1.8em; margin-bottom: 10px; }
+        .subscription-button-container { text-align: center; margin-top: 40px; }
+        .btn-subscribe { background: white; color: #667eea; border: 2px solid white; padding: 15px 40px; border-radius: 8px; font-size: 1.1em; font-weight: 700; cursor: pointer; transition: all 0.3s; }
+        .btn-subscribe:hover { background: #f0f0f0; }
+        .subscription-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); }
+        .subscription-modal.show { display: flex; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; margin-bottom: 8px; color: #333; font-weight: 600; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; }
+        .btn-submit { background: #667eea; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; width: 100%; transition: all 0.3s; }
+        .btn-submit:hover { background: #5568d3; }
+        .article-lang-buttons { display: flex; gap: 4px; align-items: center; }
+        .article-lang-btn { padding: 5px 10px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8em; color: #555; cursor: pointer; transition: all 0.2s; font-weight: 600; }
+        .article-lang-btn:hover { background: #667eea; color: white; border-color: #667eea; }
+        .article-lang-btn.active { background: #667eea; color: white; border-color: #667eea; }
+        .btn-more-small { padding: 5px 12px; background: #667eea; color: white; border: none; border-radius: 4px; font-size: 0.8em; cursor: pointer; transition: all 0.2s; font-weight: 600; margin-left: auto; }
+        .btn-more-small:hover { background: #5568d3; }
+        .difficulty-dot { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-top">
+                <h1>📰 Daily Digest</h1>
+                <div class="category-buttons">
+                    <button class="category-btn" onclick="filterByCategory('world')">🌍 World</button>
+                    <button class="category-btn" onclick="filterByCategory('science')">🔬 Science</button>
+                    <button class="category-btn" onclick="filterByCategory('tech')">💻 Tech</button>
+                    <button class="category-btn" onclick="filterByCategory('sports')">🏊 Sports</button>
+                </div>
+                <div class="difficulty-selector">
+                    <select id="difficulty-filter" onchange="filterByDifficulty(this.value)">
+                        <option value="hard">High</option>
+                        <option value="medium">Mid</option>
+                        <option value="easy">Easy</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div id="articles-container"></div>
+        <div class="subscription-button-container">
+            <button class="btn-subscribe" onclick="openSubscriptionModal()">📧 Subscribe</button>
+        </div>
+    </div>
+
+    <div id="subscription-modal" class="subscription-modal">
+        <div class="modal-content">
+            <h2>Subscribe</h2>
+            <form id="subscription-form" onsubmit="handleSubscribe(event)">
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label>Name *</label>
+                    <input type="text" id="name" required>
+                </div>
+                <button type="submit" class="btn-submit">Subscribe</button>
+            </form>
+            <button onclick="closeSubscriptionModal()" style="width: 100%; padding: 10px; margin-top: 10px;">Close</button>
+        </div>
+    </div>
+
+    <script>
+        let allArticles = [];
+        let currentCategory = 'world';
+        let currentLanguage = 'en';
+        let currentDifficulty = 'hard';
+
+        const categoryMap = {
+            'world': ['PBS', 'pbs'],
+            'science': ['Science', 'science'],
+            'tech': ['Tech', 'tech'],
+            'sports': ['Swimming', 'swim']
+        };
+
+        const difficultyBadgeMap = {
+            'easy': { icon: '🟢', label: 'Easy', class: 'easy' },
+            'medium': { icon: '🟡', label: 'Medium', class: 'medium' },
+            'hard': { icon: '🔴', label: 'High', class: 'hard' }
+        };
+
+        async function filterByCategory(category) {
+            currentCategory = category;
+            localStorage.setItem('selectedCategory', category);
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            const filtered = allArticles.filter(article => {
+                const keywords = categoryMap[category] || categoryMap['world'];
+                return keywords.some(keyword => article.source.toLowerCase().includes(keyword.toLowerCase()));
+            });
+            await renderArticles(filtered);
+        }
+
+        function changeArticleLanguage(articleId, lang, button) {
+            currentLanguage = lang;
+            localStorage.setItem('selectedLanguage', lang);
+            const buttons = button.parentElement.querySelectorAll('.article-lang-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            const category = currentCategory || 'world';
+            const filtered = allArticles.filter(article => {
+                const keywords = categoryMap[category] || categoryMap['world'];
+                return keywords.some(keyword => article.source.toLowerCase().includes(keyword.toLowerCase()));
+            });
+            renderArticles(filtered);
+        }
+
+        async function renderArticles(articles) {
+            const container = document.getElementById('articles-container');
+            if (!articles || articles.length === 0) {
+                container.innerHTML = '<div class="empty-state"><h2>No articles</h2></div>';
+                return;
+            }
+            
+            const enrichedArticles = await Promise.all(articles.map(async (article) => {
+                try {
+                    const url = `http://localhost:5001/api/article-content?article_id=${article.id}&difficulty=${currentDifficulty}&language=${currentLanguage === 'en' ? 'en' : 'zh'}`;
+                    const response = await fetch(url);
+                    if (response.ok) {
+                        const data = await response.json();
+                        // Use API keywords if available, otherwise use article's original keywords
+                        const apiKeywords = data.keywords && data.keywords.length > 0 ? data.keywords : (article.keywords || []);
+                        return {...article, difficulty_summary: data.summary || '', keywords: apiKeywords, has_difficulty_content: true};
+                    }
+                } catch (error) {
+                    console.error(`Error fetching article ${article.id}:`, error);
+                }
+                return {...article, difficulty_summary: currentLanguage === 'en' ? article.summary_en : article.summary_zh, keywords: article.keywords || [], has_difficulty_content: false};
+            }));
+            
+            const badge = difficultyBadgeMap[currentDifficulty];
+            const langActive = currentLanguage === 'en' ? 'en' : 'zh';
+            
+            container.innerHTML = enrichedArticles.map(article => {
+                // Create keywords HTML with tooltips
+                // Try to get keywords from API response first, fall back to article.keywords from JSON
+                let keywords = article.keywords || [];
+                
+                const keywordsHtml = keywords && keywords.length > 0 ? `
+                    <div class="article-keywords">
+                        <div class="keywords-label">📌 KEY TERMS</div>
+                        ${keywords.map((kw, idx) => {
+                            // Handle both formats: {term, explanation} and {word, explanation} and simple strings
+                            let term, explanation;
+                            if (typeof kw === 'string') {
+                                term = kw;
+                                explanation = `Related to ${kw.toLowerCase()}. Learn more by clicking the MORE button.`;
+                            } else {
+                                term = kw.term || kw.word || kw;
+                                explanation = kw.explanation || `Related to ${term.toLowerCase()}. Learn more by clicking the MORE button.`;
+                            }
+                            return `<span class="keyword-tag" title="${explanation}">
+                                ${term}
+                                <div class="keyword-tooltip">${explanation}</div>
+                            </span>`;
+                        }).join('')}
+                    </div>
+                ` : '';
+                
+                return `
+                <div class="article-card">
+                    <div class="article-image ${!article.image ? 'placeholder' : ''}">
+                        ${article.image ? `<img src="${article.image}" alt="${article.title}" style="width: 100%; height: 100%; object-fit: cover;">` : '📰'}
+                    </div>
+                    <div class="article-content">
+                        <div class="article-meta">
+                            <div class="article-meta-left">
+                                <span class="article-date">${article.date || 'No date'}</span>
+                                <span class="article-source">${article.source}</span>
+                            </div>
+                            <div class="article-meta-center">
+                                <span class="difficulty-dot"></span>
+                            </div>
+                            <div class="article-meta-right">
+                                <div class="article-lang-buttons">
+                                    ${langActive !== 'en' ? `<button class="article-lang-btn" onclick="changeArticleLanguage(${article.id}, 'en', this)">EN</button>` : ''}
+                                    ${langActive !== 'zh' ? `<button class="article-lang-btn" onclick="changeArticleLanguage(${article.id}, 'zh', this)">CN</button>` : ''}
+                                    <button class="btn-more-small" onclick="goToAnalysis(${article.id})">📖 MORE</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="article-title">${article.title}</div>
+                        <div class="article-summary">${article.difficulty_summary}</div>
+                        ${keywordsHtml}
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        function goToAnalysis(articleId) {
+            const difficulty = currentDifficulty || 'hard';
+            const category = currentCategory || 'world';
+            const language = currentLanguage || 'en';
+            window.location.href = `/article_analysis_v2.html?id=${articleId}&difficulty=${difficulty}&category=${category}&language=${language}`;
+        }
+
+        function openSubscriptionModal() {
+            document.getElementById('subscription-modal').classList.add('show');
+        }
+
+        function closeSubscriptionModal() {
+            document.getElementById('subscription-modal').classList.remove('show');
+        }
+
+        async function handleSubscribe(event) {
+            event.preventDefault();
+            alert('Subscription logic here');
+        }
+
+        async function filterByDifficulty(difficulty) {
+            currentDifficulty = difficulty;
+            localStorage.setItem('selectedDifficulty', difficulty);
+            // Update URL to reflect difficulty selection
+            const url = new URL(window.location);
+            url.searchParams.set('difficulty', difficulty);
+            window.history.replaceState({}, '', url);
+            const filtered = allArticles.filter(article => {
+                const keywords = categoryMap[currentCategory] || categoryMap['world'];
+                return keywords.some(keyword => article.source.toLowerCase().includes(keyword.toLowerCase()));
+            });
+            await renderArticles(filtered);
+        }
+
+        async function initializeArticles() {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                let difficultyParam = params.get('difficulty') || localStorage.getItem('selectedDifficulty') || 'hard';
+                let categoryParam = params.get('category') || localStorage.getItem('selectedCategory') || 'world';
+                let languageParam = params.get('language') || localStorage.getItem('selectedLanguage') || 'en';
+                
+                const difficultyMap = { 'high': 'hard', 'hard': 'hard', 'medium': 'medium', 'mid': 'medium', 'easy': 'easy' };
+                currentDifficulty = difficultyMap[difficultyParam.toLowerCase()] || 'hard';
+                currentCategory = categoryParam.toLowerCase();
+                currentLanguage = languageParam.toLowerCase();
+                
+                localStorage.setItem('selectedDifficulty', currentDifficulty);
+                localStorage.setItem('selectedCategory', currentCategory);
+                localStorage.setItem('selectedLanguage', currentLanguage);
+                
+                // Highlight current category button
+                document.querySelectorAll('.category-btn').forEach(btn => {
+                    if (btn.textContent.toLowerCase().includes(currentCategory) || 
+                        (currentCategory === 'sports' && btn.textContent.includes('🏊')) ||
+                        (currentCategory === 'world' && btn.textContent.includes('🌍')) ||
+                        (currentCategory === 'science' && btn.textContent.includes('🔬')) ||
+                        (currentCategory === 'tech' && btn.textContent.includes('💻'))) {
+                        btn.classList.add('active');
+                    }
+                });
+                
+                document.getElementById('difficulty-filter').value = currentDifficulty;
+                
+                const response = await fetch('/articles_data.json');
+                if (!response.ok) throw new Error('Failed to load articles');
+                allArticles = await response.json();
+                
+                console.log(`All articles loaded:`, allArticles);
+                
+                const filtered = allArticles.filter(article => {
+                    const keywords = categoryMap[currentCategory] || categoryMap['world'];
+                    return keywords.some(keyword => article.source.toLowerCase().includes(keyword.toLowerCase()));
+                });
+                
+                // If no articles match the current category, try sports as default
+                if (filtered.length === 0 && currentCategory === 'world') {
+                    currentCategory = 'sports';
+                    // Update button highlighting
+                    document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('.category-btn').forEach(btn => {
+                        if (btn.textContent.includes('🏊')) {
+                            btn.classList.add('active');
+                        }
+                    });
+                    const sportsFiltered = allArticles.filter(article => {
+                        const keywords = categoryMap['sports'];
+                        return keywords.some(keyword => article.source.toLowerCase().includes(keyword.toLowerCase()));
+                    });
+                    await renderArticles(sportsFiltered);
+                } else {
+                    await renderArticles(filtered);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('articles-container').innerHTML = '<div class="empty-state"><h2>Error</h2><p>' + error.message + '</p></div>';
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', initializeArticles);
+    </script>
+</body>
+</html>

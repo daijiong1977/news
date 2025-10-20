@@ -1,0 +1,15 @@
+.env
+*.pyc
+__pycache__/
+db.sqlite3
+*.db
+/tmp/
+.DS_Store
+node_modules/
+venv/
+.env
+secrets.json
+*.log
+articles.db
+subscriptions.db
+/tmp/*.log

@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .btn-back-to {
+            background: white;
+            color: #333;
+            padding: 12px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+        
+        .btn-back-to:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .header-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .article-date {
+            color: #999;
+            font-size: 0.95em;
+        }
+        
+        .article-source {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+        
+        .language-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .lang-btn {
+            padding: 8px 16px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .lang-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .lang-btn:hover {
+            border-color: #667eea;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: white;
+            padding: 15px 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            padding: 10px 20px;
+            border: 2px solid #ddd;
+            background: white;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            border-radius: 6px;
+            transition: all 0.2s;
+            color: #555;
+        }
+        
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .tab-btn:hover {
+            border-color: #667eea;
+        }
+        
+        .content-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+            min-height: 800px;
+        }
+        
+        @media (max-width: 1024px) {
+            .content-wrapper {
+                grid-template-columns: 1fr;
+                min-height: auto;
+            }
+        }
+        
+        .summary-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .summary-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .summary-text {
+            font-size: 1em;
+            line-height: 1.8;
+            color: #555;
+            text-align: justify;
+        }
+        
+        .questions-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            max-height: 800px;
+        }
+        
+        .questions-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            flex-shrink: 0;
+        }
+        
+        .progress-bar {
+            background: #f0f0f0;
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: #667eea;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        
+        .question-item {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .question-number {
+            font-size: 0.9em;
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .question-text {
+            font-size: 1em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .option {
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            background: white;
+            transition: all 0.2s;
+            font-size: 0.95em;
+        }
+        
+        .option:hover {
+            border-color: #667eea;
+            background: #f9f9ff;
+        }
+        
+        .option.selected {
+            border-color: #667eea;
+            background: #e8ecff;
+        }
+        
+        .option.correct {
+            border-color: #4caf50;
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .option.incorrect {
+            border-color: #f44336;
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .feedback {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        
+        .feedback.correct {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .feedback.incorrect {
+            background: #ffebee;
+            color: #c62828;
+            border-left: 4px solid #f44336;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-submit {
+            background: #667eea;
+            color: white;
+            flex: 1;
+        }
+        
+        .btn-submit:hover {
+            background: #5568d3;
+        }
+        
+        .btn-submit:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .btn-skip {
+            background: #f0f0f0;
+            color: #333;
+            flex: 1;
+        }
+        
+        .btn-skip:hover {
+            background: #e0e0e0;
+        }
+        
+        .quiz-complete {
+            text-align: center;
+            padding: 40px 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            grid-column: 1 / -1;
+        }
+        
+        .quiz-complete h2 {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .score-display {
+            font-size: 3em;
+            color: #667eea;
+            font-weight: 600;
+            margin: 20px 0;
+        }
+        
+        .score-text {
+            font-size: 1.1em;
+            color: #555;
+            margin-bottom: 30px;
+        }
+        
+        .btn-retry {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            display: inline-block;
+            margin-right: 10px;
+            border-radius: 6px;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .btn-retry:hover {
+            background: #5568d3;
+        }
+        
+        .btn-back {
+            background: #f0f0f0;
+            color: #333;
+            padding: 12px 30px;
+            display: inline-block;
+            border-radius: 6px;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .btn-back:hover {
+            background: #e0e0e0;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .keywords-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .keyword-item {
+            padding: 10px 15px;
+            background: #f0f0f0;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+        
+        .keyword-item strong {
+            color: #667eea;
+        }
+        
+        .background-section, .discussion-section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .section-content {
+            font-size: 1em;
+            line-height: 1.8;
+            color: #555;
+            text-align: justify;
+        }
+        
+        .original-content {
+            font-size: 1.2em;
+            line-height: 1.9;
+            color: #555;
+            text-align: justify;
+        }
+        
+        .discussion-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .discussion-columns {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .discussion-point {
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+        
+        .discussion-point.pro {
+            border-left-color: #4caf50;
+        }
+        
+        .discussion-point.con {
+            border-left-color: #f44336;
+        }
+        
+        .discussion-point h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.2em;
+        }
+        
+        .keywords-tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+        
+        .keyword-tab-btn {
+            padding: 10px 18px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.2s;
+            color: #555;
+        }
+        
+        .keyword-tab-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .keyword-tab-btn:hover {
+            border-color: #667eea;
+        }
+        
+        .keyword-details {
+            background: #f9f9f9;
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            line-height: 1.8;
+            color: #555;
+        }
+        
+        .keyword-details h3 {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .keyword-details p {
+            font-size: 1em;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-buttons">
+            <a href="/main_articles_interface_v2.html" class="btn-back-to" id="backBtn">← Back to Articles</a>
+        </div>
+        
+        <div class="header" id="header">
+            <div class="loading">Loading article...</div>
+        </div>
+        
+        <div class="tabs" id="tabs">
+            <div class="loading">Loading...</div>
+        </div>
+        
+        <div class="content-wrapper" id="content">
+            <div class="summary-section">
+                <div class="loading">Loading content...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let article = null;
+        let currentLanguage = 'en';
+        let currentDifficulty = 'hard';
+        let currentQuestion = 0;
+        let selectedQuestions = [];
+        let answers = {};
+        let currentTab = 'summary';
+        
+        async function loadArticle() {
+            const params = new URLSearchParams(window.location.search);
+            const articleId = params.get('id');
+            const difficultyParam = params.get('difficulty') || localStorage.getItem('selectedDifficulty') || 'hard';
+            const categoryParam = params.get('category') || localStorage.getItem('selectedCategory') || 'world';
+            const languageParam = params.get('language') || localStorage.getItem('selectedLanguage') || 'en';
+            
+            // Map URL difficulty names to database values
+            const difficultyMap = {
+                'high': 'hard',
+                'hard': 'hard',
+                'medium': 'medium',
+                'mid': 'medium',
+                'easy': 'easy'
+            };
+            currentDifficulty = difficultyMap[difficultyParam.toLowerCase()] || 'hard';
+            
+            // Save difficulty, category, and language to localStorage
+            localStorage.setItem('selectedDifficulty', currentDifficulty);
+            localStorage.setItem('selectedCategory', categoryParam.toLowerCase());
+            localStorage.setItem('selectedLanguage', languageParam.toLowerCase());
+            console.log(`[loadArticle] Difficulty: ${currentDifficulty}, Category: ${categoryParam}, Language: ${languageParam}`);
+            
+            if (!articleId) {
+                document.body.innerHTML = '<div style="color: white; text-align: center; padding: 40px;">No article selected</div>';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/articles_data_with_summaries.json');
+                if (!response.ok) throw new Error('Failed to load articles');
+                
+                const articles = await response.json();
+                article = articles.find(a => a.id == articleId);
+                
+                if (!article) {
+                    document.body.innerHTML = '<div style="color: white; text-align: center; padding: 40px;">Article not found</div>';
+                    return;
+                }
+                
+                // Fetch difficulty-specific content from API
+                console.log(`[loadArticle] Fetching ${currentDifficulty} content for article ${articleId}`);
+                const langCode = currentLanguage === 'en' ? 'en' : 'zh';
+                const apiUrl = `http://localhost:5001/api/article-content?article_id=${articleId}&difficulty=${currentDifficulty}&language=${langCode}`;
+                console.log(`[loadArticle] API URL: ${apiUrl}`);
+                
+                const apiResponse = await fetch(apiUrl);
+                
+                if (apiResponse.ok) {
+                    const difficultyContent = await apiResponse.json();
+                    console.log(`[loadArticle] ✓ Got difficulty content from API, summary length: ${difficultyContent.summary ? difficultyContent.summary.length : 0}`);
+                    console.log(`[loadArticle] Summary preview: ${difficultyContent.summary ? difficultyContent.summary.substring(0, 80) : 'N/A'}`);
+                    
+                    // Override article content with difficulty-specific content
+                    article.difficulty_summary = difficultyContent.summary || '';
+                    article.difficulty_keywords = difficultyContent.keywords || [];
+                    article.difficulty_background = difficultyContent.background || '';
+                    article.difficulty_pro = difficultyContent.pro_arguments || '';
+                    article.difficulty_con = difficultyContent.con_arguments || '';
+                    console.log(`[loadArticle] Stored: summary=${article.difficulty_summary ? 'YES' : 'NO'}, keywords=${article.difficulty_keywords.length}, bg=${article.difficulty_background ? 'YES' : 'NO'}`);
+                } else {
+                    console.log(`[loadArticle] ✗ API returned ${apiResponse.status}, using JSON content`);
+                    // Fallback to JSON content
+                    article.difficulty_summary = currentLanguage === 'en' ? article.summary_en : article.summary_zh;
+                    article.difficulty_keywords = article.keywords || [];
+                    article.difficulty_background = '';
+                    article.difficulty_pro = '';
+                    article.difficulty_con = '';
+                }
+                
+                // Load questions from database by difficulty level
+                console.log(`[loadArticle] Fetching questions for article ${articleId}, difficulty: ${currentDifficulty}`);
+                const questionsUrl = `http://localhost:5001/api/quiz-questions?article_id=${articleId}&difficulty=${currentDifficulty}`;
+                
+                try {
+                    const questionsResponse = await fetch(questionsUrl);
+                    if (questionsResponse.ok) {
+                        const questionsData = await questionsResponse.json();
+                        const allQuestions = questionsData.questions || [];
+                        console.log(`[loadArticle] ✓ Got ${allQuestions.length} questions from API for ${currentDifficulty} difficulty`);
+                        
+                        selectedQuestions = allQuestions.sort(() => Math.random() - 0.5).slice(0, 5);
+                    } else {
+                        console.log(`[loadArticle] ✗ Questions API returned ${questionsResponse.status}, using empty questions`);
+                        selectedQuestions = [];
+                    }
+                } catch (error) {
+                    console.error(`[loadArticle] Error fetching questions:`, error);
+                    selectedQuestions = [];
+                }
+                
+                selectedQuestions.forEach((q, i) => answers[i] = null);
+                
+                console.log(`[loadArticle] About to renderPage. Article object:`, {
+                    id: article.id,
+                    difficulty_summary_exists: !!article.difficulty_summary,
+                    summary_length: article.difficulty_summary ? article.difficulty_summary.length : 0,
+                    difficulty_keywords_length: (article.difficulty_keywords || []).length,
+                    currentDifficulty: currentDifficulty
+                });
+                
+                renderPage();
+            } catch (error) {
+                console.error('Error loading article:', error);
+                document.body.innerHTML = '<div style="color: white; text-align: center; padding: 40px;">Error loading article</div>';
+            }
+        }
+        
+        function renderPage() {
+            // Update back links to include difficulty, category, and language parameters
+            const difficultyUrlParam = currentDifficulty === 'medium' ? 'medium' : (currentDifficulty === 'easy' ? 'easy' : 'high');
+            const category = localStorage.getItem('selectedCategory') || 'world';
+            const language = localStorage.getItem('selectedLanguage') || 'en';
+            const backUrl = `/main_articles_interface_v2.html?difficulty=${difficultyUrlParam}&category=${category}&language=${language}`;
+            
+            const backBtn = document.getElementById('backBtn');
+            const quizBackBtn = document.getElementById('quizBackBtn');
+            
+            if (backBtn) backBtn.href = backUrl;
+            if (quizBackBtn) quizBackBtn.href = backUrl;
+            
+            renderHeader();
+            renderTabs();
+            renderContent();
+        }
+        
+        function renderHeader() {
+            const difficultyMap = {
+                'easy': '🟢 Easy',
+                'medium': '🟡 Medium',
+                'hard': '🔴 High'
+            };
+            const difficultyBadge = difficultyMap[currentDifficulty] || 'Unknown';
+            
+            const headerHtml = `
+                <h1>${article.title}</h1>
+                <div class="header-meta">
+                    <span class="article-date">${article.date}</span>
+                    <span class="article-source">${article.source}</span>
+                    <span style="background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 4px; font-size: 0.9em;">Level: ${difficultyBadge}</span>
+                    <div class="language-buttons">
+                        <button class="lang-btn ${currentLanguage === 'en' ? 'active' : ''}" onclick="changeLanguage('en')">English</button>
+                        <button class="lang-btn ${currentLanguage === 'zh' ? 'active' : ''}" onclick="changeLanguage('zh')">中文</button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('header').innerHTML = headerHtml;
+        }
+        
+        function renderTabs() {
+            // Easy level only shows Summary & Quiz and Keywords
+            // Medium and High show all tabs
+            let tabsHtml = `
+                <button class="tab-btn ${currentTab === 'summary' ? 'active' : ''}" onclick="switchTab('summary')">📖 Summary & Quiz</button>
+                <button class="tab-btn ${currentTab === 'keywords' ? 'active' : ''}" onclick="switchTab('keywords')">🏷️ Keywords</button>
+            `;
+            
+            // Add Background and Arguments tabs only for Medium and Hard levels
+            if (currentDifficulty !== 'easy') {
+                tabsHtml += `
+                <button class="tab-btn ${currentTab === 'background' ? 'active' : ''}" onclick="switchTab('background')">📚 Background</button>
+                <button class="tab-btn ${currentTab === 'discussion' ? 'active' : ''}" onclick="switchTab('discussion')">💬 Arguments</button>
+                `;
+            }
+            
+            // Original tab only for Medium and Hard
+            if (currentDifficulty !== 'easy') {
+                tabsHtml += `
+                <button class="tab-btn ${currentTab === 'original' ? 'active' : ''}" onclick="switchTab('original')">📰 Original</button>
+                `;
+            }
+            
+            document.getElementById('tabs').innerHTML = tabsHtml;
+        }
+        
+        function renderContent() {
+            if (currentTab === 'summary') {
+                renderSummaryQuiz();
+            } else if (currentTab === 'keywords') {
+                renderKeywords();
+            } else if (currentTab === 'background') {
+                renderBackground();
+            } else if (currentTab === 'discussion') {
+                renderDiscussion();
+            } else if (currentTab === 'original') {
+                renderOriginal();
+            }
+        }
+        
+        function renderSummaryQuiz() {
+            // Use difficulty-specific summary if available, otherwise fallback to JSON
+            const summary = article.difficulty_summary || (currentLanguage === 'en' ? article.summary_en : article.summary_zh);
+            const isUsingDifficulty = !!article.difficulty_summary;
+            console.log(`[renderSummaryQuiz] Using summary, difficulty_summary available: ${article.difficulty_summary ? 'YES' : 'NO'}, summary length: ${summary ? summary.length : 0}`);
+            const questionsHtml = renderQuestions();
+            
+            const debugBadge = isUsingDifficulty ? `<div style="background: #4caf50; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; font-size: 0.85em; color: white;">✓ Using ${currentDifficulty.toUpperCase()} difficulty content</div>` : `<div style="background: #ff9800; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; font-size: 0.85em; color: white;">⚠ Using fallback JSON content</div>`;
+            
+            const contentHtml = `
+                <div class="summary-section">
+                    ${debugBadge}
+                    <div class="summary-title">Full Summary</div>
+                    <div class="summary-text">${summary}</div>
+                </div>
+                
+                <div class="questions-section">
+                    ${questionsHtml}
+                </div>
+            `;
+            
+            document.getElementById('content').innerHTML = contentHtml;
+        }
+        
+        function renderQuestions() {
+            if (currentQuestion >= selectedQuestions.length) {
+                return renderQuizComplete();
+            }
+            
+            const question = selectedQuestions[currentQuestion];
+            const correctIndex = question.correct_answer;
+            const selectedAnswer = answers[currentQuestion];
+            
+            let optionsHtml = question.options.map((option, idx) => {
+                let classes = 'option';
+                if (selectedAnswer !== null) {
+                    if (idx === correctIndex) {
+                        classes += ' correct';
+                    } else if (selectedAnswer === idx && selectedAnswer !== correctIndex) {
+                        classes += ' incorrect';
+                    }
+                } else if (selectedAnswer === idx) {
+                    classes += ' selected';
+                }
+                
+                return `
+                    <div class="option ${classes}" onclick="selectAnswer(${idx})" style="pointer-events: ${selectedAnswer !== null ? 'none' : 'auto'}; opacity: ${selectedAnswer !== null && idx !== correctIndex && selectedAnswer !== idx ? '0.7' : '1'};">
+                        ${String.fromCharCode(65 + idx)}. ${option}
+                    </div>
+                `;
+            }).join('');
+            
+            let feedbackHtml = '';
+            if (selectedAnswer !== null) {
+                const isCorrect = selectedAnswer === correctIndex;
+                feedbackHtml = `
+                    <div class="feedback ${isCorrect ? 'correct' : 'incorrect'}">
+                        <strong>${isCorrect ? '✓ Correct!' : '✗ Incorrect'}</strong>
+                        <p>${question.explanation}</p>
+                    </div>
+                `;
+            }
+            
+            const progressPercent = ((currentQuestion + 1) / selectedQuestions.length) * 100;
+            
+            return `
+                <div class="questions-title">❓ Quiz (${currentQuestion + 1}/${selectedQuestions.length})</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${progressPercent}%"></div>
+                </div>
+                
+                <div class="question-item">
+                    <div class="question-number">Question ${currentQuestion + 1}</div>
+                    <div class="question-text">${question.question}</div>
+                    <div class="options">${optionsHtml}</div>
+                    ${feedbackHtml}
+                    <div class="button-group">
+                        <button class="btn btn-submit" onclick="submitAnswer()" ${selectedAnswer === null ? 'disabled' : ''}>
+                            ${selectedAnswer === null ? 'Select an answer' : 'Check Answer'}
+                        </button>
+                        ${selectedAnswer !== null ? `
+                            <button class="btn btn-skip" onclick="nextQuestion()">
+                                ${currentQuestion === selectedQuestions.length - 1 ? 'Finish' : 'Next →'}
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+        
+        function renderQuizComplete() {
+            const correct = Object.values(answers).filter((ans, idx) => {
+                if (ans === null) return false;
+                const q = selectedQuestions[idx];
+                return ans === q.correct_answer;
+            }).length;
+            
+            const percentage = Math.round((correct / selectedQuestions.length) * 100);
+            const isPerfect = percentage === 100;
+            
+            return `
+                <div class="quiz-complete" style="grid-column: 1 / -1;">
+                    <h2>Quiz Complete!</h2>
+                    <div class="score-display">${percentage}%</div>
+                    <div class="score-text">${correct} out of ${selectedQuestions.length} correct</div>
+                    ${isPerfect ? '<p style="font-size: 1.2em; color: #4caf50; margin-bottom: 30px;">🌟 Perfect Score!</p>' : ''}
+                    <button class="btn-retry" onclick="retryQuiz()">Try Again with New Questions</button>
+                    <a href="/main_articles_interface_v2.html" class="btn-back" id="quizBackBtn">Back to Articles</a>
+                </div>
+            `;
+        }
+        
+        function extractKeywordExplanation(keyword, summary, difficulty = 'hard') {
+            // First check if keyword has multi-level explanations
+            if (keyword.easy_explanation || keyword.medium_explanation || keyword.hard_explanation) {
+                // Use difficulty-specific explanation
+                if (difficulty === 'easy' && keyword.easy_explanation) {
+                    return keyword.easy_explanation;
+                } else if ((difficulty === 'medium' || difficulty === 'med') && keyword.medium_explanation) {
+                    return keyword.medium_explanation;
+                } else if ((difficulty === 'hard' || difficulty === 'high') && keyword.hard_explanation) {
+                    return keyword.hard_explanation;
+                }
+                // Fallback to generic explanation if available
+                return keyword.explanation || keyword.easy_explanation || keyword.medium_explanation || keyword.hard_explanation;
+            }
+            
+            // For simple string keywords or objects without multi-level explanations
+            const keywordText = typeof keyword === 'string' ? keyword : (keyword.word || keyword.term || '');
+            
+            // Find sentences containing the keyword and extract relevant context
+            if (!summary) return `"${keywordText}" is a key term in this article.`;
+            
+            const sentences = summary.match(/[^.!?]+[.!?]+/g) || [];
+            const relevantSentences = [];
+            
+            const keywordLower = keywordText.toLowerCase();
+            
+            for (const sentence of sentences) {
+                if (sentence.toLowerCase().includes(keywordLower)) {
+                    relevantSentences.push(sentence.trim());
+                    if (relevantSentences.length >= 2) break;
+                }
+            }
+            
+            if (relevantSentences.length > 0) {
+                return relevantSentences.join(' ');
+            }
+            
+            // Fallback: search for related context
+            return `"${keywordText}" is an important concept discussed in this article about the topic.`;
+        }
+        
+        function renderKeywords() {
+            // Use difficulty-specific keywords if available, otherwise fallback to JSON keywords
+            const keywords = article.difficulty_keywords || article.keywords || [];
+            const summary = article.difficulty_summary || (currentLanguage === 'en' ? article.summary_en : article.summary_zh) || '';
+            
+            if (!keywords || keywords.length === 0) {
+                const contentHtml = `
+                    <div class="summary-section" style="grid-column: 1 / -1;">
+                        <div class="summary-title">Key Topics</div>
+                        <p>No keywords available for this article.</p>
+                    </div>
+                `;
+                document.getElementById('content').innerHTML = contentHtml;
+                return;
+            }
+            
+            // Create keyword tabs
+            const keywordTabsHtml = keywords.map((kw, idx) => {
+                const keywordText = typeof kw === 'string' ? kw : (kw.word || kw.term || '');
+                return `<button class="keyword-tab-btn ${idx === 0 ? 'active' : ''}" onclick="switchKeyword(${idx})">${keywordText}</button>`;
+            }).join('');
+            
+            // Create keyword detail panels with difficulty-appropriate explanations
+            const keywordDetailsHtml = keywords.map((kw, idx) => {
+                let keywordText, explanation, frequency;
+                
+                if (typeof kw === 'string') {
+                    keywordText = kw;
+                    // Try to extract from summary or use fallback
+                    explanation = extractKeywordExplanation(kw, summary, currentDifficulty);
+                    frequency = 'Important';
+                } else {
+                    keywordText = kw.word || kw.term || '';
+                    // Use difficulty-specific explanation if available
+                    explanation = extractKeywordExplanation(kw, summary, currentDifficulty);
+                    frequency = kw.frequency || 'Important';
+                }
+                
+                return `
+                    <div class="keyword-detail-panel ${idx === 0 ? 'active' : ''}" id="keyword-panel-${idx}" style="display: ${idx === 0 ? 'block' : 'none'};">
+                        <div class="keyword-details">
+                            <h3>📌 ${keywordText}</h3>
+                            <p><strong>Level:</strong> ${currentDifficulty === 'easy' ? '🟢 Easy' : (currentDifficulty === 'medium' ? '🟡 Medium' : '🔴 Hard')}</p>
+                            <p><strong>Frequency:</strong> ${frequency}</p>
+                            <p><strong>Explanation:</strong></p>
+                            <p>${explanation}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            const contentHtml = `
+                <div class="summary-section" style="grid-column: 1 / -1;">
+                    <div class="summary-title">Key Topics & Terms</div>
+                    <div class="keywords-tabs">
+                        ${keywordTabsHtml}
+                    </div>
+                    <div class="keyword-panels">
+                        ${keywordDetailsHtml}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('content').innerHTML = contentHtml;
+        }
+        
+        function switchKeyword(index) {
+            // Hide all panels
+            const panels = document.querySelectorAll('.keyword-detail-panel');
+            panels.forEach(p => p.style.display = 'none');
+            
+            // Hide all active buttons
+            const buttons = document.querySelectorAll('.keyword-tab-btn');
+            buttons.forEach(b => b.classList.remove('active'));
+            
+            // Show selected panel and button
+            const selectedPanel = document.getElementById(`keyword-panel-${index}`);
+            if (selectedPanel) {
+                selectedPanel.style.display = 'block';
+            }
+            buttons[index].classList.add('active');
+        }
+        
+        function renderBackground() {
+            const contentHtml = `
+                <div class="summary-section" style="grid-column: 1 / -1;">
+                    <div class="background-section">
+                        <div class="section-title">Background Reading</div>
+                        <div class="section-content">${article.difficulty_background || article.background_reading || ''}</div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('content').innerHTML = contentHtml;
+        }
+        
+        function renderDiscussion() {
+            // Use difficulty-specific arguments if available, otherwise fallback to JSON discussion
+            const proArg = article.difficulty_pro || (article.discussion && article.discussion.pro) || '';
+            const conArg = article.difficulty_con || (article.discussion && article.discussion.con) || '';
+            
+            const contentHtml = `
+                <div class="summary-section" style="grid-column: 1 / -1;">
+                    <div class="discussion-section">
+                        <div class="section-title">Two-Sided Arguments</div>
+                        <div class="discussion-columns">
+                            <div class="discussion-point pro">
+                                <h4>✓ Supporting Arguments</h4>
+                                <p>${proArg}</p>
+                            </div>
+                            <div class="discussion-point con">
+                                <h4>✗ Counter Arguments</h4>
+                                <p>${conArg}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('content').innerHTML = contentHtml;
+        }
+        
+        function renderOriginal() {
+            const originalContent = article.original_content;
+            const paragraphs = originalContent.split('\n\n').map(p => `<p>${p}</p>`).join('');
+            
+            const contentHtml = `
+                <div class="summary-section" style="grid-column: 1 / -1;">
+                    <div class="section-title">📰 Original Article</div>
+                    <img src="/${article.image}" alt="${article.title}" style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 20px;">
+                    <div class="original-content">
+                        ${paragraphs}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('content').innerHTML = contentHtml;
+        }
+        
+        function selectAnswer(index) {
+            if (answers[currentQuestion] === null) {
+                answers[currentQuestion] = index;
+                renderContent();
+            }
+        }
+        
+        function submitAnswer() {
+            renderContent();
+        }
+        
+        function nextQuestion() {
+            currentQuestion++;
+            renderContent();
+        }
+        
+        async function changeLanguage(lang) {
+            currentLanguage = lang;
+            
+            // Fetch the content in the new language from API
+            try {
+                const langCode = lang === 'en' ? 'en' : 'zh';
+                const apiResponse = await fetch(
+                    `http://localhost:5001/api/article-content?article_id=${article.id}&difficulty=${currentDifficulty}&language=${langCode}`
+                );
+                
+                if (apiResponse.ok) {
+                    const difficultyContent = await apiResponse.json();
+                    // Update article content with difficulty-specific content in new language
+                    article.difficulty_summary = difficultyContent.summary || '';
+                    article.difficulty_keywords = difficultyContent.keywords || [];
+                    article.difficulty_background = difficultyContent.background || '';
+                    article.difficulty_pro = difficultyContent.pro_arguments || '';
+                    article.difficulty_con = difficultyContent.con_arguments || '';
+                }
+            } catch (error) {
+                console.error('Error fetching language content:', error);
+            }
+            
+            renderPage();
+        }
+        
+        function switchTab(tab) {
+            currentTab = tab;
+            renderPage();
+        }
+        
+        function retryQuiz() {
+            currentQuestion = 0;
+            selectedQuestions = article.questions.sort(() => Math.random() - 0.5).slice(0, 5);
+            answers = {};
+            selectedQuestions.forEach((q, i) => answers[i] = null);
+            currentTab = 'summary';
+            renderPage();
+        }
+        
+        document.addEventListener('DOMContentLoaded', loadArticle);
+    </script>
+</body>
+</html>
