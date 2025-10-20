@@ -219,7 +219,7 @@ def main():
     print("DATA COLLECTOR - RSS Feed Aggregator")
     print("="*70)
     
-    collect_articles(num_per_source=1)
+    collect_articles(num_per_source=5)
     
     # Show what was collected
     conn = sqlite3.connect(DB_FILE)
