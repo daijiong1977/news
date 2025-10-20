@@ -22,10 +22,10 @@ if not api_key:
 # Configuration
 DB_PATH = '/Users/jidai/news/articles.db'
 API_URL = 'https://api.deepseek.com/chat/completions'
-OUTPUT_DIR = '/Users/jidai/news'
+OUTPUT_DIR = os.getcwd()
 
 # Load example structure to show AI the exact format
-EXAMPLE_JSON_PATH = '/Users/jidai/news/example_response_structure.json'
+EXAMPLE_JSON_PATH = os.path.join(os.getcwd(), 'example_response_structure.json')
 with open(EXAMPLE_JSON_PATH) as f:
     example_data = json.load(f)
     # Use only the easy level as a minimal example to keep prompt size down
