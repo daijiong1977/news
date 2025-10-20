@@ -585,12 +585,13 @@
                 'easy': 'easy'
             };
             currentDifficulty = difficultyMap[difficultyParam.toLowerCase()] || 'hard';
+            currentLanguage = languageParam.toLowerCase() === 'zh' ? 'zh' : 'en';
             
             // Save difficulty, category, and language to localStorage
             localStorage.setItem('selectedDifficulty', currentDifficulty);
             localStorage.setItem('selectedCategory', categoryParam.toLowerCase());
-            localStorage.setItem('selectedLanguage', languageParam.toLowerCase());
-            console.log(`[loadArticle] Difficulty: ${currentDifficulty}, Category: ${categoryParam}, Language: ${languageParam}`);
+            localStorage.setItem('selectedLanguage', currentLanguage);
+            console.log(`[loadArticle] Difficulty: ${currentDifficulty}, Category: ${categoryParam}, Language: ${currentLanguage}`);
             
             if (!articleId) {
                 document.body.innerHTML = '<div style="color: white; text-align: center; padding: 40px;">No article selected</div>';
