@@ -245,9 +245,17 @@ def crawl_sources(conn: sqlite3.Connection, test_mode: bool = False, limit: Opti
         
         for article in articles:
             try:
+                # Check if article with same title already exists
+                cursor.execute("SELECT id FROM articles WHERE title = ?", (article["title"],))
+                existing = cursor.fetchone()
+                
+                if existing:
+                    print(f"  ⊘ Skipped (duplicate): {article['title'][:60]}...", file=sys.stderr)
+                    continue
+                
                 # Insert article
                 cursor.execute("""
-                    INSERT OR IGNORE INTO articles 
+                    INSERT INTO articles 
                     (title, source, url, description, pub_date, image_url, crawled_at)
                     VALUES (?, ?, ?, ?, ?, ?, ?)
                 """, (
@@ -320,17 +328,29 @@ def process_with_deepseek(conn: sqlite3.Connection, test_mode: bool = False) -> 
     
     cursor = conn.cursor()
     
-    # Get articles not yet processed
+    # Get all articles with content to check which ones need processing
     cursor.execute("""
-        SELECT id, title, content FROM articles 
-        WHERE content IS NOT NULL AND deepseek_processed = 0 LIMIT ?
-    """, (5 if test_mode else 50,))
+        SELECT id, title, content, deepseek_processed FROM articles 
+        WHERE content IS NOT NULL 
+        ORDER BY processed_at DESC
+    """)
     
-    articles = cursor.fetchall()
-    print(f"Processing {len(articles)} articles through Deepseek...", file=sys.stderr)
+    all_articles = cursor.fetchall()
+    to_process = [a for a in all_articles if a[3] == 0]  # Filter for unprocessed
+    already_processed = len(all_articles) - len(to_process)
+    
+    print(f"Total articles with content: {len(all_articles)}", file=sys.stderr)
+    print(f"Already analyzed: {already_processed}", file=sys.stderr)
+    print(f"Processing {len(to_process)} articles through Deepseek...", file=sys.stderr)
+    
+    # Show already processed articles
+    if already_processed > 0:
+        for article_id, title, _, _ in all_articles:
+            if any(a[3] == 1 for a in all_articles if a[0] == article_id):
+                print(f"  ⊘ Skipped (already analyzed): {title[:60]}...", file=sys.stderr)
     
     processed = 0
-    for article_id, title, content in articles:
+    for article_id, title, content, _ in to_process:
         print(f"  Processing: {title[:60]}...", file=sys.stderr)
         
         try:
