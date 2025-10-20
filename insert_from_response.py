@@ -17,7 +17,7 @@ if len(sys.argv) < 2:
     sys.exit(1)
 
 # Configuration
-DB_PATH = '/Users/jidai/news/articles.db'
+DB_PATH = os.path.join(os.getcwd(), 'articles.db')
 response_file = sys.argv[1]
 
 # Map difficulty text to difficulty_id
