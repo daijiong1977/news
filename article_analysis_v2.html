@@ -615,20 +615,16 @@
                 
                 // Map difficulty levels to summary field names
                 const summaryFieldMap = {
-                    'easy': 'summary_easy',
-                    'medium': 'summary_medium',
-                    'hard': 'summary_hard'
+                    'easy': { en: 'summary_easy_en', zh: 'summary_easy_zh' },
+                    'medium': { en: 'summary_mid_en', zh: 'summary_mid_zh' },
+                    'hard': { en: 'summary_hard_en', zh: 'summary_hard_zh' }
                 };
                 
-                const summaryField = summaryFieldMap[currentDifficulty] || 'summary_hard';
+                const difficultyData = summaryFieldMap[currentDifficulty] || summaryFieldMap['hard'];
+                const summaryField = difficultyData[currentLanguage === 'zh' ? 'zh' : 'en'];
                 
-                // Use language-specific summary (summary_en for English, summary_zh for Chinese)
+                // Use language and difficulty specific summary
                 let selectedSummary = article[summaryField] || '';
-                if (currentLanguage === 'en' && article.summary_en) {
-                    selectedSummary = article.summary_en;
-                } else if (currentLanguage === 'zh' && article.summary_zh) {
-                    selectedSummary = article.summary_zh;
-                }
                 
                 article.difficulty_summary = selectedSummary;
                 article.difficulty_keywords = article.keywords || [];
@@ -636,7 +632,7 @@
                 article.difficulty_pro = '';
                 article.difficulty_con = '';
                 
-                console.log(`[loadArticle] Loaded: summary=${article.difficulty_summary ? 'YES' : 'NO'}, keywords=${article.difficulty_keywords.length}, language=${currentLanguage}`);
+                console.log(`[loadArticle] Loaded: difficulty=${currentDifficulty}, language=${currentLanguage}, field=${summaryField}, summary=${selectedSummary ? 'YES' : 'NO'}`);
                 
                 // No questions loaded from API (not available in static mode)
                 selectedQuestions = [];
@@ -740,13 +736,13 @@
         }
         
         function renderSummaryQuiz() {
-            // Use difficulty-specific summary if available, otherwise fallback to JSON
-            const summary = article.difficulty_summary || (currentLanguage === 'en' ? article.summary_en : article.summary_zh);
+            // Use difficulty-specific summary if available
+            const summary = article.difficulty_summary || '';
             const isUsingDifficulty = !!article.difficulty_summary;
             console.log(`[renderSummaryQuiz] Using summary, difficulty_summary available: ${article.difficulty_summary ? 'YES' : 'NO'}, summary length: ${summary ? summary.length : 0}`);
             const questionsHtml = renderQuestions();
             
-            const debugBadge = isUsingDifficulty ? `<div style="background: #4caf50; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; font-size: 0.85em; color: white;">✓ Using ${currentDifficulty.toUpperCase()} difficulty content</div>` : `<div style="background: #ff9800; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; font-size: 0.85em; color: white;">⚠ Using fallback JSON content</div>`;
+            const debugBadge = isUsingDifficulty ? `<div style="background: #4caf50; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; font-size: 0.85em; color: white;">✓ Using ${currentDifficulty.toUpperCase()} difficulty (${currentLanguage === 'zh' ? 'CN' : 'EN'}) content</div>` : `<div style="background: #ff9800; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; font-size: 0.85em; color: white;">⚠ Using fallback JSON content</div>`;
             
             const contentHtml = `
                 <div class="summary-section">
@@ -895,7 +891,7 @@
         function renderKeywords() {
             // Use difficulty-specific keywords if available, otherwise fallback to JSON keywords
             const keywords = article.difficulty_keywords || article.keywords || [];
-            const summary = article.difficulty_summary || (currentLanguage === 'en' ? article.summary_en : article.summary_zh) || '';
+            const summary = article.difficulty_summary || '';
             
             if (!keywords || keywords.length === 0) {
                 const contentHtml = `

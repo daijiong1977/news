@@ -189,15 +189,14 @@
                 return;
             }
             
-            // Map difficulty to summary field name
+            // Map difficulty to language-specific summary fields
             const difficultyMap = {
-                'easy': 'summary_easy',
-                'medium': 'summary_medium',
-                'hard': 'summary_hard'
+                'easy': { en: 'summary_easy_en', zh: 'summary_easy_zh' },
+                'medium': { en: 'summary_mid_en', zh: 'summary_mid_zh' },
+                'hard': { en: 'summary_hard_en', zh: 'summary_hard_zh' }
             };
             
-            const summaryField = difficultyMap[currentDifficulty] || 'summary_hard';
-            
+            const difficultyData = difficultyMap[currentDifficulty] || difficultyMap['hard'];
             const badge = difficultyBadgeMap[currentDifficulty];
             const langActive = currentLanguage === 'en' ? 'en' : 'zh';
             
@@ -206,13 +205,10 @@
                 let keywords = article.keywords || [];
                 
                 // Get the appropriate summary based on difficulty and language
-                let displaySummary = article[summaryField] || article.summary_en || '';
-                if (currentLanguage === 'zh') {
-                    displaySummary = article.summary_zh || article[summaryField] || article.summary_en || '';
-                    console.log(`[renderArticles] Article ${article.id}: Using summary_zh (${displaySummary.length} chars)`);
-                } else {
-                    console.log(`[renderArticles] Article ${article.id}: Using summary_en (${displaySummary.length} chars)`);
-                }
+                const summaryField = difficultyData[currentLanguage === 'zh' ? 'zh' : 'en'];
+                let displaySummary = article[summaryField] || '';
+                
+                console.log(`[renderArticles] Article ${article.id}: difficulty=${currentDifficulty}, language=${currentLanguage}, field=${summaryField}, summary=${displaySummary.substring(0, 50)}...`);
                 
                 const keywordsHtml = keywords && keywords.length > 0 ? `
                     <div class="article-keywords">

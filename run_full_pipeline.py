@@ -452,30 +452,35 @@ def process_with_deepseek(conn: sqlite3.Connection, test_mode: bool = False) -> 
         
         try:
             # Create prompt for Deepseek
-            prompt = f"""Analyze this article and provide summaries in BOTH English and Chinese (Simplified).
+            prompt = f"""Analyze this article and provide summaries in BOTH English and Chinese (Simplified) at THREE difficulty levels.
 
 ARTICLE TITLE: {title}
 
 ARTICLE CONTENT:
 {content}
 
-Please provide ONE summary for each language at the SAME reading level (elementary/simple level).
+Please provide summaries at THREE reading levels for EACH language (6 total summaries).
 
 Format your response as JSON:
 {{
     "summaries": {{
-        "elementary_en": "Simple summary in English using easy words (ages 8-11)",
-        "elementary_zh": "简单的中文摘要,用简单的词语(8-11岁)"
+        "easy_en": "Very simple summary in English using easy words (ages 8-10)",
+        "easy_zh": "非常简单的中文摘要,用简单词语(8-10岁)",
+        "mid_en": "Intermediate summary in English with some complex words (ages 11-13)",
+        "mid_zh": "中等难度的中文摘要,带一些复杂词汇(11-13岁)",
+        "high_en": "Detailed summary in English with complex vocabulary (ages 14+)",
+        "high_zh": "详细的中文摘要,使用复杂词汇(14岁以上)"
     }},
     "language": "en"
 }}
 
 IMPORTANT NOTES:
-- Write the English summary at elementary/simple level
-- Write the Chinese summary at the SAME simple/elementary level
-- Use clear, easy language in both versions
-- Keep both summaries roughly the same length
-- Both should be appropriate for children to understand"""
+- easy level: Simple language for younger readers
+- mid level: Standard language for teens
+- high level: Complex language for older readers
+- ALL summaries in English should be AT THE SAME LEVEL as the corresponding Chinese summary
+- Keep summaries roughly the same length across both languages
+- Translate meaning, not word-for-word"""
             
             # Call Deepseek API
             headers = {
@@ -812,11 +817,12 @@ def generate_articles_data(conn: sqlite3.Connection) -> None:
             a.content,
             a.image_local,
             a.image_url,
-            GROUP_CONCAT(CASE WHEN s.difficulty = 'elementary' THEN s.summary END) as summary_elementary,
-            GROUP_CONCAT(CASE WHEN s.difficulty = 'middle' THEN s.summary END) as summary_middle,
-            GROUP_CONCAT(CASE WHEN s.difficulty = 'high' THEN s.summary END) as summary_high,
-            GROUP_CONCAT(CASE WHEN s.difficulty = 'elementary_en' THEN s.summary END) as summary_elementary_en,
-            GROUP_CONCAT(CASE WHEN s.difficulty = 'elementary_zh' THEN s.summary END) as summary_elementary_zh
+            GROUP_CONCAT(CASE WHEN s.difficulty = 'easy_en' THEN s.summary END) as summary_easy_en,
+            GROUP_CONCAT(CASE WHEN s.difficulty = 'easy_zh' THEN s.summary END) as summary_easy_zh,
+            GROUP_CONCAT(CASE WHEN s.difficulty = 'mid_en' THEN s.summary END) as summary_mid_en,
+            GROUP_CONCAT(CASE WHEN s.difficulty = 'mid_zh' THEN s.summary END) as summary_mid_zh,
+            GROUP_CONCAT(CASE WHEN s.difficulty = 'high_en' THEN s.summary END) as summary_high_en,
+            GROUP_CONCAT(CASE WHEN s.difficulty = 'high_zh' THEN s.summary END) as summary_high_zh
         FROM articles a
         LEFT JOIN article_summaries s ON a.id = s.article_id
         WHERE a.deepseek_processed = 1
@@ -829,7 +835,9 @@ def generate_articles_data(conn: sqlite3.Connection) -> None:
     # Build articles data with language support and all difficulty levels
     articles_data = []
     for row in articles:
-        article_id, title, date, source, content, image_local, image_url, summary_elem, summary_mid, summary_high, summary_elem_en, summary_elem_zh = row
+        (article_id, title, date, source, content, image_local, image_url, 
+         summary_easy_en, summary_easy_zh, summary_mid_en, summary_mid_zh, 
+         summary_high_en, summary_high_zh) = row
         
         # Use local image if available, otherwise use original URL, fallback to placeholder
         if image_local:
@@ -849,11 +857,12 @@ def generate_articles_data(conn: sqlite3.Connection) -> None:
             "date": date or dt.datetime.now().strftime("%Y-%m-%d"),
             "source": source,
             "image": final_image,  # Real downloaded image or fallback to placeholder
-            "summary_easy": summary_elem or "",
-            "summary_medium": summary_mid or "",
-            "summary_hard": summary_high or "",
-            "summary_en": summary_elem_en or summary_elem or "",  # English version (if generated from Deepseek)
-            "summary_zh": summary_elem_zh or "",  # Chinese version (if generated from Deepseek)
+            "summary_easy_en": summary_easy_en or "",
+            "summary_easy_zh": summary_easy_zh or "",
+            "summary_mid_en": summary_mid_en or "",
+            "summary_mid_zh": summary_mid_zh or "",
+            "summary_hard_en": summary_high_en or "",
+            "summary_hard_zh": summary_high_zh or "",
             "keywords": keywords_list
         })
     
