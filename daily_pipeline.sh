@@ -43,18 +43,32 @@ mkdir -p "${WORK_DIR}/logs"
     echo "DAILY NEWS PIPELINE - COMPLETED AT $(date)"
     echo "======================================================================="
     
-    # Show summary
+    # Step 4: Check database results
     echo ""
-    echo "Database Summary:"
+    echo "[CHECK] Database Status:"
     python3 << 'PYSCRIPT'
 import sqlite3
 c = sqlite3.connect('articles.db').cursor()
 total = c.execute('SELECT COUNT(*) FROM articles').fetchone()[0]
 processed = c.execute('SELECT COUNT(*) FROM articles WHERE deepseek_processed=1').fetchone()[0]
 summaries = c.execute('SELECT COUNT(*) FROM article_summaries').fetchone()[0]
+keywords = c.execute('SELECT COUNT(*) FROM keywords').fetchone()[0]
+questions = c.execute('SELECT COUNT(*) FROM questions').fetchone()[0]
+choices = c.execute('SELECT COUNT(*) FROM choices').fetchone()[0]
+comments = c.execute('SELECT COUNT(*) FROM comments').fetchone()[0]
+background = c.execute('SELECT COUNT(*) FROM background_read').fetchone()[0]
+analysis = c.execute('SELECT COUNT(*) FROM article_analysis').fetchone()[0]
+
 print(f"  Total articles: {total}")
-print(f"  Processed: {processed}")
-print(f"  Summaries: {summaries}")
+print(f"  Processed articles: {processed}")
+print(f"  Article summaries: {summaries}")
+print(f"  Keywords: {keywords}")
+print(f"  Questions: {questions}")
+print(f"  Choices: {choices}")
+print(f"  Comments: {comments}")
+print(f"  Background reading: {background}")
+print(f"  Article analysis: {analysis}")
+print(f"  Total records: {summaries + keywords + questions + choices + comments + background + analysis}")
 PYSCRIPT
 
 } 2>&1 | tee "$LOG_FILE"
