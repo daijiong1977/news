@@ -69,6 +69,24 @@ What I changed in this repo
 - Simplified this README to recommend a `git pull` workflow as the default.
 - If you want, I can also update or disable the GitHub Actions deploy workflow so it won't attempt SSH deploys on push. See `.github/workflows/deploy.yml`.
 
+Enabling GitHub Actions SSH deploy (optional)
+---------------------------------------------
+If you prefer GitHub to push and trigger the deploy automatically, the repository includes a GitHub Actions workflow that will copy `deploy/deploy_news.sh` to the server and run it via SSH. To enable it you must add these repository secrets (Settings → Secrets → Actions):
+
+- `EC2_HOST` — server IP or hostname (example: `18.223.121.227`)
+- `EC2_USER` — user to SSH as (example: `ec2-user`)
+- `EC2_PORT` — SSH port (usually `22`)
+- `EC2_SSH_KEY` — the private key (PEM) contents for the deploy key (no passphrase preferred for Actions)
+
+Guidance for keys:
+- Create a deploy-only SSH keypair on your machine: `ssh-keygen -t ed25519 -f deploy_news_key`.
+- Add the public key (`deploy_news_key.pub`) to `/home/ec2-user/.ssh/authorized_keys` on the server.
+- Paste the private key (`deploy_news_key`) into `EC2_SSH_KEY` in GitHub Secrets (make sure to include newlines exactly as in the PEM file).
+
+Once secrets are set, pushes to `main` will run the deploy workflow and execute `/usr/local/bin/deploy_news.sh` on the server as root (the workflow moves the script into place and runs it with `sudo`).
+
+Security note: Use a deploy-only key and restrict its permissions on the server (e.g., limit allowed commands or use a dedicated deploy user). Rotate the key if it is ever exposed.
+
 Next steps I can take (if you want):
 - Convert the GitHub Action to a manual dispatch-only workflow (so nothing runs automatically on push).
 - Provide a minimal webhook receiver + systemd example (Flask single-file) that runs `git pull` when triggered and verifies a secret.

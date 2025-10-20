@@ -1,20 +1,36 @@
-name: Deploy (manual)
+name: Deploy to EC2
 
 on:
-  workflow_dispatch: {}
+  push:
+    branches: [ main ]
 
 jobs:
-  info:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Deployment instructions
-      run: |
-        echo "This workflow is intentionally manual and informational."
-        echo "It will NOT perform SSH or run deploy scripts automatically."
-        echo "To deploy, SSH to your server and run the commands in deploy/README.md or use the manual steps below:" 
-        echo "  cd /var/www/news && git fetch origin main && git reset --hard origin/main && sudo systemctl restart news.service"
-        echo "If you want Actions to perform deployment, re-enable the original deploy steps and add the necessary secrets (EC2_HOST, EC2_USER, EC2_PORT, EC2_SSH_KEY)."
+    - name: Copy files to server and trigger deploy
+      uses: appleboy/scp-action@v0.1.5
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        port: ${{ secrets.EC2_PORT }}
+        source: "deploy/deploy_news.sh"
+        target: "/home/${{ secrets.EC2_USER }}/deploy_news.sh"
+
+    - name: Run deploy script via SSH
+      uses: appleboy/ssh-action@v0.1.6
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        port: ${{ secrets.EC2_PORT }}
+        script: |
+          chmod +x /home/${{ secrets.EC2_USER }}/deploy_news.sh
+          sudo mv /home/${{ secrets.EC2_USER }}/deploy_news.sh /usr/local/bin/deploy_news.sh
+          sudo chown root:root /usr/local/bin/deploy_news.sh
+          sudo /usr/local/bin/deploy_news.sh
