@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import '../styles/ArticleDetail.css';
 
 interface Filters {
   difficulty: 'easy' | 'mid' | 'hard';
@@ -12,13 +13,29 @@ interface Question {
   question: string;
   choices: string[];
   correct_answer: number;
+  explanation?: string;
 }
 
 interface Comment {
   id: number;
   content: string;
-  attitude: string;
+  attitude: 'positive' | 'neutral' | 'negative';
   source?: string;
+}
+
+interface Keyword {
+  word: string;
+  explanation: string;
+}
+
+interface ArticleData {
+  id: number;
+  title: string;
+  zh_title?: string;
+  source: string;
+  pub_date: string;
+  description: string;
+  image_url?: string;
 }
 
 interface Props {
@@ -28,13 +45,17 @@ interface Props {
 }
 
 const ArticleDetail: React.FC<Props> = ({ articleId, filters, onBack }) => {
-  const [article, setArticle] = useState<any>(null);
-  const [summaries, setSummaries] = useState<any[]>([]);
-  const [keywords, setKeywords] = useState<string[]>([]);
+  const [article, setArticle] = useState<ArticleData | null>(null);
+  const [summary, setSummary] = useState<string>('');
+  const [keywords, setKeywords] = useState<Keyword[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
+  const [backgroundReading, setBackgroundReading] = useState<string>('');
+  const [analysis, setAnalysis] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({});
+  const [showDetailed, setShowDetailed] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState<'en' | 'zh'>(filters.language);
 
   useEffect(() => {
     fetchArticleDetail();
@@ -47,23 +68,22 @@ const ArticleDetail: React.FC<Props> = ({ articleId, filters, onBack }) => {
         difficulty: filters.difficulty,
         language: filters.language,
       });
-      const response = await axios.get(
-        `/api/articles/${articleId}?${params}`
-      );
-      setArticle(response.data.article);
-      setSummaries(response.data.summaries || []);
-      setKeywords(response.data.keywords || []);
-      setQuestions(response.data.questions || []);
-      setComments(response.data.comments || []);
+      const response = await axios.get(`/api/articles/${articleId}?${params}`);
+      
+      const data = response.data;
+      setArticle(data.article);
+      setSummary(data.summary || '');
+      setKeywords(data.keywords || []);
+      setQuestions(data.questions || []);
+      setComments(data.comments || []);
+      setBackgroundReading(data.background_reading || '');
+      setAnalysis(data.analysis || '');
     } catch (err) {
       console.error('Failed to load article detail', err);
     } finally {
       setLoading(false);
     }
   };
-
-  if (loading) return <div className="loading">Loading...</div>;
-  if (!article) return <div className="error">Article not found</div>;
 
   const handleAnswerSelect = (questionId: number, answerIndex: number) => {
     setSelectedAnswers({
@@ -72,82 +92,215 @@ const ArticleDetail: React.FC<Props> = ({ articleId, filters, onBack }) => {
     });
   };
 
+  const toggleLanguage = (lang: 'en' | 'zh') => {
+    setCurrentLanguage(lang);
+  };
+
+  if (loading) {
+    return (
+      <div className="article-detail-wrapper">
+        <div className="loading">Loading article details...</div>
+      </div>
+    );
+  }
+
+  if (!article) {
+    return (
+      <div className="article-detail-wrapper">
+        <div className="error">Article not found</div>
+        <button onClick={onBack} className="detail-back-button">
+          ← Back to List
+        </button>
+      </div>
+    );
+  }
+
+  const displayTitle = currentLanguage === 'zh' && article.zh_title ? article.zh_title : article.title;
+
   return (
-    <div className="article-detail">
-      <button onClick={onBack} className="back-button">
+    <div className="article-detail-wrapper">
+      <button onClick={onBack} className="detail-back-button">
         ← Back to Articles
       </button>
 
-      <header className="detail-header">
-        <h1>{filters.language === 'zh' && article.zh_title ? article.zh_title : article.title}</h1>
-        <p className="source">{article.source}</p>
-        <p className="date">{new Date(article.pub_date).toLocaleDateString()}</p>
-        <span className="difficulty-badge">{filters.difficulty.toUpperCase()}</span>
-      </header>
+      {/* Article Preview Section */}
+      <div className="article-preview">
+        <div className="preview-header">
+          <div className="preview-content">
+            <h1>{displayTitle}</h1>
 
-      {summaries.length > 0 && (
-        <section className="summaries">
-          <h2>Summary</h2>
-          {summaries.map((summary) => (
-            <div key={summary.id} className="summary-box">
-              <p>{summary.text}</p>
+            <div className="preview-meta">
+              <div className="meta-item">
+                <span className="meta-icon">📰</span>
+                <span>{article.source}</span>
+              </div>
+              <div className="meta-item">
+                <span className="meta-icon">📅</span>
+                <span>{new Date(article.pub_date).toLocaleDateString()}</span>
+              </div>
+              <div className="meta-item">
+                <span className="meta-icon">📚</span>
+                <span>{filters.difficulty}</span>
+              </div>
             </div>
-          ))}
+
+            <p className="preview-snippet">{article.description}</p>
+
+            <div className="language-toggle">
+              <button
+                className={`lang-btn ${currentLanguage === 'en' ? 'active' : ''}`}
+                onClick={() => toggleLanguage('en')}
+              >
+                English
+              </button>
+              {article.zh_title && (
+                <button
+                  className={`lang-btn ${currentLanguage === 'zh' ? 'active' : ''}`}
+                  onClick={() => toggleLanguage('zh')}
+                >
+                  中文
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div>
+            {article.image_url ? (
+              <img src={article.image_url} alt={article.title} className="preview-image" />
+            ) : (
+              <div className="preview-image placeholder">📰</div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Summary Section */}
+      {summary && (
+        <section className="detail-section">
+          <h2 className="section-title">
+            <span className="section-title-icon">📖</span>
+            Summary
+          </h2>
+          <div className="summary-container">
+            <p className="summary-text">{summary}</p>
+          </div>
         </section>
       )}
 
+      {/* Keywords Section */}
       {keywords.length > 0 && (
-        <section className="keywords">
-          <h2>Key Terms</h2>
-          <div className="keywords-list">
-            {keywords.map((keyword, idx) => (
-              <span key={idx} className="keyword-tag">
-                {keyword}
-              </span>
+        <section className="detail-section">
+          <h2 className="section-title">
+            <span className="section-title-icon">🔑</span>
+            Key Words & Concepts
+          </h2>
+          <div className="keywords-grid">
+            {keywords.map((keyword, index) => (
+              <div key={index} className="keyword-card">
+                <div className="keyword-word">{keyword.word}</div>
+                <div className="keyword-explanation">{keyword.explanation}</div>
+              </div>
             ))}
           </div>
         </section>
       )}
 
-      {questions.length > 0 && (
-        <section className="questions">
-          <h2>Comprehension Check</h2>
-          {questions.map((q) => (
-            <div key={q.id} className="question-box">
-              <p className="question-text">{q.question}</p>
-              <div className="choices">
-                {q.choices.map((choice, idx) => (
-                  <label key={idx} className="choice">
+      {/* Background Reading Section */}
+      {backgroundReading && (
+        <section className="detail-section">
+          <h2 className="section-title">
+            <span className="section-title-icon">🌍</span>
+            Background Reading
+          </h2>
+          <div className="background-box">{backgroundReading}</div>
+        </section>
+      )}
+
+      {/* Dive Deeper Button */}
+      {(questions.length > 0 || comments.length > 0 || analysis) && (
+        <div className="dive-button-container">
+          <button
+            className="dive-button"
+            onClick={() => setShowDetailed(!showDetailed)}
+          >
+            {showDetailed ? '↑ Show Less' : '↓ Dive Deeper'}
+          </button>
+        </div>
+      )}
+
+      {/* Questions Section */}
+      {showDetailed && questions.length > 0 && (
+        <section className="quiz-container">
+          <h2 className="section-title">
+            <span className="section-title-icon">❓</span>
+            Test Your Understanding
+          </h2>
+
+          {questions.map((question, index) => (
+            <div key={question.id} className="quiz-question">
+              <div className="quiz-question-number">Question {index + 1}</div>
+              <div className="quiz-question-text">{question.question}</div>
+
+              <div className="quiz-options">
+                {question.choices.map((choice, choiceIndex) => (
+                  <label key={choiceIndex} className="quiz-option">
                     <input
                       type="radio"
-                      name={`q-${q.id}`}
-                      checked={selectedAnswers[q.id] === idx}
-                      onChange={() => handleAnswerSelect(q.id, idx)}
+                      name={`question-${question.id}`}
+                      checked={selectedAnswers[question.id] === choiceIndex}
+                      onChange={() => handleAnswerSelect(question.id, choiceIndex)}
                     />
                     <span>{choice}</span>
-                    {selectedAnswers[q.id] === idx && (
-                      <span className="feedback">
-                        {idx === q.correct_answer ? '✓ Correct!' : '✗ Try again'}
-                      </span>
-                    )}
                   </label>
                 ))}
               </div>
+
+              {selectedAnswers[question.id] !== undefined && (
+                <div className="quiz-explanation">
+                  <strong>
+                    {selectedAnswers[question.id] === question.correct_answer
+                      ? '✓ Correct!'
+                      : '✗ Not quite right'}
+                  </strong>
+                  {question.explanation && <p>{question.explanation}</p>}
+                </div>
+              )}
             </div>
           ))}
         </section>
       )}
 
-      {comments.length > 0 && (
-        <section className="comments">
-          <h2>Different Perspectives</h2>
-          {comments.map((comment) => (
-            <div key={comment.id} className={`comment-box attitude-${comment.attitude}`}>
-              <p className="attitude-badge">{comment.attitude}</p>
-              <p>{comment.content}</p>
-              {comment.source && <p className="source-text">— {comment.source}</p>}
-            </div>
-          ))}
+      {/* Comments/Perspectives Section */}
+      {showDetailed && comments.length > 0 && (
+        <section className="detail-section">
+          <h2 className="section-title">
+            <span className="section-title-icon">💬</span>
+            Different Perspectives
+          </h2>
+          <div className="comments-container">
+            {comments.map((comment) => (
+              <div key={comment.id} className={`comment-card ${comment.attitude}`}>
+                <div className="comment-header">
+                  <span className={`comment-attitude ${comment.attitude}`}>
+                    {comment.attitude}
+                  </span>
+                  {comment.source && <span className="comment-source">{comment.source}</span>}
+                </div>
+                <div className="comment-text">{comment.content}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Analysis Section */}
+      {showDetailed && analysis && (
+        <section className="detail-section">
+          <h2 className="section-title">
+            <span className="section-title-icon">🔍</span>
+            Deep Analysis
+          </h2>
+          <div className="analysis-box">{analysis}</div>
         </section>
       )}
     </div>
