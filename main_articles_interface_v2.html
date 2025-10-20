@@ -234,8 +234,11 @@
         }
 
         function goToArticle(articleId) {
-            // Navigate to the article detail page
-            window.location.href = `/output/article_${articleId}.html`;
+            // Navigate to the article detail page with analysis view
+            const difficulty = currentDifficulty || 'hard';
+            const category = currentCategory || 'world';
+            const language = currentLanguage || 'en';
+            window.location.href = `/article_analysis_v2.html?id=${articleId}&difficulty=${difficulty}&category=${category}&language=${language}`;
         }
 
         function goToAnalysis(articleId) {

@@ -736,7 +736,7 @@ def generate_articles_data(conn: sqlite3.Connection) -> None:
             "title": title,
             "date": date or dt.datetime.now().strftime("%Y-%m-%d"),
             "source": source,
-            "image": "📰",  # Use emoji as placeholder (no actual images available)
+            "image": f"https://picsum.photos/400/300?random={article_id}",  # Real image from placeholder service
             "summary_easy": summary_elem or "",
             "summary_medium": summary_mid or "",
             "summary_hard": summary_high or "",
