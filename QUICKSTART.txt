@@ -1,0 +1,153 @@
+# QUICK START - Development & Deployment
+
+## 🚀 For Daily Operations
+
+### Run the pipeline once:
+```bash
+ssh -i ~/Downloads/web1.pem ec2-user@18.223.121.227
+cd /var/www/news
+python3 run_full_pipeline.py
+```
+
+### Check what's happening:
+- New articles are crawled (duplicates skipped with "⊘")
+- Only new articles are sent to Deepseek (others skipped with "⊘")
+- HTML pages generated for all articles
+- JSON updated for website
+
+---
+
+## 🔧 For Code Changes (GitHub-First Workflow)
+
+### 1. Edit locally:
+```bash
+cd /Users/jidai/news
+# Edit files in VS Code
+```
+
+### 2. Commit locally:
+```bash
+git add .
+git commit -m "feat: description of what changed"
+```
+
+### 3. Push to GitHub:
+```bash
+git push origin main
+```
+
+### 4. Deploy to server:
+```bash
+./deploy_to_server.sh
+```
+
+---
+
+## 📝 Example: Adding a new RSS source
+
+### Edit locally:
+```bash
+vim run_full_pipeline.py
+```
+
+Find `SOURCES` dict and add:
+```python
+"newsname": {
+    "url": "https://example.com/rss",
+    "name": "Example News",
+    "max_articles": 5,
+},
+```
+
+### Commit and deploy:
+```bash
+git add run_full_pipeline.py
+git commit -m "feat: add Example News RSS source"
+git push origin main
+./deploy_to_server.sh
+
+# Test on server:
+ssh -i ~/Downloads/web1.pem ec2-user@18.223.121.227
+cd /var/www/news && python3 run_full_pipeline.py --test
+```
+
+---
+
+## 🔍 Smart Features (Automatic)
+
+### Duplicate Detection:
+```
+Source: PBS NewsHour
+  ✓ Added: New article...
+  ⊘ Skipped (duplicate): Old article...
+```
+
+### Smart Deepseek:
+```
+STEP 3: PROCESSING WITH DEEPSEEK API
+Total articles with content: 30
+Already analyzed: 28
+Processing 2 articles through Deepseek...
+  ⊘ Skipped (already analyzed): Article 1...
+```
+
+---
+
+## 🌐 Website Access
+
+- **Main**: https://news.6ray.com/
+- **Articles data**: https://news.6ray.com/output/articles_data.json
+- **Article gallery**: https://news.6ray.com/output/
+
+---
+
+## 📚 Full Documentation
+
+See `GITHUB_WORKFLOW.md` for:
+- Complete workflow details
+- Best practices
+- Troubleshooting
+- File tracking rules
+
+---
+
+## ❓ Quick Answers
+
+**Q: My changes aren't on the server**
+A: Run `./deploy_to_server.sh` after pushing to GitHub
+
+**Q: Same articles keep getting added**
+A: Duplicate detection should prevent this - check if titles differ
+
+**Q: Deepseek API errors?**
+A: Check API key in systemd service: `systemctl cat news-pipeline.service`
+
+**Q: Need to undo a commit?**
+A: `git reset --soft HEAD~1` to undo but keep changes
+
+---
+
+## 🎯 Daily Workflow
+
+```
+Morning Check:
+  1. Check website: https://news.6ray.com/
+  2. Browse new articles
+  
+Code Change:
+  1. Edit locally
+  2. git commit
+  3. git push
+  4. ./deploy_to_server.sh
+  
+Server Check:
+  1. SSH to server
+  2. python3 run_full_pipeline.py
+  3. Check for ⊘ skipped messages
+  4. Verify no new duplicate articles
+```
+
+---
+
+Last updated: October 20, 2025
+All features tested and working ✅
