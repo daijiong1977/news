@@ -621,13 +621,22 @@
                 };
                 
                 const summaryField = summaryFieldMap[currentDifficulty] || 'summary_hard';
-                article.difficulty_summary = article[summaryField] || '';
+                
+                // Use language-specific summary if available (summary_en for English, summary_zh for Chinese/complex)
+                let selectedSummary = article[summaryField] || '';
+                if (currentLanguage === 'en') {
+                    selectedSummary = article.summary_en || selectedSummary || '';
+                } else if (currentLanguage === 'zh') {
+                    selectedSummary = article.summary_zh || article.summary_hard || selectedSummary || '';
+                }
+                
+                article.difficulty_summary = selectedSummary;
                 article.difficulty_keywords = article.keywords || [];
                 article.difficulty_background = '';
                 article.difficulty_pro = '';
                 article.difficulty_con = '';
                 
-                console.log(`[loadArticle] Loaded: summary=${article.difficulty_summary ? 'YES' : 'NO'}, keywords=${article.difficulty_keywords.length}`);
+                console.log(`[loadArticle] Loaded: summary=${article.difficulty_summary ? 'YES' : 'NO'}, keywords=${article.difficulty_keywords.length}, language=${currentLanguage}`);
                 
                 // No questions loaded from API (not available in static mode)
                 selectedQuestions = [];

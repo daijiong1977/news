@@ -847,8 +847,8 @@ def generate_articles_data(conn: sqlite3.Connection) -> None:
             "summary_easy": summary_elem or "",
             "summary_medium": summary_mid or "",
             "summary_hard": summary_high or "",
-            "summary_en": summary_elem or summary_mid or summary_high or "",
-            "summary_zh": summary_mid or summary_elem or "",
+            "summary_en": summary_elem or "",  # English = Easy version
+            "summary_zh": summary_high or summary_mid or "",  # Chinese button = Hard version (most detailed)
             "keywords": keywords_list
         })
     
