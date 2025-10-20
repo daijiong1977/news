@@ -1,0 +1,15 @@
+[Unit]
+Description=News application (example)
+After=network.target
+
+[Service]
+Type=simple
+User=ec2-user
+WorkingDirectory=/var/www/news
+# Replace ExecStart with your app start command or podman run invocation
+ExecStart=/usr/bin/podman run --name news -p 5678:5678 -v /var/www/news:/app:Z docker.io/yourimage:latest
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
