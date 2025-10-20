@@ -702,16 +702,10 @@ def generate_articles_data(conn: sqlite3.Connection) -> None:
     
     articles = cursor.fetchall()
     
-    # Build articles data with language support
+    # Build articles data with language support and all difficulty levels
     articles_data = []
     for row in articles:
         article_id, title, date, source, content, summary_elem, summary_mid, summary_high = row
-        
-        # Use elementary level as default English summary
-        summary_en = summary_elem or summary_mid or summary_high or ""
-        
-        # For now, use middle as Chinese translation placeholder
-        summary_zh = summary_mid or summary_elem or ""
         
         # Extract keywords from title (simplified)
         title_words = [w for w in title.split() if len(w) > 4]
@@ -722,9 +716,12 @@ def generate_articles_data(conn: sqlite3.Connection) -> None:
             "title": title,
             "date": date or dt.datetime.now().strftime("%Y-%m-%d"),
             "source": source,
-            "image": f"output/article_{article_id}.html",  # Link to article
-            "summary_en": summary_en,
-            "summary_zh": summary_zh,
+            "image": "📰",  # Use emoji as placeholder (no actual images available)
+            "summary_easy": summary_elem or "",
+            "summary_medium": summary_mid or "",
+            "summary_hard": summary_high or "",
+            "summary_en": summary_elem or summary_mid or summary_high or "",
+            "summary_zh": summary_mid or summary_elem or "",
             "keywords": keywords_list
         })
     

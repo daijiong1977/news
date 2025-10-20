@@ -160,29 +160,27 @@
                 return;
             }
             
-            const enrichedArticles = await Promise.all(articles.map(async (article) => {
-                try {
-                    const url = `http://localhost:5001/api/article-content?article_id=${article.id}&difficulty=${currentDifficulty}&language=${currentLanguage === 'en' ? 'en' : 'zh'}`;
-                    const response = await fetch(url);
-                    if (response.ok) {
-                        const data = await response.json();
-                        // Use API keywords if available, otherwise use article's original keywords
-                        const apiKeywords = data.keywords && data.keywords.length > 0 ? data.keywords : (article.keywords || []);
-                        return {...article, difficulty_summary: data.summary || '', keywords: apiKeywords, has_difficulty_content: true};
-                    }
-                } catch (error) {
-                    console.error(`Error fetching article ${article.id}:`, error);
-                }
-                return {...article, difficulty_summary: currentLanguage === 'en' ? article.summary_en : article.summary_zh, keywords: article.keywords || [], has_difficulty_content: false};
-            }));
+            // Map difficulty to summary field name
+            const difficultyMap = {
+                'easy': 'summary_easy',
+                'medium': 'summary_medium',
+                'hard': 'summary_hard'
+            };
+            
+            const summaryField = difficultyMap[currentDifficulty] || 'summary_hard';
             
             const badge = difficultyBadgeMap[currentDifficulty];
             const langActive = currentLanguage === 'en' ? 'en' : 'zh';
             
-            container.innerHTML = enrichedArticles.map(article => {
+            container.innerHTML = articles.map(article => {
                 // Create keywords HTML with tooltips
-                // Try to get keywords from API response first, fall back to article.keywords from JSON
                 let keywords = article.keywords || [];
+                
+                // Get the appropriate summary based on difficulty and language
+                let displaySummary = article[summaryField] || article.summary_en || '';
+                if (currentLanguage === 'zh') {
+                    displaySummary = article.summary_zh || article[summaryField] || article.summary_en || '';
+                }
                 
                 const keywordsHtml = keywords && keywords.length > 0 ? `
                     <div class="article-keywords">
@@ -228,7 +226,7 @@
                             </div>
                         </div>
                         <div class="article-title">${article.title}</div>
-                        <div class="article-summary">${article.difficulty_summary}</div>
+                        <div class="article-summary">${displaySummary}</div>
                         ${keywordsHtml}
                     </div>
                 </div>
