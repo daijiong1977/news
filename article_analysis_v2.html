@@ -622,12 +622,12 @@
                 
                 const summaryField = summaryFieldMap[currentDifficulty] || 'summary_hard';
                 
-                // Use language-specific summary if available (summary_en for English, summary_zh for Chinese/complex)
+                // Use language-specific summary (summary_en for English, summary_zh for Chinese)
                 let selectedSummary = article[summaryField] || '';
-                if (currentLanguage === 'en') {
-                    selectedSummary = article.summary_en || selectedSummary || '';
-                } else if (currentLanguage === 'zh') {
-                    selectedSummary = article.summary_zh || article.summary_hard || selectedSummary || '';
+                if (currentLanguage === 'en' && article.summary_en) {
+                    selectedSummary = article.summary_en;
+                } else if (currentLanguage === 'zh' && article.summary_zh) {
+                    selectedSummary = article.summary_zh;
                 }
                 
                 article.difficulty_summary = selectedSummary;
