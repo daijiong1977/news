@@ -35,9 +35,9 @@ Global filters (applied by `clean_paragraphs()`)
 - Duplicate paragraphs: consecutive duplicate paragraphs are suppressed.
 - Minimum paragraph/content thresholds: content must produce a non-empty cleaned result; separate pipelines (sport preview, batch) may require extra character-length thresholds.
   - Explicit content-length thresholds currently used in the codebase:
+    - Global default (all feeds except sport): cleaned content length must be between 2300 and 4500 characters (inclusive). This is the standard range used for preview acceptance unless a caller or per-feed rule overrides it.
     - Sport preview/short-listing (strict): cleaned content length >= 1500 characters (historical value).
     - Sport preview (relaxed): cleaned content length >= 1200 characters (applied during later re-runs to improve yield).
-    - Default preview acceptance: no single global hard minimum is enforced beyond producing non-empty cleaned content, but scripts that call `collect_preview()` may pass `min_chars` to require a minimum cleaned character count.
 
 Age-13 banned-word filter (strict removal)
 - Location: `config/age13_banned.txt` — a newline-separated list of words/phrases.
@@ -111,10 +111,11 @@ Where to change behavior
   - Duplicate paragraph suppression: consecutive duplicates removed.
   - Promo/emoji short-line drop: short lines (typically < 80 chars) starting with promo emojis or matching promo/ad patterns are removed.
   - Minimum cleaned content length (per-run):
-    - Sport strict: cleaned_chars >= 1500 and image_bytes >= 70000
-    - Sport relaxed: cleaned_chars >= 1200 and image_bytes >= 70000
-    - Batch collect: uses min_image_bytes = 70000 and will accept cleaned content that is non-empty; callers may set `min_chars` if required.
-    - Quick preview: min_image_bytes = 2000 (no global min_chars unless caller sets one).
+    - Global default (non-sport): 2300 <= cleaned_chars <= 4500 and image_bytes meets the configured `min_image_bytes` for the run.
+    - Sport strict: cleaned_chars >= 1500 and image_bytes >= 70000.
+    - Sport relaxed: cleaned_chars >= 1200 and image_bytes >= 70000.
+    - Batch collect: uses `min_image_bytes = 70000` and otherwise follows the global default cleaned_chars range unless the batch caller explicitly sets a different `min_chars`/override for a feed.
+    - Quick preview: `min_image_bytes = 2000` (2 KB) and quick previews typically do not enforce the global upper/lower char bounds unless the caller passes `min_chars`/`max_chars`.
   - Image candidate acceptance:
     - Skip if URL contains any of: `favicon`, `logo`, `placeholder`, `spacer`, `blank`, `icon`, `icons`, `sprite`.
     - Reject if HTTP Content-Type == `image/png`.
