@@ -28,6 +28,23 @@ def get_feeds_from_db(conn):
     return cursor.fetchall()
 
 
+def is_video_article(title, description, url):
+    """Check if article is a video/show/segment (should be skipped)."""
+    # Keywords that indicate video content
+    video_keywords = [
+        'video', 'show', 'segment', 'watch', 'wrap', 'news wrap',
+        'tape', 'broadcast', 'program'
+    ]
+    
+    combined = f"{title} {description} {url}".lower()
+    
+    for keyword in video_keywords:
+        if keyword in combined:
+            return True
+    
+    return False
+
+
 def article_exists(conn, url):
     """Check if article already exists by URL."""
     cursor = conn.cursor()
@@ -167,6 +184,11 @@ def collect_articles(num_per_source=1):
         
         # Insert articles
         for article in articles:
+            # Skip video articles
+            if is_video_article(article['title'], article['description'], article['url']):
+                print(f"  ⊘ Skipped (VIDEO): {article['title'][:60]}...")
+                continue
+            
             if article_exists(conn, article['url']):
                 print(f"  ⊘ Duplicate: {article['title'][:60]}...")
                 duplicates += 1
