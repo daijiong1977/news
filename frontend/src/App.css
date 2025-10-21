@@ -5,9 +5,9 @@
 }
 
 .app-header {
-  text-align: center;
-  margin-bottom: 40px;
-  padding: 40px 20px;
+  text-align: left;
+  margin-bottom: 20px;
+  padding: 20px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border-radius: 12px;
@@ -15,12 +15,12 @@
 }
 
 .app-header h1 {
-  font-size: 2.5rem;
-  margin-bottom: 10px;
+  font-size: 1.5rem;
+  margin-bottom: 5px;
 }
 
 .app-header p {
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   opacity: 0.9;
 }
 
@@ -32,9 +32,9 @@
 .filters {
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  margin-bottom: 30px;
-  padding: 15px 20px;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding: 12px 15px;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -43,32 +43,33 @@
 .filter-categories {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   flex-wrap: wrap;
+  order: -1;
 }
 
 .filter-categories label {
   font-weight: 600;
-  font-size: 0.9rem;
-  color: #333;
+  font-size: 0.8rem;
+  color: #666;
   flex-shrink: 0;
 }
 
 .category-button-group {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
   align-items: center;
 }
 
 .category-btn {
-  padding: 6px 12px;
+  padding: 5px 10px;
   border: 1.5px solid #ddd;
   background: white;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 0.85em;
+  font-size: 0.8em;
   transition: all 0.3s;
   white-space: nowrap;
 }
@@ -85,32 +86,34 @@
 
 .filter-controls {
   display: flex;
-  gap: 20px;
+  gap: 8px;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .filter-group {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   flex-shrink: 0;
 }
 
 .filter-group label {
   font-weight: 600;
-  font-size: 0.9rem;
-  color: #333;
+  font-size: 0.75rem;
+  color: #999;
   white-space: nowrap;
 }
 
 .filter-group select {
-  padding: 6px 10px;
-  border: 1.5px solid #e0e0e0;
-  border-radius: 5px;
-  font-size: 0.9rem;
+  padding: 4px 8px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 0.8rem;
   background-color: white;
   cursor: pointer;
   transition: border-color 0.3s;
+  min-width: 60px;
 }
 
 .filter-group select:hover {
