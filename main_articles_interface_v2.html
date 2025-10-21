@@ -8,13 +8,13 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
         .container { max-width: 1200px; margin: 0 auto; }
-        .header { background: white; padding: 25px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); }
-        .header-top { display: flex; justify-content: flex-start; align-items: center; gap: 20px; flex-wrap: nowrap; }
-        .header h1 { font-size: 1.8em; color: #333; margin-right: auto; }
-        .difficulty-selector { display: flex; gap: 8px; align-items: center; }
-        .difficulty-selector select { padding: 10px 15px; border: 2px solid #667eea; border-radius: 6px; font-weight: 600; background: white; color: #333; cursor: pointer; }
-        .category-buttons { display: flex; gap: 8px; flex-wrap: nowrap; align-items: center; }
-        .category-btn { padding: 8px 14px; border: 2px solid #ddd; background: white; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.3s; font-size: 0.95em; }
+        .header { background: white; padding: 18px 20px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); }
+        .header-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .header h1 { font-size: 1.5em; color: #333; margin: 0; flex-shrink: 0; }
+        .difficulty-selector { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+        .difficulty-selector select { padding: 6px 10px; border: 1.5px solid #667eea; border-radius: 5px; font-weight: 600; background: white; color: #333; cursor: pointer; font-size: 0.9em; }
+        .category-buttons { display: flex; gap: 6px; flex-wrap: nowrap; align-items: center; overflow-x: auto; flex-shrink: 0; }
+        .category-btn { padding: 6px 11px; border: 1.5px solid #ddd; background: white; border-radius: 5px; cursor: pointer; font-weight: 600; transition: all 0.3s; font-size: 0.85em; white-space: nowrap; flex-shrink: 0; }
         .category-btn:hover { border-color: #667eea; }
         .category-btn.active { background: #667eea; color: white; border-color: #667eea; }
         #articles-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 25px; margin-bottom: 40px; }
@@ -54,11 +54,11 @@
         .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; }
         .btn-submit { background: #667eea; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; width: 100%; transition: all 0.3s; }
         .btn-submit:hover { background: #5568d3; }
-        .article-lang-buttons { display: flex; gap: 4px; align-items: center; }
-        .article-lang-btn { padding: 5px 10px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8em; color: #555; cursor: pointer; transition: all 0.2s; font-weight: 600; }
+        .article-lang-buttons { display: flex; gap: 3px; align-items: center; }
+        .article-lang-btn { padding: 4px 8px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 3px; font-size: 0.75em; color: #555; cursor: pointer; transition: all 0.2s; font-weight: 600; }
         .article-lang-btn:hover { background: #667eea; color: white; border-color: #667eea; }
         .article-lang-btn.active { background: #667eea; color: white; border-color: #667eea; }
-        .btn-more-small { padding: 5px 12px; background: #667eea; color: white; border: none; border-radius: 4px; font-size: 0.8em; cursor: pointer; transition: all 0.2s; font-weight: 600; margin-left: auto; }
+        .btn-more-small { padding: 4px 8px; background: #667eea; color: white; border: none; border-radius: 3px; font-size: 0.75em; cursor: pointer; transition: all 0.2s; font-weight: 600; margin-left: auto; }
         .btn-more-small:hover { background: #5568d3; }
         .difficulty-dot { display: none; }
     </style>
@@ -74,18 +74,16 @@
                     <button class="category-btn" onclick="filterByCategory('tech')">💻 Tech</button>
                     <button class="category-btn" onclick="filterByCategory('sports')">🏊 Sports</button>
                 </div>
-                <div style="display: flex; gap: 15px; align-items: center;">
-                    <div class="difficulty-selector">
-                        <select id="difficulty-filter" onchange="filterByDifficulty(this.value)">
-                            <option value="hard">High</option>
-                            <option value="medium">Mid</option>
-                            <option value="easy">Easy</option>
-                        </select>
-                    </div>
-                    <div style="display: flex; gap: 8px;">
-                        <button class="article-lang-btn" id="global-en-btn" style="background: #667eea; color: white;" onclick="setGlobalLanguage('en', this)">EN</button>
-                        <button class="article-lang-btn" id="global-zh-btn" onclick="setGlobalLanguage('zh', this)">CN</button>
-                    </div>
+                <div class="difficulty-selector">
+                    <select id="difficulty-filter" onchange="filterByDifficulty(this.value)">
+                        <option value="hard">High</option>
+                        <option value="medium">Mid</option>
+                        <option value="easy">Easy</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 5px;">
+                    <button class="article-lang-btn" id="global-en-btn" style="background: #667eea; color: white;" onclick="setGlobalLanguage('en', this)">EN</button>
+                    <button class="article-lang-btn" id="global-zh-btn" onclick="setGlobalLanguage('zh', this)">CN</button>
                 </div>
             </div>
         </div>
