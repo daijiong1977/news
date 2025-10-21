@@ -70,6 +70,45 @@ Image selection and rules
 - Srcset parsing: `_choose_best_from_srcset(srcset)` picks the largest width or highest density entry from a comma-separated srcset.
 - Scoring (present but used primarily for DB path): `_score_image_candidate()` scores preferred hosts (e.g., BBC's `ichef.bbci.co.uk`), same-origin images, and larger width markers; however preview downloads generally accept the first valid candidate following the preference order to avoid selecting unrelated large CDN assets.
 
+Image filter requirements (clean-image rules)
+
+- Purpose: these rules apply when deciding whether an image candidate is acceptable as the "clean" article image (for preview and eventual DB record). Implemented in `download_image_preview()` and `download_and_record_image()`.
+- Priority of sources (first-match wins unless rejected by filters):
+  1. OpenGraph meta (`<meta property="og:image">`)
+  2. Twitter meta (`<meta name="twitter:image">`)
+  3. `<link rel="image_src">`
+  4. `<picture>` / `<source>` (`srcset` parsed and best candidate chosen)
+  5. Article-specific selectors (`article img`, `figure img`, `div.article img`, etc.)
+
+- Format and content-type rules:
+  - Prefer `image/jpeg`, `image/jpg`, `image/webp`. These are treated as first-class candidates.
+  - Reject `image/png` (PNG commonly used for logos, icons, and placeholders) by Content-Type check.
+  - If Content-Type is not provided or ambiguous, inspect file extension and prefer `.jpg`, `.jpeg`, `.webp` and deprioritize `.png`.
+
+- URL-based rejection blacklist (case-insensitive substring checks):
+  - If the image URL contains any of: `favicon`, `logo`, `placeholder`, `spacer`, `blank`, `icon`, `icons`, `sprite`, `badge`, `pixel` → reject candidate.
+
+- Size thresholds (downloaded bytes):
+  - Quick preview: `min_image_bytes = 2000` (2 KB) — used for fast runs.
+  - Batch/strict and default clean-image gate: `min_image_bytes = 70000` (70 KB) — used for batch processing and when we want high-quality images for DB records.
+  - Per-feed overrides: scripts or callers may pass a different `min_image_bytes` to accept smaller images for certain feeds.
+
+- Additional heuristics:
+  - If an image URL has explicit size hints in `srcset` (e.g., `... 800w`), prefer the larger width candidate when selecting from `srcset`.
+  - Prefer same-origin images (host matching article host) and known article CDNs (e.g., BBC's `ichef.bbci.co.uk`) in scoring if multiple candidates remain.
+  - If multiple candidates meet all rules, choose the first candidate in the preference order above; this avoids picking large unrelated site chrome images.
+
+- Failure modes & fallbacks:
+  - If no candidate passes the clean-image checks, the preview may still be produced without an image (caller can decide to drop the article if image is required).
+  - For WAF/403 issues (e.g., TheStreet), the downloader may record the failure in `debug/` and skip the image; advanced options: proxy, headless browser (Playwright), or site-specific allowance policies.
+
+- Where to change these rules in the code:
+  - `download_image_preview()` — quick preview downloader and pre-checks.
+  - `download_and_record_image()` — image download used during DB insertion (applies stricter checks and records metadata).
+  - `_choose_best_from_srcset()` — parse & prefer larger width or density entries.
+  - `_score_image_candidate()` — adjust scoring weights for preferred hosts or same-origin bias.
+
+
 Per-source / catalog special rules and notes
 - BBC (news / sport / entertainment):
   - Image hosts like `ichef.bbci.co.uk` are preferred in scoring.
