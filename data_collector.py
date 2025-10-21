@@ -84,6 +84,13 @@ def clean_paragraphs(paragraphs):
         "\u00a0": " ",
     }
     
+    # Common byline patterns to detect (names that appear in PBS articles)
+    BYLINE_NAMES = {
+        'Nick Schifrin', 'Sonia Kopelev', 'Geoff Bennett', 'Amna Nawaz',
+        'Stephanie Kotuby', 'Alexa Gold', 'Jonah Anderson', 'Ismael M. Belkoura',
+        'Amalia Hout-Marchand', 'Leonardo Pini', 'Athan Yanos',
+    }
+    
     cleaned = []
     for raw in paragraphs:
         # Unescape HTML entities
@@ -95,25 +102,35 @@ def clean_paragraphs(paragraphs):
         if not text:
             continue
         
-        # Skip all-caps short text (like bylines: "Nick Schifrin")
+        # Check for byline patterns: repeated names or name:
+        # Pattern 1: "Name Name" (duplicated name)
+        stripped = text.strip()
+        parts = stripped.split()
+        if len(parts) == 2 and parts[0] == parts[1]:
+            # Likely "Nick Schifrin Nick Schifrin" - skip it
+            continue
+        
+        # Pattern 2: Direct byline name match
+        if stripped in BYLINE_NAMES:
+            continue
+        
+        # Pattern 3: Name with colon (e.g., "Nick Schifrin:")
+        if len(parts) <= 3 and stripped.endswith(':'):
+            name_part = stripped[:-1].strip()
+            if name_part in BYLINE_NAMES:
+                continue
+        
+        # Skip all-caps short text (like bylines)
         upper_count = sum(1 for ch in text if ch.isupper())
         lower_count = sum(1 for ch in text if ch.islower())
         if upper_count and not lower_count and len(text.split()) <= 6:
             continue
         
-        # Skip names followed by title (pattern: "Name Title")
-        # Usually 2-4 words, starts with capital letter
-        if len(text.split()) <= 4 and text[0].isupper():
-            # If it looks like just a name/role, skip it
-            # Check if it contains common roles or is all proper nouns
-            if text.count('\n') == 0 and ':' not in text:  # No newlines or colons
-                word_count = len(text.split())
-                if word_count <= 3:
-                    # Check if all words are capitalized (typical of bylines)
-                    words = text.split()
-                    if all(w[0].isupper() for w in words if len(w) > 0):
-                        # This is likely a byline, skip it
-                        continue
+        # Skip short capitalized phrases (2-3 words, all caps) - generic byline pattern
+        if len(parts) <= 3 and all(w[0].isupper() for w in parts if len(w) > 0):
+            # If very short and all proper case, likely a byline
+            if len(parts) <= 2 and len(text) < 40:
+                continue
         
         # Skip feedback prompts
         if text.lower() == "leave your feedback":
@@ -215,6 +232,35 @@ def is_video_article(title, description, url):
     for keyword in video_keywords:
         if keyword in combined:
             return True
+    
+    return False
+
+
+def is_transcript_article(content):
+    """Check if article is a transcript-style piece (mixed speaker names and dialogue).
+    These are hard to clean and should be skipped for now."""
+    if not content:
+        return False
+    
+    # Transcript-style indicators: speaker names mixed throughout content
+    # Common PBS and news transcript patterns
+    transcript_indicators = [
+        'has the details.',
+        'reports:',
+        'says:',
+        'tells ',
+        'NewsHour:',
+        'the details.',
+    ]
+    
+    content_lower = content.lower()
+    
+    # Check if content has transcript markers
+    indicator_count = sum(1 for indicator in transcript_indicators if indicator in content_lower)
+    
+    # If multiple transcript indicators found, it's likely a transcript
+    if indicator_count >= 2:
+        return True
     
     return False
 
@@ -369,6 +415,11 @@ def collect_articles(num_per_source=1):
             # Skip video articles
             if is_video_article(article['title'], article['description'], article['url']):
                 print(f"  ⊘ Skipped (VIDEO): {article['title'][:60]}...")
+                continue
+            
+            # Skip transcript-style articles (PBS news interviews/reports with mixed speakers)
+            if is_transcript_article(article['content']):
+                print(f"  ⊘ Skipped (TRANSCRIPT): {article['title'][:60]}...")
                 continue
             
             if article_exists(conn, article['url']):
