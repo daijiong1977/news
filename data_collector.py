@@ -811,7 +811,7 @@ def download_image_preview(article_url, html_text, min_bytes=100_000):
     return None
 
 
-def collect_preview(num_per_source=5, min_image_bytes=100_000):
+def collect_preview(num_per_source=5, min_image_bytes=100_000, per_feed_timeout=240):
     """Collect articles but only download images for preview. Do NOT insert into DB.
     Produces a preview HTML file `preview_articles.html` showing accepted articles and local image paths.
     An article is accepted only if a qualifying image (>= min_image_bytes) is found and content passes cleaning.
@@ -824,7 +824,12 @@ def collect_preview(num_per_source=5, min_image_bytes=100_000):
         print(f"\n[{feed_name}] Fetching up to 20, targeting {num_per_source} clean preview articles")
         articles = parse_rss_feed(feed_url, feed_name, category_id, max_articles=20)
         kept = 0
+        feed_start = time.time()
         for art in articles:
+            # If this feed is taking too long, abort remaining items and move to next feed
+            if per_feed_timeout and (time.time() - feed_start) > per_feed_timeout:
+                print(f"  ⊘ Timeout after {per_feed_timeout}s for feed: {feed_name}, moving to next feed")
+                break
             if kept >= num_per_source:
                 break
             # basic filters
@@ -865,8 +870,11 @@ def collect_preview(num_per_source=5, min_image_bytes=100_000):
            '</head><body>', '<h1>Preview Articles</h1>']
 
     for it in preview_items:
-        out.append(f"<div class='article'><h2>{_html.escape(it['title'])}</h2>")
-        out.append(f"<p><em>{_html.escape(it['source'])} - <a href='{_html.escape(it['url'])}'>Original</a></em></p>")
+        # Titles from feeds may contain numeric HTML entities (e.g. &#8216;) —
+        # unescape them first so they render correctly, then escape for safety.
+        title_text = _html.unescape(it.get('title') or '')
+        out.append(f"<div class='article'><h2>{_html.escape(title_text)}</h2>")
+        out.append(f"<p><em>{_html.escape(it.get('source') or '')} - <a href='{_html.escape(it.get('url') or '')}'>Original</a></em></p>")
         if it['image'] and os.path.exists(it['image']):
             out.append(f"<p><img src='{_html.escape(it['image'])}'></p>")
         for p in it['content'].split('\n\n'):
@@ -959,7 +967,7 @@ def parse_rss_feed(feed_url, source_name, category_id, max_articles=1):
         return []
 
 
-def collect_articles(num_per_source=1):
+def collect_articles(num_per_source=1, per_feed_timeout=240):
     """Collect articles from RSS feeds stored in database.
 
     Policy: For each active feed, fetch up to 20 items and keep up to
@@ -998,11 +1006,16 @@ def collect_articles(num_per_source=1):
 
         # Fetch feed items
         articles = parse_rss_feed(feed_url, feed_name, category_id, max_to_fetch)
+        feed_start = time.time()
         print(f"  ✓ Found {len(articles)} article(s) in feed")
 
         # Process fetched articles and insert up to `target_count` clean articles
         clean_count = 0
         for article in articles:
+            # Per-feed timeout: stop processing this feed after per_feed_timeout seconds
+            if per_feed_timeout and (time.time() - feed_start) > per_feed_timeout:
+                print(f"  ⊘ Timeout after {per_feed_timeout}s for feed: {feed_name}, moving to next feed")
+                break
             # Stop early if we've collected enough clean articles for this feed
             if clean_count >= target_count:
                 print(f"  ✓ {feed_name}: Reached target of {target_count} clean articles, stopping")

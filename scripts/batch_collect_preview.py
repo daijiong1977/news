@@ -130,8 +130,10 @@ out=['<!doctype html>','<html><head><meta charset="utf-8"><title>Batch Review</t
 out.append(f"<h1>Batch Review - {datetime.now().isoformat()}</h1>")
 for it in master_items:
     out.append("<div class='article'>")
-    out.append(f"<h2>{_html.escape(it['title'])}</h2>")
-    out.append(f"<p><em>{_html.escape(it['source'])} - <a href='{_html.escape(it['url'])}'>Original</a> - {_html.escape(str(it.get('pubDate')))}</em></p>")
+    # Normalize numeric/html entities in titles so quotes and punctuation render correctly
+    title_text = _html.unescape(it.get('title') or '')
+    out.append(f"<h2>{_html.escape(title_text)}</h2>")
+    out.append(f"<p><em>{_html.escape(it.get('source') or '')} - <a href='{_html.escape(it.get('url') or '')}'>Original</a> - {_html.escape(str(it.get('pubDate')))}</em></p>")
     if it['image'] and os.path.exists(it['image']):
         out.append(f"<p><img src='{_html.escape(it['image'])}'></p>")
     for p in it['content'].split('\n\n'):
