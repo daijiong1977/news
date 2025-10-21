@@ -43,49 +43,56 @@ const FilterComponent: React.FC<Props> = ({ filters, onFilterChange }) => {
 
   return (
     <div className="filters">
-      <div className="filter-group">
-        <label htmlFor="difficulty">Difficulty:</label>
-        <select
-          id="difficulty"
-          value={filters.difficulty}
-          onChange={(e) =>
-            onFilterChange({ difficulty: e.target.value as any })
-          }
-        >
-          <option value="easy">Easy (Elementary)</option>
-          <option value="mid">Medium (Middle School)</option>
-          <option value="hard">Hard (High School)</option>
-        </select>
-      </div>
-
-      <div className="filter-group">
-        <label htmlFor="language">Language:</label>
-        <select
-          id="language"
-          value={filters.language}
-          onChange={(e) =>
-            onFilterChange({ language: e.target.value as any })
-          }
-        >
-          <option value="en">English</option>
-          <option value="zh">中文 (Chinese)</option>
-        </select>
-      </div>
-
-      <div className="filter-group">
-        <label htmlFor="category">Category:</label>
-        <select
-          id="category"
-          value={filters.category}
-          onChange={(e) => onFilterChange({ category: e.target.value })}
-        >
-          <option value="">All Categories</option>
+      <div className="filter-categories">
+        <label>Categories:</label>
+        <div className="category-button-group">
+          <button 
+            className={`category-btn ${filters.category === '' ? 'active' : ''}`}
+            onClick={() => onFilterChange({ category: '' })}
+          >
+            All
+          </button>
           {categories.map((cat) => (
-            <option key={cat} value={cat}>
+            <button
+              key={cat}
+              className={`category-btn ${filters.category === cat ? 'active' : ''}`}
+              onClick={() => onFilterChange({ category: cat })}
+            >
               {cat}
-            </option>
+            </button>
           ))}
-        </select>
+        </div>
+      </div>
+
+      <div className="filter-controls">
+        <div className="filter-group">
+          <label htmlFor="difficulty">Difficulty:</label>
+          <select
+            id="difficulty"
+            value={filters.difficulty}
+            onChange={(e) =>
+              onFilterChange({ difficulty: e.target.value as any })
+            }
+          >
+            <option value="easy">Easy</option>
+            <option value="mid">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </div>
+
+        <div className="filter-group">
+          <label htmlFor="language">Language:</label>
+          <select
+            id="language"
+            value={filters.language}
+            onChange={(e) =>
+              onFilterChange({ language: e.target.value as any })
+            }
+          >
+            <option value="en">English</option>
+            <option value="zh">中文</option>
+          </select>
+        </div>
       </div>
     </div>
   );
