@@ -71,43 +71,56 @@
 
 .filter-controls {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   flex-wrap: nowrap;
   align-items: center;
   flex-shrink: 0;
 }
 
-.filter-group {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.filter-group label {
-  display: none;
-}
-
-.filter-group select {
-  padding: 6px 10px;
+.level-select {
+  padding: 5px 8px;
   border: 1.5px solid #667eea;
   border-radius: 5px;
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   background-color: white;
   cursor: pointer;
   transition: border-color 0.3s;
-  font-weight: 600;
+  font-weight: 700;
   color: #333;
+  min-width: 65px;
 }
 
-.filter-group select:hover {
+.level-select:hover {
   border-color: #764ba2;
 }
 
-.filter-group select:focus {
+.level-select:focus {
   outline: none;
   border-color: #764ba2;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.lang-toggle {
+  padding: 5px 10px;
+  border: 1.5px solid #667eea;
+  background: white;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.75rem;
+  transition: all 0.3s;
+  color: #333;
+  min-width: 35px;
+}
+
+.lang-toggle:hover {
+  background: #f0f4ff;
+  border-color: #764ba2;
+}
+
+.lang-toggle:active {
+  background: #667eea;
+  color: white;
 }
 
 /* Article List */

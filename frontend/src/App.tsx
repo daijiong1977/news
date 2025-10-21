@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import './App.css';
 import ArticleList from './components/ArticleList';
 import ArticleDetail from './components/ArticleDetail';
 import Filters from './components/Filters';
 
-interface Filters {
+interface FilterState {
   difficulty: 'easy' | 'mid' | 'hard';
   language: 'en' | 'zh';
   category: string;
 }
 
 function App() {
-  const [filters, setFilters] = useState<Filters>({
+  const [filters, setFilters] = useState<FilterState>({
     difficulty: 'mid',
     language: 'en',
     category: '',
   });
   const [selectedArticleId, setSelectedArticleId] = useState<number | null>(null);
 
-  const handleFilterChange = (newFilters: Partial<Filters>) => {
+  const handleFilterChange = (newFilters: Partial<FilterState>) => {
     setFilters({ ...filters, ...newFilters });
   };
 

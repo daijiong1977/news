@@ -12,17 +12,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Copy files to server and trigger deploy
-      uses: appleboy/scp-action@v0.1.5
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USER }}
-        key: ${{ secrets.EC2_SSH_KEY }}
-        port: ${{ secrets.EC2_PORT }}
-        source: "deploy/deploy_news.sh"
-        target: "/home/${{ secrets.EC2_USER }}/deploy_news.sh"
-
-    - name: Run deploy script via SSH
+    - name: Deploy to EC2
       uses: appleboy/ssh-action@v0.1.6
       with:
         host: ${{ secrets.EC2_HOST }}
@@ -30,7 +20,8 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         port: ${{ secrets.EC2_PORT }}
         script: |
-          chmod +x /home/${{ secrets.EC2_USER }}/deploy_news.sh
-          sudo mv /home/${{ secrets.EC2_USER }}/deploy_news.sh /usr/local/bin/deploy_news.sh
-          sudo chown root:root /usr/local/bin/deploy_news.sh
-          sudo /usr/local/bin/deploy_news.sh
+          cd /var/www/news
+          git fetch origin main
+          git reset --hard origin/main
+          echo "✓ Repository updated to latest commit"
+          echo "✓ Deploy complete at $(date)"

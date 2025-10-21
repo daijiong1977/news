@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/ArticleDetail.css';
+import ArticleInteractive from './ArticleInteractive';
 
 interface Filters {
   difficulty: 'easy' | 'mid' | 'hard';
@@ -56,34 +57,36 @@ const ArticleDetail: React.FC<Props> = ({ articleId, filters, onBack }) => {
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({});
   const [showDetailed, setShowDetailed] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState<'en' | 'zh'>(filters.language);
+  const [viewMode, setViewMode] = useState<'standard' | 'interactive'>('standard');
 
   useEffect(() => {
+    const fetchArticleDetail = async () => {
+      try {
+        setLoading(true);
+        const params = new URLSearchParams({
+          difficulty: filters.difficulty,
+          language: filters.language,
+        });
+        // Use full URL instead of proxy
+        const response = await axios.get(`http://localhost:8000/api/articles/${articleId}?${params}`);
+        
+        const data = response.data;
+        setArticle(data.article);
+        setSummary(data.summary || '');
+        setKeywords(data.keywords || []);
+        setQuestions(data.questions || []);
+        setComments(data.comments || []);
+        setBackgroundReading(data.background_reading || '');
+        setAnalysis(data.analysis || '');
+      } catch (err) {
+        console.error('Failed to load article detail', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchArticleDetail();
   }, [articleId, filters]);
-
-  const fetchArticleDetail = async () => {
-    try {
-      setLoading(true);
-      const params = new URLSearchParams({
-        difficulty: filters.difficulty,
-        language: filters.language,
-      });
-      const response = await axios.get(`/api/articles/${articleId}?${params}`);
-      
-      const data = response.data;
-      setArticle(data.article);
-      setSummary(data.summary || '');
-      setKeywords(data.keywords || []);
-      setQuestions(data.questions || []);
-      setComments(data.comments || []);
-      setBackgroundReading(data.background_reading || '');
-      setAnalysis(data.analysis || '');
-    } catch (err) {
-      console.error('Failed to load article detail', err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleAnswerSelect = (questionId: number, answerIndex: number) => {
     setSelectedAnswers({
@@ -117,11 +120,33 @@ const ArticleDetail: React.FC<Props> = ({ articleId, filters, onBack }) => {
 
   const displayTitle = currentLanguage === 'zh' && article.zh_title ? article.zh_title : article.title;
 
+  // If interactive view is selected, show the interactive component
+  if (viewMode === 'interactive') {
+    return (
+      <div className="article-detail-wrapper">
+        <button onClick={() => setViewMode('standard')} className="detail-back-button">
+          ← Back to Standard View
+        </button>
+        <ArticleInteractive articleId={articleId} onBack={onBack} />
+      </div>
+    );
+  }
+
+  // Standard view
   return (
     <div className="article-detail-wrapper">
-      <button onClick={onBack} className="detail-back-button">
-        ← Back to Articles
-      </button>
+      <div className="detail-header-actions">
+        <button onClick={onBack} className="detail-back-button">
+          ← Back to Articles
+        </button>
+        <button 
+          onClick={() => setViewMode('interactive')} 
+          className="view-mode-toggle"
+          title="Switch to interactive view"
+        >
+          ✨ Interactive View
+        </button>
+      </div>
 
       {/* Article Preview Section */}
       <div className="article-preview">

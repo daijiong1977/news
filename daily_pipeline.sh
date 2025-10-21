@@ -9,9 +9,17 @@ set -e
 WORK_DIR="/var/www/news"
 cd "$WORK_DIR"
 
-# Source environment variables
-source .env
+# Source environment variables from .env if it exists
+if [ -f "$WORK_DIR/.env" ]; then
+    set -a
+    source "$WORK_DIR/.env"
+    set +a
+fi
+
+# Export API keys and settings (set by bootstrap or .env)
 export DEEPSEEK_API_KEY
+export EMAIL_API_KEY
+export EMAIL_RECIPIENT
 
 # Logging
 TIMESTAMP=$(date '+%Y-%m-%d_%H-%M-%S')

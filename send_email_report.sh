@@ -3,9 +3,33 @@
 # Send Email Report of Daily Pipeline Results
 # Uses the email API at https://emailapi.6ray.com
 
-cd /var/www/news
+# Determine working directory (support both EC2 /var/www/news and local development)
+WORK_DIR="${1:-.}"
+if [ -d "/var/www/news" ]; then
+    WORK_DIR="/var/www/news"
+elif [ -d "/Users/jidai/news" ]; then
+    WORK_DIR="/Users/jidai/news"
+else
+    WORK_DIR="."
+fi
 
-RECIPIENT_EMAIL="${1:-jidai@6ray.com}"
+cd "$WORK_DIR" || exit 1
+
+# Load environment variables if available
+if [ -f "$WORK_DIR/.env" ]; then
+    set -a
+    source "$WORK_DIR/.env"
+    set +a
+    export DEEPSEEK_API_KEY
+    export EMAIL_API_KEY
+    export EMAIL_RECIPIENT
+fi
+
+# Ensure EMAIL_RECIPIENT has a default
+EMAIL_RECIPIENT="${EMAIL_RECIPIENT:-jidai@6ray.com}"
+export EMAIL_RECIPIENT
+
+RECIPIENT_EMAIL="${2:-${EMAIL_RECIPIENT}}"
 
 python3 << 'PYSCRIPT'
 import sqlite3
@@ -14,8 +38,18 @@ import json
 import urllib.request
 from datetime import datetime
 
+# Get API key (from bootstrap environment or .env)
 API_KEY = os.environ.get('EMAIL_API_KEY')
 RECIPIENT = os.environ.get('EMAIL_RECIPIENT', 'jidai@6ray.com')
+
+# Debug: Check if we have the API key
+if not API_KEY:
+    print("⚠ Warning: EMAIL_API_KEY not set - email will not be sent")
+    print("  Make sure EMAIL_API_KEY is set in bootstrap or environment")
+    exit(0)  # Exit gracefully, don't fail the pipeline
+
+print(f"✓ EMAIL_API_KEY found (length: {len(API_KEY)} chars)")
+print(f"✓ Recipient: {RECIPIENT}")
 
 # Get database stats
 c = sqlite3.connect('articles.db').cursor()

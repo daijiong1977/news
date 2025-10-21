@@ -14,6 +14,7 @@ interface Article {
   description: string;
   source: string;
   pub_date: string;
+  image?: string | null;
 }
 
 interface Props {
@@ -27,27 +28,28 @@ const ArticleList: React.FC<Props> = ({ filters, onSelectArticle }) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        setLoading(true);
+        const params = new URLSearchParams({
+          difficulty: filters.difficulty,
+          language: filters.language,
+          ...(filters.category && { category: filters.category }),
+        });
+        // Use full URL instead of proxy
+        const response = await axios.get(`http://localhost:8000/api/articles?${params}`);
+        setArticles(response.data);
+        setError(null);
+      } catch (err) {
+        setError('Failed to load articles');
+        console.error('API Error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchArticles();
   }, [filters]);
-
-  const fetchArticles = async () => {
-    try {
-      setLoading(true);
-      const params = new URLSearchParams({
-        difficulty: filters.difficulty,
-        language: filters.language,
-        ...(filters.category && { category: filters.category }),
-      });
-      const response = await axios.get(`/api/articles?${params}`);
-      setArticles(response.data);
-      setError(null);
-    } catch (err) {
-      setError('Failed to load articles');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (loading) return <div className="loading">Loading articles...</div>;
   if (error) return <div className="error">{error}</div>;
@@ -65,6 +67,11 @@ const ArticleList: React.FC<Props> = ({ filters, onSelectArticle }) => {
               className="article-card"
               onClick={() => onSelectArticle(article.id)}
             >
+              {article.image && (
+                <div className="article-image">
+                  <img src={`http://localhost:8000${article.image}`} alt={article.title} />
+                </div>
+              )}
               <h3>
                 {filters.language === 'zh' && article.zh_title
                   ? article.zh_title

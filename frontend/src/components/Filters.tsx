@@ -66,34 +66,28 @@ const FilterComponent: React.FC<Props> = ({ filters, onFilterChange }) => {
       </div>
 
       <div className="filter-controls">
-        <div className="filter-group">
-          <label htmlFor="difficulty">Difficulty:</label>
-          <select
-            id="difficulty"
-            value={filters.difficulty}
-            onChange={(e) =>
-              onFilterChange({ difficulty: e.target.value as any })
-            }
-          >
-            <option value="easy">Easy</option>
-            <option value="mid">Medium</option>
-            <option value="hard">Hard</option>
-          </select>
-        </div>
+        <select
+          className="level-select"
+          value={filters.difficulty}
+          onChange={(e) =>
+            onFilterChange({ difficulty: e.target.value as any })
+          }
+        >
+          <option value="easy">EASY</option>
+          <option value="mid">MID</option>
+          <option value="hard">HIGH</option>
+        </select>
 
-        <div className="filter-group">
-          <label htmlFor="language">Language:</label>
-          <select
-            id="language"
-            value={filters.language}
-            onChange={(e) =>
-              onFilterChange({ language: e.target.value as any })
-            }
-          >
-            <option value="en">English</option>
-            <option value="zh">中文</option>
-          </select>
-        </div>
+        <button
+          className="lang-toggle"
+          onClick={() =>
+            onFilterChange({
+              language: filters.language === 'en' ? 'zh' : 'en',
+            })
+          }
+        >
+          {filters.language === 'en' ? 'CN' : 'EN'}
+        </button>
       </div>
     </div>
   );
