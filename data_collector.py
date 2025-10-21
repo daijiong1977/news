@@ -55,6 +55,91 @@ class ParagraphExtractor(HTMLParser):
         return self.paragraphs
 
 
+def clean_paragraphs(paragraphs):
+    """Clean and filter paragraphs - remove bylines, feedback prompts, etc."""
+    import html
+    import re
+    
+    TRIM_PREFIXES = (
+        "Read More:",
+        "READ MORE:",
+        "Watch:",
+        "WATCH:",
+        "Notice:",
+        "NOTICE:",
+    )
+    TRIM_CONTAINS = (
+        "Support trusted journalism",
+        "Support Provided By:",
+        "Subscribe to Here's the Deal",
+    )
+    ASCII_REPLACEMENTS = {
+        "\u2018": "'",
+        "\u2019": "'",
+        "\u201c": '"',
+        "\u201d": '"',
+        "\u2013": "-",
+        "\u2014": "-",
+        "\u2026": "...",
+        "\u00a0": " ",
+    }
+    
+    cleaned = []
+    for raw in paragraphs:
+        # Unescape HTML entities
+        text = html.unescape(raw.strip())
+        for src, dst in ASCII_REPLACEMENTS.items():
+            text = text.replace(src, dst)
+        text = text.replace("\r", "")
+        
+        if not text:
+            continue
+        
+        # Skip all-caps short text (like bylines: "Nick Schifrin")
+        upper_count = sum(1 for ch in text if ch.isupper())
+        lower_count = sum(1 for ch in text if ch.islower())
+        if upper_count and not lower_count and len(text.split()) <= 6:
+            continue
+        
+        # Skip names followed by title (pattern: "Name Title")
+        # Usually 2-4 words, starts with capital letter
+        if len(text.split()) <= 4 and text[0].isupper():
+            # If it looks like just a name/role, skip it
+            # Check if it contains common roles or is all proper nouns
+            if text.count('\n') == 0 and ':' not in text:  # No newlines or colons
+                word_count = len(text.split())
+                if word_count <= 3:
+                    # Check if all words are capitalized (typical of bylines)
+                    words = text.split()
+                    if all(w[0].isupper() for w in words if len(w) > 0):
+                        # This is likely a byline, skip it
+                        continue
+        
+        # Skip feedback prompts
+        if text.lower() == "leave your feedback":
+            continue
+        
+        # Skip prefixes
+        if any(text.startswith(prefix) for prefix in TRIM_PREFIXES):
+            continue
+        
+        # Skip certain phrases
+        if any(needle in text for needle in TRIM_CONTAINS):
+            continue
+        
+        # Skip if less than 30 chars (too short to be real content)
+        if len(text) < 30:
+            continue
+        
+        # Skip duplicates
+        if cleaned and text == cleaned[-1]:
+            continue
+        
+        cleaned.append(text)
+    
+    return cleaned
+
+
 def fetch_article_content(url):
     """Fetch full article content from URL and extract text."""
     try:
@@ -67,7 +152,31 @@ def fetch_article_content(url):
         # Extract paragraphs
         parser = ParagraphExtractor()
         parser.feed(response.text)
-        paragraphs = parser.get_paragraphs()
+        raw_paragraphs = parser.get_paragraphs()
+        
+        # Clean whitespace from all paragraphs first
+        import re
+        cleaned_raw = []
+        for p in raw_paragraphs:
+            # Normalize whitespace
+            clean_p = re.sub(r'\s+', ' ', p.strip())
+            if clean_p:
+                cleaned_raw.append(clean_p)
+        
+        # Find the start of actual content by looking for substantial paragraphs
+        # Skip the first few paragraphs which are usually bylines/presenter names
+        content_start = 0
+        for i, p in enumerate(cleaned_raw):
+            # Skip very short paragraphs (< 50 chars) - these are usually bylines
+            if len(p) > 50:
+                content_start = i
+                break
+        
+        # Use paragraphs starting from content_start
+        filtered_paragraphs = cleaned_raw[content_start:]
+        
+        # Clean and filter paragraphs
+        paragraphs = clean_paragraphs(filtered_paragraphs)
         
         if paragraphs:
             content = "\n\n".join(paragraphs[:15])  # Take first 15 paragraphs
