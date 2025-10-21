@@ -29,11 +29,13 @@ def get_feeds_from_db(conn):
 
 
 def is_video_article(title, description, url):
-    """Check if article is a video/show/segment (should be skipped)."""
-    # Keywords that indicate video content
+    """Check if article is a video/show/segment (should be skipped).
+    Only skip if it's clearly about watching/viewing video content."""
+    # Only skip if explicitly marked as video content to watch
     video_keywords = [
-        'video', 'show', 'segment', 'watch', 'wrap', 'news wrap',
-        'tape', 'broadcast', 'program'
+        'watch:', 'video:', 'segment -',
+        'pbs newshour episode', 'full episode',
+        'video episode'
     ]
     
     combined = f"{title} {description} {url}".lower()
