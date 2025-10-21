@@ -21,13 +21,23 @@ const FilterComponent: React.FC<Props> = ({ filters, onFilterChange }) => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('/api/categories');
+      const response = await fetch('http://localhost:8000/api/categories');
       const data = await response.json();
-      setCategories(data);
+      
+      // Handle both array of objects {id, name} and array of strings
+      if (Array.isArray(data)) {
+        const categoryNames = data.map(cat => 
+          typeof cat === 'string' ? cat : cat.name
+        );
+        setCategories(categoryNames);
+      } else {
+        // Fallback if response is not an array
+        setCategories(['US News', 'Politics', 'Science', 'Technology']);
+      }
     } catch (err) {
       console.error('Failed to load categories', err);
       // Fallback categories
-      setCategories(['Technology', 'Science', 'Politics']);
+      setCategories(['US News', 'Politics', 'Science', 'Technology']);
     }
   };
 
