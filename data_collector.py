@@ -11,8 +11,71 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 from urllib.parse import urljoin
 import pathlib
+from html.parser import HTMLParser
+import time
 
 DB_FILE = pathlib.Path("articles.db")
+
+
+class ParagraphExtractor(HTMLParser):
+    """Extract paragraphs from HTML."""
+    def __init__(self):
+        super().__init__()
+        self.paragraphs = []
+        self.current_p = []
+        self.in_p = False
+        self.in_script = False
+        self.in_style = False
+    
+    def handle_starttag(self, tag, attrs):
+        if tag == 'p':
+            self.in_p = True
+        elif tag == 'script':
+            self.in_script = True
+        elif tag == 'style':
+            self.in_style = True
+    
+    def handle_endtag(self, tag):
+        if tag == 'p' and self.in_p:
+            text = ''.join(self.current_p).strip()
+            if text and len(text) > 10:  # Skip very short text
+                self.paragraphs.append(text)
+            self.current_p = []
+            self.in_p = False
+        elif tag == 'script':
+            self.in_script = False
+        elif tag == 'style':
+            self.in_style = False
+    
+    def handle_data(self, data):
+        if self.in_p and not self.in_script and not self.in_style:
+            self.current_p.append(data)
+    
+    def get_paragraphs(self):
+        return self.paragraphs
+
+
+def fetch_article_content(url):
+    """Fetch full article content from URL and extract text."""
+    try:
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
+        }
+        response = requests.get(url, timeout=10, headers=headers)
+        response.raise_for_status()
+        
+        # Extract paragraphs
+        parser = ParagraphExtractor()
+        parser.feed(response.text)
+        paragraphs = parser.get_paragraphs()
+        
+        if paragraphs:
+            content = "\n\n".join(paragraphs[:15])  # Take first 15 paragraphs
+            return content[:5000]  # Limit to 5000 chars
+        else:
+            return ""
+    except Exception as e:
+        return ""
 
 
 def get_feeds_from_db(conn):
@@ -130,15 +193,23 @@ def parse_rss_feed(feed_url, source_name, category_id, max_articles=1):
             pub_date = pub_date_elem.text if pub_date_elem is not None else datetime.now().isoformat()
             
             if title and url:
+                # Fetch full article content from URL
+                full_content = fetch_article_content(url)
+                if not full_content:
+                    full_content = content  # Fall back to RSS content
+                
                 articles.append({
                     'title': title,
                     'source': source_name,
                     'url': url,
                     'description': description[:500] if description else "",
-                    'content': content[:5000] if content else "",
+                    'content': full_content[:5000] if full_content else "",
                     'pub_date': pub_date,
                     'category_id': category_id
                 })
+                
+                # Be respectful - add delay between requests
+                time.sleep(0.3)
         
         print(f"  ✓ Found {len(articles)} article(s)")
         return articles
