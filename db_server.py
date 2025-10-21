@@ -9,9 +9,17 @@ from urllib.parse import urlparse, parse_qs
 import json
 import sqlite3
 from pathlib import Path
+import os
 
-DB_PATH = '/Users/jidai/news/articles.db'
-IMAGES_DIR = Path('/Users/jidai/news/article_images')
+# Detect environment and set paths accordingly
+if os.path.exists('/var/www/news'):
+    # Running on EC2
+    DB_PATH = '/var/www/news/articles.db'
+    IMAGES_DIR = Path('/var/www/news/article_images')
+else:
+    # Running locally on Mac
+    DB_PATH = '/Users/jidai/news/articles.db'
+    IMAGES_DIR = Path('/Users/jidai/news/article_images')
 
 class DBQueryHandler(BaseHTTPRequestHandler):
     def do_GET(self):
