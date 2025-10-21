@@ -143,6 +143,66 @@ def clean_paragraphs(paragraphs):
         # Skip certain phrases
         if any(needle in text for needle in TRIM_CONTAINS):
             continue
+
+        # Remove TechRadar/Engagement boilerplate often found at the end
+        if text.startswith('You must confirm your public display name'):
+            continue
+        if text.startswith('Follow TechRadar') or 'Follow TechRadar' in text:
+            continue
+
+        # Remove funding statements like "Funding: ..." appearing as standalone paragraphs
+        if text.startswith('Funding:') or text.startswith('Funding –'):
+            continue
+
+        # Remove common advertisement/comment boilerplate
+        AD_REMOVE_CONTAINS = (
+            'techradar',
+            'sign up for',
+            'sign up',
+            'sign in',
+            'log in',
+            'login',
+            'log out',
+            'logout',
+            'read our full guide',
+                'you must confirm your public display name',
+                'follow techradar',
+                'vpn',
+                'nordvpn',
+                'sponsored',
+                'affiliate',
+                'affiliate commission',
+                'buy now',
+                'get the world',
+        )
+        low_text = text.lower()
+
+        # Aggressive promo/emoji filtering
+        # If the paragraph starts with common promo emojis and is short, drop it
+        promo_emojis_start = ('✅', '🔒', '🔥', '⭐', '✨', '💥', '🚨', '🎉')
+        if text.lstrip().startswith(promo_emojis_start) and len(text) < 220:
+            continue
+
+        # Remove lines that are mostly non-alphanumeric/emoji bullets or extremely short promo snippets
+        if len(text) < 120 and re.match(r'^[\W_\s\p{So}\p{Cn}]+$', text) if False else False:
+            # fallback: if it contains an emoji and is short, drop it
+            if any(ch in text for ch in promo_emojis_start):
+                continue
+
+        # Remove explicit percent-off or sale lines when short / clearly promotional
+        if ('%' in text or ' off' in low_text or '70% off' in low_text or 'save' in low_text or 'discount' in low_text):
+            # drop short promotional lines or emoji-marked offers
+            if len(text) < 220 or any(ch in text for ch in promo_emojis_start):
+                continue
+
+        # Remove obvious subscription/payment promotional lines
+        if re.search(r'\b(subscription|subscribe|monthly|per month|per year|set you back|add to your TV package|\$\d|£\d|AU\$|CAN\$|\d+% off)\b', low_text):
+            if len(text) < 300:
+                continue
+
+        # Remove common advertisement/comment boilerplate
+        if any(k in low_text for k in AD_REMOVE_CONTAINS):
+            continue
         
         # Skip if less than 30 chars (too short to be real content)
         if len(text) < 30:
@@ -154,6 +214,20 @@ def clean_paragraphs(paragraphs):
         
         cleaned.append(text)
     
+    # Post-processing: strip trailing footer lines that look like publisher addresses or copyright
+    while cleaned:
+        last = cleaned[-1]
+        low_last = last.lower()
+        # remove if contains copyright sign or publisher address hints or 'future us'
+        if '©' in last or 'future us' in low_last or re.search(r'\b\d{5}\b', low_last) or 'full' in low_last and 'floor' in low_last:
+            cleaned.pop()
+            continue
+        # also remove short lines that contain commas and numbers like addresses
+        if len(last.split()) < 10 and re.search(r'\d', last) and ',' in last:
+            cleaned.pop()
+            continue
+        break
+
     return cleaned
 
 
@@ -330,6 +404,29 @@ def is_transcript_article(content, title=""):
     return False
 
 
+def is_games_or_filler_article(title, description, content):
+    """Check if article is games/puzzles/filler content (should be skipped)."""
+    combined = f"{title} {description} {content}".lower()
+    
+    # Games/puzzle keywords to filter out
+    games_keywords = [
+        'hints and answers',
+        'game #',
+        'puzzle',
+        'wordle',
+        'connections',
+        'strands',
+        'how to watch',
+        'champions league',
+    ]
+    
+    for keyword in games_keywords:
+        if keyword in combined:
+            return True
+    
+    return False
+
+
 def article_exists(conn, url):
     """Check if article already exists by URL."""
     cursor = conn.cursor()
@@ -342,12 +439,16 @@ def insert_article(conn, title, source, url, description, content, pub_date, cat
     cursor = conn.cursor()
     
     try:
+        # Ensure title is unescaped and trimmed
+        import html as _html
+        safe_title = _html.unescape(title).strip() if title else ""
+
         cursor.execute("""
             INSERT INTO articles 
             (title, source, url, description, content, pub_date, crawled_at, category_id, deepseek_processed)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)
         """, (
-            title[:500] if title else "",
+            safe_title[:500] if safe_title else "",
             source[:100] if source else "",
             url[:500] if url else "",
             description[:1000] if description else "",
@@ -361,6 +462,257 @@ def insert_article(conn, title, source, url, description, content, pub_date, cat
     except sqlite3.IntegrityError as e:
         print(f"  ✗ Duplicate URL or constraint error: {e}")
         return None
+
+
+def download_and_record_image(conn, article_id, article_url, html_text):
+    """Find first relevant image, download it, save locally under article_images/, and record in DB."""
+    from bs4 import BeautifulSoup
+    import os
+    if not html_text:
+        return None
+
+    soup = BeautifulSoup(html_text, 'html.parser')
+    # 1) Prefer OpenGraph / Twitter meta images
+    meta_img = None
+    og = soup.find('meta', property='og:image')
+    if og and og.get('content'):
+        meta_img = og.get('content')
+    if not meta_img:
+        tw = soup.find('meta', attrs={'name': 'twitter:image'})
+        if tw and tw.get('content'):
+            meta_img = tw.get('content')
+    if not meta_img:
+        link_img = soup.find('link', rel=lambda x: x and 'image_src' in x)
+        if link_img and link_img.get('href'):
+            meta_img = link_img.get('href')
+
+    candidates = []
+    if meta_img:
+        candidates.append(meta_img)
+
+    # 2) Collect candidate images from common containers and attributes (src, data-src, srcset)
+    def _extract_url_from_srcset(srcset):
+        # srcset may contain multiple items like 'a.jpg 1x, b.jpg 2x'
+        if not srcset:
+            return None
+        parts = [p.strip() for p in srcset.split(',')]
+        if not parts:
+            return None
+        first = parts[0].split()[0]
+        return first
+
+    selectors = ['article img', 'div.article img', 'div.main img', 'figure img', 'picture img', 'img']
+    for sel in selectors:
+        for img in soup.select(sel):
+            src = img.get('src') or img.get('data-src') or img.get('data-srcset')
+            if not src and img.get('srcset'):
+                src = _extract_url_from_srcset(img.get('srcset'))
+            if src:
+                candidates.append(src)
+
+    # Normalize and filter candidates
+    norm = []
+    for c in candidates:
+        if not c:
+            continue
+        full = urljoin(article_url, c)
+        # skip obvious logos/favicons
+        low = full.lower()
+        if any(x in low for x in ('logo', 'favicon', 'apple-touch-icon', 'icon', '/icons/', 'pbs-logo')):
+            continue
+        if full in norm:
+            continue
+        norm.append(full)
+
+    if not norm:
+        return None
+
+    # Try downloading candidates and accept first that looks like a real article image
+    img_url = None
+    for cand in norm:
+        try:
+            resp = requests.get(cand, timeout=10, stream=True)
+            resp.raise_for_status()
+            # Check content-length header first
+            clen = resp.headers.get('content-length')
+            if clen and int(clen) < 8192:
+                # too small, probably a tiny logo
+                resp.close()
+                continue
+            # Read some bytes to ensure size if header missing
+            data = resp.content
+            if len(data) < 8192:
+                continue
+            img_url = cand
+            img_bytes = data
+            break
+        except Exception:
+            continue
+
+    # Save image file
+    os.makedirs('article_images', exist_ok=True)
+    # Create a safe filename
+    import hashlib
+    h = hashlib.sha1(img_url.encode('utf-8')).hexdigest()[:12]
+    ext = os.path.splitext(img_url)[1].split('?')[0]
+    if not ext or len(ext) > 6:
+        ext = '.jpg'
+    fname = f'article_{article_id}_{h}{ext}'
+    local_path = os.path.join('article_images', fname)
+    try:
+        with open(local_path, 'wb') as f:
+            f.write(img_bytes)
+    except Exception:
+        return None
+
+    # Insert into article_images table
+    cur = conn.cursor()
+    try:
+        cur.execute(
+            "INSERT INTO article_images (article_id, image_name, original_url, local_location) VALUES (?, ?, ?, ?)",
+            (article_id, fname, img_url, local_path)
+        )
+        conn.commit()
+        return local_path
+    except Exception:
+        return None
+
+
+def download_image_preview(article_url, html_text, min_bytes=100_000):
+    """Download best image candidate for preview only. Return local path or None.
+    Requires image size >= min_bytes to accept.
+    Does not touch the database."""
+    from bs4 import BeautifulSoup
+    import os, hashlib
+
+    if not html_text:
+        return None
+    soup = BeautifulSoup(html_text, 'html.parser')
+
+    # Prefer og:image/twitter:image
+    candidates = []
+    og = soup.find('meta', property='og:image')
+    if og and og.get('content'):
+        candidates.append(og.get('content'))
+    tw = soup.find('meta', attrs={'name': 'twitter:image'})
+    if tw and tw.get('content'):
+        candidates.append(tw.get('content'))
+
+    # gather images
+    for sel in ['article img', 'div.article img', 'div.main img', 'figure img', 'img']:
+        for img in soup.select(sel):
+            src = img.get('src') or img.get('data-src') or img.get('srcset')
+            if src and ',' in src:
+                src = src.split(',')[0].split()[0]
+            if src:
+                candidates.append(src)
+
+    # normalize
+    norm = []
+    for c in candidates:
+        if not c:
+            continue
+        full = urljoin(article_url, c)
+        low = full.lower()
+        if any(x in low for x in ('logo', 'favicon', 'placeholder', 'pbs-logo')):
+            continue
+        if full not in norm:
+            norm.append(full)
+
+    if not norm:
+        return None
+
+    os.makedirs('article_images', exist_ok=True)
+    from urllib.parse import urlparse
+
+    for cand in norm:
+        try:
+            r = requests.get(cand, timeout=10)
+            r.raise_for_status()
+            data = r.content
+            if len(data) < min_bytes:
+                continue
+            ext = os.path.splitext(urlparse(cand).path)[1]
+            if not ext or len(ext) > 6:
+                ext = '.jpg'
+            h = hashlib.sha1(cand.encode('utf-8')).hexdigest()[:12]
+            fname = f'preview_{h}{ext}'
+            local_path = os.path.join('article_images', fname)
+            with open(local_path, 'wb') as f:
+                f.write(data)
+            return local_path
+        except Exception:
+            continue
+    return None
+
+
+def collect_preview(num_per_source=5, min_image_bytes=100_000):
+    """Collect articles but only download images for preview. Do NOT insert into DB.
+    Produces a preview HTML file `preview_articles.html` showing accepted articles and local image paths.
+    An article is accepted only if a qualifying image (>= min_image_bytes) is found and content passes cleaning.
+    """
+    feeds = get_feeds_from_db(sqlite3.connect(DB_FILE))
+    import os
+    preview_items = []
+
+    for feed_id, feed_name, feed_url, category_id, category_name in feeds:
+        print(f"\n[{feed_name}] Fetching up to 20, targeting {num_per_source} clean preview articles")
+        articles = parse_rss_feed(feed_url, feed_name, category_id, max_articles=20)
+        kept = 0
+        for art in articles:
+            if kept >= num_per_source:
+                break
+            # basic filters
+            if is_video_article(art['title'], art['description'], art['url']):
+                continue
+            if is_transcript_article(art['content'], art['title']):
+                continue
+            # clean content paragraphs
+            paras = art['content'].split('\n') if art['content'] else []
+            cleaned = clean_paragraphs(paras)
+            if not cleaned:
+                continue
+            # fetch page and try preview image
+            try:
+                resp = requests.get(art['url'], timeout=10)
+                resp.raise_for_status()
+                img_local = download_image_preview(art['url'], resp.text, min_bytes=min_image_bytes)
+                if not img_local:
+                    print(f"  ⊘ Skipped (no large image): {art['title'][:60]}...")
+                    continue
+                # accepted
+                preview_items.append({
+                    'title': art['title'],
+                    'url': art['url'],
+                    'source': art['source'],
+                    'content': '\n\n'.join(cleaned),
+                    'image': img_local
+                })
+                kept += 1
+                print(f"  ✓ Preview accepted: {art['title'][:60]}... -> {img_local}")
+            except Exception:
+                continue
+
+    # generate preview HTML
+    import html as _html
+    out = ['<!doctype html>', '<html><head><meta charset="utf-8"><title>Preview Articles</title>',
+           '<style>body{font-family:Arial,Helvetica,sans-serif;line-height:1.45;margin:20px} .article{margin-bottom:50px} img{max-width:700px;height:auto}</style>',
+           '</head><body>', '<h1>Preview Articles</h1>']
+
+    for it in preview_items:
+        out.append(f"<div class='article'><h2>{_html.escape(it['title'])}</h2>")
+        out.append(f"<p><em>{_html.escape(it['source'])} - <a href='{_html.escape(it['url'])}'>Original</a></em></p>")
+        if it['image'] and os.path.exists(it['image']):
+            out.append(f"<p><img src='{_html.escape(it['image'])}'></p>")
+        for p in it['content'].split('\n\n'):
+            out.append(f"<p>{_html.escape(p)}</p>")
+        out.append('</div>')
+
+    out.append('</body></html>')
+    with open('preview_articles.html', 'w', encoding='utf-8') as f:
+        f.write('\n'.join(out))
+    print('\nGenerated preview_articles.html with', len(preview_items), 'items')
+    return preview_items
 
 
 def parse_rss_feed(feed_url, source_name, category_id, max_articles=1):
@@ -443,91 +795,115 @@ def parse_rss_feed(feed_url, source_name, category_id, max_articles=1):
 
 
 def collect_articles(num_per_source=1):
-    """Collect articles from RSS feeds stored in database."""
-    
+    """Collect articles from RSS feeds stored in database.
+
+    Policy: For each active feed, fetch up to 20 items and keep up to
+    `num_per_source` clean articles (stop early when the target is reached).
+    """
+
     if not DB_FILE.exists():
         print(f"✗ Database not found: {DB_FILE}")
         return False
-    
+
     conn = sqlite3.connect(DB_FILE)
-    
-    print("\n" + "="*70)
+
+    print("\n" + "=" * 70)
     print("COLLECTING ARTICLES FROM RSS FEEDS")
-    print("="*70)
+    print("=" * 70)
     print(f"Target: {num_per_source} article(s) per source")
-    
+
     # Get feeds from database
     feeds = get_feeds_from_db(conn)
-    
     if not feeds:
         print("✗ No active feeds found in database")
         conn.close()
         return False
-    
+
     print(f"Found {len(feeds)} active feed(s)")
-    
+
     collected = 0
     duplicates = 0
-    
+
     for feed_id, feed_name, feed_url, category_id, category_name in feeds:
         print(f"\n[{feed_name}]")
-        
-        # For PBS, get more articles since we filter transcripts
-        max_to_fetch = num_per_source
+
+        max_to_fetch = 20
         target_count = num_per_source
-        if feed_name.upper() == "PBS":
-            max_to_fetch = 20  # Get up to 20 PBS articles
-            target_count = 5    # But only keep 5 after filtering transcripts
-            print(f"  PBS Special Mode: Fetching up to {max_to_fetch}, targeting {target_count} clean articles")
-        
-        # Fetch RSS feed
+        print(f"  Fetching up to {max_to_fetch}, targeting {target_count} clean articles from {feed_name}")
+
+        # Fetch feed items
         articles = parse_rss_feed(feed_url, feed_name, category_id, max_to_fetch)
-        
-        # Insert articles
-        pbs_clean_count = 0
+        print(f"  ✓ Found {len(articles)} article(s) in feed")
+
+        # Process fetched articles and insert up to `target_count` clean articles
+        clean_count = 0
         for article in articles:
-            # For PBS, stop after getting 5 clean articles
-            if feed_name.upper() == "PBS" and pbs_clean_count >= target_count:
-                print(f"  ✓ PBS: Reached target of {target_count} clean articles, stopping")
+            # Stop early if we've collected enough clean articles for this feed
+            if clean_count >= target_count:
+                print(f"  ✓ {feed_name}: Reached target of {target_count} clean articles, stopping")
                 break
-            
+
             # Skip video articles
             if is_video_article(article['title'], article['description'], article['url']):
                 print(f"  ⊘ Skipped (VIDEO): {article['title'][:60]}...")
                 continue
-            
-            # Skip transcript-style articles (PBS news interviews/reports with mixed speakers)
+
+            # Skip transcript-style articles
             if is_transcript_article(article['content'], article['title']):
                 print(f"  ⊘ Skipped (TRANSCRIPT): {article['title'][:60]}...")
                 continue
-            
+
+            # Skip games/puzzles/filler content
+            if is_games_or_filler_article(article['title'], article['description'], article['content']):
+                print(f"  ⊘ Skipped (GAMES/FILLER): {article['title'][:60]}...")
+                continue
+
+            # Skip articles outside character range (2000-4500 chars)
+            content_length = len(article['content'] or "")
+            if content_length < 2000 or content_length > 4500:
+                print(f"  ⊘ Skipped (LENGTH {content_length}): {article['title'][:60]}...")
+                continue
+
+            # Skip duplicates
             if article_exists(conn, article['url']):
                 print(f"  ⊘ Duplicate: {article['title'][:60]}...")
                 duplicates += 1
-            else:
-                article_id = insert_article(
-                    conn,
-                    article['title'],
-                    article['source'],
-                    article['url'],
-                    article['description'],
-                    article['content'],
-                    article['pub_date'],
-                    article['category_id']
-                )
-                if article_id:
-                    print(f"  ✓ Inserted (ID {article_id}): {article['title'][:60]}...")
-                    collected += 1
-                    # Track PBS clean articles
-                    if feed_name.upper() == "PBS":
-                        pbs_clean_count += 1
-    
+                continue
+
+            # Insert article
+            article_id = insert_article(
+                conn,
+                article['title'],
+                article['source'],
+                article['url'],
+                article['description'],
+                article['content'],
+                article['pub_date'],
+                article['category_id']
+            )
+
+            if article_id:
+                print(f"  ✓ Inserted (ID {article_id}): {article['title'][:60]}...")
+                collected += 1
+                clean_count += 1
+                # Attempt to download first image from the article page and record it
+                try:
+                    page_resp = requests.get(article['url'], timeout=10)
+                    page_resp.raise_for_status()
+                    saved = download_and_record_image(conn, article_id, article['url'], page_resp.text)
+                    if saved:
+                        print(f"    ✓ Image saved: {saved}")
+                    else:
+                        print(f"    ⊘ No image saved for article ID {article_id}")
+                except Exception:
+                    print(f"    ⊘ Failed to fetch page for images: {article['url']}")
+
     conn.close()
-    
-    print("\n" + "="*70)
+
+    print("\n" + "=" * 70)
     print(f"✓ Collection complete: {collected} new articles, {duplicates} duplicates")
-    print("="*70)
-    
+    print("=" * 70)
+
     return collected > 0
 
 
