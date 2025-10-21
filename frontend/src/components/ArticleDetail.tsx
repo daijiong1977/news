@@ -68,7 +68,7 @@ const ArticleDetail: React.FC<Props> = ({ articleId, filters, onBack }) => {
           language: filters.language,
         });
         // Use full URL instead of proxy
-        const response = await axios.get(`http://localhost:8000/api/articles/${articleId}?${params}`);
+        const response = await axios.get(`http://localhost:8008/api/articles/${articleId}?${params}`);
         
         const data = response.data;
         setArticle(data.article);

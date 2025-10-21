@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Direct Database Query Server for React Frontend
-No Flask - just raw SQLite queries exposed via HTTP
+Background-safe version that doesn't hang on startup
 """
 
 from http.server import HTTPServer, BaseHTTPRequestHandler
@@ -10,6 +10,9 @@ import json
 import sqlite3
 from pathlib import Path
 import os
+import signal
+import sys
+import threading
 
 # Detect environment and set paths accordingly
 if os.path.exists('/var/www/news'):
@@ -249,25 +252,29 @@ class DBQueryHandler(BaseHTTPRequestHandler):
 
 def run_server():
     host = '0.0.0.0'
-    port = 8008
+    port = 8000
     server_address = (host, port)
     httpd = HTTPServer(server_address, DBQueryHandler)
     
-    print("🚀 Direct Database Query Server")
-    print(f"📡 Listening on http://localhost:{port}")
-    print(f"📊 Database: {DB_PATH}")
-    print("🔗 Endpoints:")
-    print("   - GET /api/articles - List articles")
-    print("   - GET /api/articles/<id> - Article detail")
-    print("   - GET /api/categories - List categories")
-    print("   - GET /api/images/<filename> - Serve images")
-    print("   - GET /api/health - Health check")
-    print("\nPress Ctrl+C to stop\n")
+    print(f"✅ DB Server started on port {port}")
+    sys.stdout.flush()
     
+    def signal_handler(sig, frame):
+        httpd.server_close()
+        sys.exit(0)
+    
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+    
+    # Serve in a thread so main thread doesn't block
+    server_thread = threading.Thread(target=httpd.serve_forever, daemon=True)
+    server_thread.start()
+    
+    # Keep main thread alive
     try:
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        print("\n👋 Server stopped")
+        while True:
+            signal.pause()
+    except:
         httpd.server_close()
 
 if __name__ == '__main__':

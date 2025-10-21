@@ -21,7 +21,7 @@ const FilterComponent: React.FC<Props> = ({ filters, onFilterChange }) => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/categories');
+      const response = await fetch('http://localhost:8008/api/categories');
       const data = await response.json();
       
       // Handle both array of objects {id, name} and array of strings

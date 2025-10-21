@@ -261,7 +261,7 @@ const ArticleInteractive: React.FC<Props> = ({ articleId, onBack }) => {
     const fetchArticle = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:8000/api/articles/${articleId}`);
+        const response = await axios.get(`http://localhost:8008/api/articles/${articleId}`);
         setArticle(response.data);
       } catch (err) {
         console.error('Failed to load article', err);

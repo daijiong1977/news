@@ -24,34 +24,26 @@ interface Props {
 
 const ArticleList: React.FC<Props> = ({ filters, onSelectArticle }) => {
   const [articles, setArticles] = useState<Article[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        setLoading(true);
         const params = new URLSearchParams({
           difficulty: filters.difficulty,
           language: filters.language,
           ...(filters.category && { category: filters.category }),
         });
-        // Use full URL instead of proxy
-        const response = await axios.get(`http://localhost:8000/api/articles?${params}`);
+        const response = await axios.get(`http://localhost:8008/api/articles?${params}`);
         setArticles(response.data);
         setError(null);
       } catch (err) {
         setError('Failed to load articles');
-        console.error('API Error:', err);
-      } finally {
-        setLoading(false);
       }
     };
-
     fetchArticles();
   }, [filters]);
 
-  if (loading) return <div className="loading">Loading articles...</div>;
   if (error) return <div className="error">{error}</div>;
 
   return (
@@ -69,7 +61,7 @@ const ArticleList: React.FC<Props> = ({ filters, onSelectArticle }) => {
             >
               {article.image && (
                 <div className="article-image">
-                  <img src={`http://localhost:8000${article.image}`} alt={article.title} />
+                  <img src={`http://localhost:8008${article.image}`} alt={article.title} />
                 </div>
               )}
               <h3>
