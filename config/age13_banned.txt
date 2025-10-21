@@ -1,0 +1,49 @@
+# Banned words/phrases for under-13 filtering
+# One entry per line; lines starting with # are comments and ignored.
+
+# sexual violence / abuse
+rape
+rapist
+raped
+sexual assault
+sexual abuse
+molest
+molested
+grooming
+pedophile
+paedophile
+incest
+
+# explicit sexual acts / porn
+fuck
+fucked
+fucking
+blowjob
+fellatio
+cunnilingus
+intercourse
+anal sex
+sodomy
+porn
+pornography
+xxx
+pornstar
+
+# strong profanity
+shit
+cunt
+dick
+asshole
+bastard
+
+# child-specific sexual terms
+"child sexual abuse"
+"sexual grooming"
+
+# graphic violence/self-harm (optional)
+murder
+kill
+suicide
+behead
+decapitate
+gore

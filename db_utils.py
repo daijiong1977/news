@@ -334,7 +334,7 @@ def get_articles_by_source(limit_per_source: int = 3) -> dict[str, list[dict]]:
         cursor.execute("""
             SELECT * FROM articles 
             WHERE source = ? 
-            ORDER BY date_iso DESC 
+            ORDER BY pub_date DESC 
             LIMIT ?
         """, (source, limit_per_source))
         

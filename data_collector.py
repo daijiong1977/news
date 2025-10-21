@@ -55,6 +55,99 @@ class ParagraphExtractor(HTMLParser):
         return self.paragraphs
 
 
+def _choose_best_from_srcset(srcset):
+    """Pick the best (largest) URL from a srcset string.
+    srcset examples: 'a.jpg 100w, b.jpg 800w' or 'a.jpg 1x, b.jpg 2x'.
+    Return the URL (first part) of the entry with the largest width or density.
+    """
+    if not srcset:
+        return None
+    parts = [p.strip() for p in srcset.split(',') if p.strip()]
+    best_url = None
+    best_val = -1.0
+    for part in parts:
+        # Split into URL and descriptor
+        segs = part.split()
+        url = segs[0]
+        val = 0.0
+        if len(segs) > 1:
+            desc = segs[1]
+            # handle width like '800w' or density like '2x'
+            try:
+                if desc.endswith('w'):
+                    val = float(desc[:-1])
+                elif desc.endswith('x'):
+                    val = float(desc[:-1]) * 1000.0  # treat density as very large to prefer hi-res
+                else:
+                    val = float(desc)
+            except Exception:
+                val = 0.0
+        else:
+            # no descriptor: treat as default small
+            val = 0.0
+        if val > best_val:
+            best_val = val
+            best_url = url
+    return best_url
+
+
+def _score_image_candidate(img_url, article_url):
+    """Return a score for an image candidate to prefer large/original media-host images.
+    Heuristics:
+      - prefer known media hosts (ichef.bbci.co.uk, bbci.co.uk)
+      - prefer URLs with '/standard/<width>/' or '/branded_sport/<width>/' and larger widths
+      - prefer same-origin images (domain contains article domain)
+    """
+    from urllib.parse import urlparse
+    import re
+
+    score = 0.0
+    if not img_url:
+        return score
+    try:
+        p = urlparse(img_url)
+        host = p.netloc or ''
+        path = p.path or ''
+    except Exception:
+        return score
+
+    # known media hosts
+    if 'ichef.bbci.co.uk' in host or 'bbci.co.uk' in host:
+        score += 10000.0
+
+    # prefer same-origin (bbc.com article vs bbc image)
+    try:
+        art_host = urlparse(article_url).netloc or ''
+        if art_host and art_host in host:
+            score += 2000.0
+    except Exception:
+        pass
+
+    # parse width from typical BBC patterns
+    m = re.search(r'/standard/(\d+)', path)
+    if not m:
+        m = re.search(r'/branded_sport/(\d+)', path)
+    if m:
+        try:
+            w = float(m.group(1))
+            score += w  # add width directly
+        except Exception:
+            pass
+
+    # prefer webp/jpg over png placeholders
+    if path.endswith('.webp'):
+        score += 50.0
+    if path.endswith('.jpg') or path.endswith('.jpeg'):
+        score += 30.0
+
+    # small penalty for things that look like logos
+    low = (host + path).lower()
+    if any(x in low for x in ('logo', 'favicon', 'apple-touch-icon', '/icons/', 'placeholder', 'spacer', 'blank')):
+        score -= 5000.0
+
+    return score
+
+
 def clean_paragraphs(paragraphs):
     """Clean and filter paragraphs - remove bylines, feedback prompts, etc."""
     import html
@@ -202,6 +295,10 @@ def clean_paragraphs(paragraphs):
 
         # Remove common advertisement/comment boilerplate
         if any(k in low_text for k in AD_REMOVE_CONTAINS):
+            continue
+
+        # Remove paragraph-level 'Related:' markers often appended to feed summaries
+        if stripped.lower().startswith('related:'):
             continue
         
         # Skip if less than 30 chars (too short to be real content)
@@ -491,22 +588,40 @@ def download_and_record_image(conn, article_id, article_url, html_text):
         candidates.append(meta_img)
 
     # 2) Collect candidate images from common containers and attributes (src, data-src, srcset)
-    def _extract_url_from_srcset(srcset):
-        # srcset may contain multiple items like 'a.jpg 1x, b.jpg 2x'
-        if not srcset:
-            return None
-        parts = [p.strip() for p in srcset.split(',')]
-        if not parts:
-            return None
-        first = parts[0].split()[0]
-        return first
+    # include <picture> and <source> elements and choose best from srcset where present
+    for pic in soup.find_all('picture'):
+        # look for <source> entries first
+        for src in pic.find_all('source'):
+            # check srcset preferentially
+            sset = src.get('srcset') or src.get('data-srcset')
+            best = _choose_best_from_srcset(sset) if sset else None
+            if best:
+                candidates.append(best)
+            elif src.get('src'):
+                candidates.append(src.get('src'))
+        # then any img inside picture
+        img = pic.find('img')
+        if img:
+            sset = img.get('srcset') or img.get('data-srcset')
+            if sset:
+                best = _choose_best_from_srcset(sset)
+                if best:
+                    candidates.append(best)
+            src = img.get('src') or img.get('data-src')
+            if src:
+                candidates.append(src)
 
-    selectors = ['article img', 'div.article img', 'div.main img', 'figure img', 'picture img', 'img']
+    selectors = ['article img', 'div.article img', 'div.main img', 'figure img', 'img']
     for sel in selectors:
         for img in soup.select(sel):
+            # prefer srcset/density
+            sset = img.get('srcset') or img.get('data-srcset') or img.get('data-srcset')
+            if sset:
+                best = _choose_best_from_srcset(sset)
+                if best:
+                    candidates.append(best)
+                    continue
             src = img.get('src') or img.get('data-src') or img.get('data-srcset')
-            if not src and img.get('srcset'):
-                src = _extract_url_from_srcset(img.get('srcset'))
             if src:
                 candidates.append(src)
 
@@ -516,9 +631,17 @@ def download_and_record_image(conn, article_id, article_url, html_text):
         if not c:
             continue
         full = urljoin(article_url, c)
-        # skip obvious logos/favicons
+        # skip obvious logos/favicons or tiny placeholders
         low = full.lower()
-        if any(x in low for x in ('logo', 'favicon', 'apple-touch-icon', 'icon', '/icons/', 'pbs-logo')):
+        if any(x in low for x in ('favicon', 'apple-touch-icon', '/icons/')):
+            continue
+        # skip if filename indicates placeholder or logo
+        if any(x in low for x in ('logo', 'pbs-logo', 'placeholder', 'spacer', 'blank')):
+            continue
+        # skip png files (often logos/placeholders). prefer jpg/webp
+        from urllib.parse import urlparse
+        path = urlparse(full).path.lower()
+        if path.endswith('.png'):
             continue
         if full in norm:
             continue
@@ -527,21 +650,23 @@ def download_and_record_image(conn, article_id, article_url, html_text):
     if not norm:
         return None
 
-    # Try downloading candidates and accept first that looks like a real article image
+    # Try candidates in collected order (meta -> srcset -> selectors) and accept
+    # the first valid image. Avoid relying on large-size heuristics which can
+    # select the wrong asset; prefer explicit meta and src/srcset ordering.
     img_url = None
+    img_bytes = None
     for cand in norm:
         try:
             resp = requests.get(cand, timeout=10, stream=True)
             resp.raise_for_status()
-            # Check content-length header first
-            clen = resp.headers.get('content-length')
-            if clen and int(clen) < 8192:
-                # too small, probably a tiny logo
+            ctype = resp.headers.get('content-type','').lower()
+            # Skip png responses (often logos/placeholders delivered as png)
+            if 'image/png' in ctype:
                 resp.close()
                 continue
-            # Read some bytes to ensure size if header missing
             data = resp.content
-            if len(data) < 8192:
+            # tiny images are likely icons/placeholders; require minimal bytes
+            if not data or len(data) < 2000:
                 continue
             img_url = cand
             img_bytes = data
@@ -598,13 +723,40 @@ def download_image_preview(article_url, html_text, min_bytes=100_000):
     if tw and tw.get('content'):
         candidates.append(tw.get('content'))
 
-    # gather images
+    # Include picture/source and choose best srcset entries
+    for pic in soup.find_all('picture'):
+        for src in pic.find_all('source'):
+            sset = src.get('srcset') or src.get('data-srcset')
+            best = _choose_best_from_srcset(sset) if sset else None
+            if best:
+                candidates.append(best)
+            elif src.get('src'):
+                candidates.append(src.get('src'))
+        img = pic.find('img')
+        if img:
+            sset = img.get('srcset') or img.get('data-srcset')
+            if sset:
+                best = _choose_best_from_srcset(sset)
+                if best:
+                    candidates.append(best)
+            src = img.get('src') or img.get('data-src')
+            if src:
+                candidates.append(src)
+
+    # gather images from common selectors
     for sel in ['article img', 'div.article img', 'div.main img', 'figure img', 'img']:
         for img in soup.select(sel):
-            src = img.get('src') or img.get('data-src') or img.get('srcset')
-            if src and ',' in src:
-                src = src.split(',')[0].split()[0]
+            sset = img.get('srcset') or img.get('data-srcset')
+            if sset:
+                best = _choose_best_from_srcset(sset)
+                if best:
+                    candidates.append(best)
+                    continue
+            src = img.get('src') or img.get('data-src') or img.get('data-srcset')
             if src:
+                # if multiple comma-separated, pick the first URL
+                if ',' in src:
+                    src = src.split(',')[0].split()[0]
                 candidates.append(src)
 
     # normalize
@@ -614,7 +766,15 @@ def download_image_preview(article_url, html_text, min_bytes=100_000):
             continue
         full = urljoin(article_url, c)
         low = full.lower()
-        if any(x in low for x in ('logo', 'favicon', 'placeholder', 'pbs-logo')):
+        # skip obvious logos/favicons/placeholder
+        if any(x in low for x in ('favicon', 'apple-touch-icon', '/icons/')):
+            continue
+        if any(x in low for x in ('logo', 'pbs-logo', 'placeholder', 'spacer', 'blank')):
+            continue
+        # skip png files (often logos/placeholders). prefer jpg/webp
+        from urllib.parse import urlparse
+        path = urlparse(full).path.lower()
+        if path.endswith('.png'):
             continue
         if full not in norm:
             norm.append(full)
@@ -625,13 +785,18 @@ def download_image_preview(article_url, html_text, min_bytes=100_000):
     os.makedirs('article_images', exist_ok=True)
     from urllib.parse import urlparse
 
+    # Try candidates in collected order and accept first valid one
     for cand in norm:
         try:
             r = requests.get(cand, timeout=10)
             r.raise_for_status()
-            data = r.content
-            if len(data) < min_bytes:
+            ctype = r.headers.get('content-type','').lower()
+            if 'image/png' in ctype:
                 continue
+            data = r.content
+            if not data or len(data) < 2000:
+                continue
+            from urllib.parse import urlparse
             ext = os.path.splitext(urlparse(cand).path)[1]
             if not ext or len(ext) > 6:
                 ext = '.jpg'

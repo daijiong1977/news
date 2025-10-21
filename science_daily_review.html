@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Science Daily Articles - Review</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        
+        .header h1 {
+            color: #4ecdc4;
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .article {
+            background: white;
+            margin-bottom: 40px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #4ecdc4;
+        }
+        
+        .article-header {
+            padding: 30px;
+            background: #f9f9f9;
+        }
+        
+        .article-number {
+            display: inline-block;
+            background: #4ecdc4;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+        
+        .article-title {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+        
+        .article-url {
+            display: block;
+            padding: 12px;
+            background: white;
+            border-left: 3px solid #4ecdc4;
+            border-radius: 4px;
+            word-break: break-all;
+            margin-bottom: 15px;
+        }
+        
+        .article-url a {
+            color: #4ecdc4;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .article-url a:hover {
+            text-decoration: underline;
+        }
+        
+        .article-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 30px;
+        }
+        
+        .article-image-section {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .section-label {
+            font-size: 0.85em;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        
+        .article-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            background: #f0f0f0;
+            border-radius: 6px;
+            border: 1px solid #eee;
+        }
+        
+        .no-image {
+            width: 100%;
+            height: 300px;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            border-radius: 6px;
+            border: 1px solid #eee;
+        }
+        
+        .article-content-section {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .article-description {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            color: #555;
+            line-height: 1.6;
+            font-size: 0.95em;
+            flex-grow: 1;
+        }
+        
+        .article-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9em;
+            color: #666;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .footer {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            color: #666;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .article-body {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔬 Science Daily Articles</h1>
+            <p>5 articles with original links and images for comparison</p>
+        </div>
+
+        <div class="article">
+            <div class="article-header">
+                <div class="article-number">Article #1</div>
+                <h2 class="article-title">This simple neck measurement might reveal hidden heart risks</h2>
+                <div class="article-url">
+                    <strong>🔗 Original Link:</strong> <a href="https://www.sciencedaily.com/releases/2025/10/251020092844.htm" target="_blank">https://www.sciencedaily.com/releases/2025/10/251020092844.htm</a>
+                </div>
+            </div>
+            
+            <div class="article-body">
+                <div class="article-image-section">
+                    <div class="section-label">Image</div>
+                    <img src="article_images/science_article_36.jpg" alt="This simple neck measurement might reveal hidden heart risks" class="article-image">
+                </div>
+                
+                <div class="article-content-section">
+                    <div class="section-label">Current Article Data</div>
+                    <div class="article-description">
+                        <strong>Description:</strong><br>Neck size is proving to be a powerful indicator of hidden health risks. Larger neck circumferences are associated with cardiovascular disease, diabetes, and sleep apnea, even among those with normal weight. Fat stored in the upper body affects vital metabolic processes, increasing strain on the heart and blood vessels. A simple tape-measure check might reveal more about your health than you think.
+                    </div>
+                    <div class="article-meta">
+                        <div class="meta-item">📅 Mon, 20 Oct 2025 23:16:52 EDT</div>
+                        <div class="meta-item">📊 3221 chars</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="article">
+            <div class="article-header">
+                <div class="article-number">Article #2</div>
+                <h2 class="article-title">Feeling stressed? Science finds a simple way to take back control</h2>
+                <div class="article-url">
+                    <strong>🔗 Original Link:</strong> <a href="https://www.sciencedaily.com/releases/2025/10/251020092833.htm" target="_blank">https://www.sciencedaily.com/releases/2025/10/251020092833.htm</a>
+                </div>
+            </div>
+            
+            <div class="article-body">
+                <div class="article-image-section">
+                    <div class="section-label">Image</div>
+                    <div class="no-image">No image available</div>
+                </div>
+                
+                <div class="article-content-section">
+                    <div class="section-label">Current Article Data</div>
+                    <div class="article-description">
+                        <strong>Description:</strong><br>Feeling in control may be the key to conquering daily stress. Penn State researchers found that people were 62% more likely to resolve everyday hassles on days when they felt greater control. This link grew stronger over time, suggesting we get better at managing stress as we age. Simple actions like setting priorities and reframing challenges can help boost that sense of control and reduce overall stress.
+                    </div>
+                    <div class="article-meta">
+                        <div class="meta-item">📅 Mon, 20 Oct 2025 22:52:52 EDT</div>
+                        <div class="meta-item">📊 4300 chars</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="article">
+            <div class="article-header">
+                <div class="article-number">Article #3</div>
+                <h2 class="article-title">Scientists create LED light that kills cancer cells without harming healthy ones</h2>
+                <div class="article-url">
+                    <strong>🔗 Original Link:</strong> <a href="https://www.sciencedaily.com/releases/2025/10/251020092831.htm" target="_blank">https://www.sciencedaily.com/releases/2025/10/251020092831.htm</a>
+                </div>
+            </div>
+            
+            <div class="article-body">
+                <div class="article-image-section">
+                    <div class="section-label">Image</div>
+                    <div class="no-image">No image available</div>
+                </div>
+                
+                <div class="article-content-section">
+                    <div class="section-label">Current Article Data</div>
+                    <div class="article-description">
+                        <strong>Description:</strong><br>A new light-driven cancer therapy uses LEDs and tin nanoflakes to kill tumors safely and affordably. Developed by teams in Texas and Portugal, it eliminates up to 92% of skin cancer cells without harming healthy ones.
+                    </div>
+                    <div class="article-meta">
+                        <div class="meta-item">📅 Mon, 20 Oct 2025 11:28:13 EDT</div>
+                        <div class="meta-item">📊 4723 chars</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="article">
+            <div class="article-header">
+                <div class="article-number">Article #4</div>
+                <h2 class="article-title">Scientists detect hidden brain damage years before MS symptoms</h2>
+                <div class="article-url">
+                    <strong>🔗 Original Link:</strong> <a href="https://www.sciencedaily.com/releases/2025/10/251020092828.htm" target="_blank">https://www.sciencedaily.com/releases/2025/10/251020092828.htm</a>
+                </div>
+            </div>
+            
+            <div class="article-body">
+                <div class="article-image-section">
+                    <div class="section-label">Image</div>
+                    <div class="no-image">No image available</div>
+                </div>
+                
+                <div class="article-content-section">
+                    <div class="section-label">Current Article Data</div>
+                    <div class="article-description">
+                        <strong>Description:</strong><br>Scientists at UCSF have uncovered evidence that multiple sclerosis silently damages the brain years before diagnosis. By studying proteins in blood samples, they identified early immune signals and markers of nerve damage. The findings point to IL-3 and MOG as crucial early indicators — and open the door to new diagnostic blood tests and preventive strategies.
+                    </div>
+                    <div class="article-meta">
+                        <div class="meta-item">📅 Tue, 21 Oct 2025 03:14:36 EDT</div>
+                        <div class="meta-item">📊 3105 chars</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="article">
+            <div class="article-header">
+                <div class="article-number">Article #5</div>
+                <h2 class="article-title">Scientists just found hidden life thriving beneath the Arctic ice</h2>
+                <div class="article-url">
+                    <strong>🔗 Original Link:</strong> <a href="https://www.sciencedaily.com/releases/2025/10/251020092826.htm" target="_blank">https://www.sciencedaily.com/releases/2025/10/251020092826.htm</a>
+                </div>
+            </div>
+            
+            <div class="article-body">
+                <div class="article-image-section">
+                    <div class="section-label">Image</div>
+                    <div class="no-image">No image available</div>
+                </div>
+                
+                <div class="article-content-section">
+                    <div class="section-label">Current Article Data</div>
+                    <div class="article-description">
+                        <strong>Description:</strong><br>Melting Arctic ice is revealing a hidden world of nitrogen-fixing bacteria beneath the surface. These microbes, not the usual cyanobacteria, enrich the ocean with nitrogen, fueling algae growth that supports the entire marine food chain. As ice cover declines, both algae production and CO2 absorption may increase, altering the region’s ecological balance. The discovery could force scientists to revise predictions about Arctic climate feedbacks.
+                    </div>
+                    <div class="article-meta">
+                        <div class="meta-item">📅 Tue, 21 Oct 2025 02:36:47 EDT</div>
+                        <div class="meta-item">📊 4466 chars</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>✅ Science Daily Articles - Ready for Review</strong></p>
+            <p style="font-size: 0.9em; margin-top: 10px; color: #999;">
+                Generated 2025-10-21 09:23:39
+            </p>
+        </div>
+    </div>
+</body>
+</html>
