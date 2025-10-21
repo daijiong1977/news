@@ -11,7 +11,7 @@ DB_FILE = pathlib.Path("articles.db")
 # Feed data
 FEEDS = [
     ("US News", "https://feeds.nytimes.com/services/xml/rss/nyt/US.xml", "US News", True),
-    ("Swimming", "https://www.swimmingworldmagazine.com/feed/", "Swimming", True),
+    ("Swimming", "https://www.swimmingworldmagazine.com/news/feed/", "Swimming", True),
     ("Technology", "https://feeds.arstechnica.com/arstechnica/index", "Technology", True),
     ("Science", "https://feeds.arstechnica.com/arstechnica/science", "Science", True),
     ("Politics", "https://feeds.nytimes.com/services/xml/rss/nyt/Politics.xml", "Politics", True),

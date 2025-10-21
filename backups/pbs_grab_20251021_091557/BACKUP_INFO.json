@@ -1,0 +1,12 @@
+{
+  "backup_date": "2025-10-21T09:15:57.330864",
+  "pbs_feed": "https://www.pbs.org/newshour/feeds/rss/politics",
+  "total_articles": 5,
+  "total_images": 5,
+  "contents": {
+    "articles": "articles.json - All PBS article data",
+    "images": "article_images/ - Downloaded article images",
+    "html_final": "pbs_politics_final.html - Final review page with images",
+    "html_review": "pbs_politics_review.html - Review page"
+  }
+}

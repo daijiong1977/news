@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """
-Process ONE article at a time with compact prompt.
-Verify response and insert into database without changing schema.
-
-CRITICAL: Uses example JSON structure to ensure consistent API responses.
+Simple single-article processor for Deepseek
+Use: python3 process_one_article.py <article_id>
+Processes ONE article at a time with verified prompt.
 """
 
 import os
@@ -14,7 +13,7 @@ from datetime import datetime
 import requests
 
 # Get API key
-api_key = os.environ.get('DEEPSEEK_API_KEY')
+api_key = os.environ.get('DEEPSEEK_API_KEY', 'sk-dd996c4863a04d3ebad13c7ee52ca31b')
 if not api_key:
     print("ERROR: DEEPSEEK_API_KEY not set")
     sys.exit(1)

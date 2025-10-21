@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article Content Verification</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .article-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border-left: 4px solid;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .article-section.pbs { border-left-color: #ff6b6b; }
+        .article-section.science { border-left-color: #4ecdc4; }
+        .article-section.swimming { border-left-color: #45b7d1; }
+        .article-section.technology { border-left-color: #f59e0b; }
+        
+        .article-id {
+            background: #e3e3e3;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+        
+        .article-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .article-meta {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .article-meta span {
+            margin-right: 20px;
+        }
+        
+        .field-label {
+            font-weight: 600;
+            color: #444;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            color: #667eea;
+        }
+        
+        .field-content {
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 4px;
+            border-left: 3px solid #667eea;
+            font-size: 0.95em;
+            line-height: 1.6;
+            color: #333;
+            word-break: break-word;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .article-image {
+            max-width: 200px;
+            max-height: 150px;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+        
+        .source-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 4px;
+        }
+        
+        .empty-field {
+            color: #999;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 Article Content Verification</h1>
+            <p>Raw content grabbed from local database - 19 articles total</p>
+        </div>
+
+        <div class="source-title">🔹 PBS (5 articles)</div>
+
+        <div class="article-section pbs">
+            <div class="article-id">ID #1</div>
+            <div class="article-title">Trump Urges Ukraine to Cede Territory as European Leaders React</div>
+            
+            <div class="article-meta">
+                <span>📅 Mon, 20 Oct 2025 18:55:37 -0400</span>
+                <span>📍 PBS</span>
+                <span><a href="https://www.pbs.org/newshour/show/how-european-leaders-are-responding-as-trump-urges-ukraine-to-cede-territory-to-russia" target="_blank" style="color: #667eea;">🔗 Original</a></span>
+            </div>
+            
+            <div class="field-label">📌 Description</div>
+            <div class="field-content">President Trump expressed doubt that Ukraine could defeat Russia and win back all the land Moscow has seized since it first invaded in 2014. His renewed skepticism comes following his meeting on Friday with Ukrainian President Zelenskyy in which Trump declined Ukraine&rsquo;s requests for long range missiles. Nick Schifrin reports.</div>
+            
+            <div class="field-label">📝 Full Content (Grabbed)</div>
+            <div class="field-content">President Trump expressed doubt that Ukraine could defeat Russia and win back all the land Moscow has seized since it first invaded in 2014. His renewed skepticism comes following his meeting on Friday with Ukrainian President Zelenskyy in which Trump declined Ukraine&rsquo;s requests for long range missiles. Nick Schifrin reports.</div>
+
+            <div class="field-label">🖼️ Image</div>
+            <div><img src="article_images/article_1.jpg" class="article-image" alt="Trump Urges Ukraine to Cede Territory as European Leaders React"></div>
+
+        </div>
+
+        <div class="article-section pbs">
+            <div class="article-id">ID #2</div>
+            <div class="article-title">News Wrap: Louvre closed as investigators hunt for jewel thieves</div>
+            
+            <div class="article-meta">
+                <span>📅 Mon, 20 Oct 2025 18:50:50 -0400</span>
+                <span>📍 PBS</span>
+                <span><a href="https://www.pbs.org/newshour/show/news-wrap-louvre-closed-as-investigators-hunt-for-jewel-thieves" target="_blank" style="color: #667eea;">🔗 Original</a></span>
+            </div>
+            
+            <div class="field-label">📌 Description</div>
+            <div class="field-content">In our news wrap Monday, the Louvre remained closed as investigators hunt for those responsible for a heist of some of France's most precious jewels, Amazon's cloud computing service says a problem with its domain name system is responsible for a global outage and the Supreme Court will hear a Second Amendment challenge involving a law that bans regular drug users from having a gun.</div>
+            
+            <div class="field-label">📝 Full Content (Grabbed)</div>
+            <div class="field-content">In our news wrap Monday, the Louvre remained closed as investigators hunt for those responsible for a heist of some of France's most precious jewels, Amazon's cloud computing service says a problem with its domain name system is responsible for a global outage and the Supreme Court will hear a Second Amendment challenge involving a law that bans regular drug users from having a gun.</div>
+
+            <div class="field-label">🖼️ Image</div>
+            <div><img src="article_images/article_2.jpg" class="article-image" alt="News Wrap: Louvre closed as investigators hunt for jewel thieves"></div>
+
+        </div>
+
+        <div class="article-section pbs">
+            <div class="article-id">ID #3</div>
+            <div class="article-title">Trump clashes with Colombian president over Caribbean boat strikes</div>
+            
+            <div class="article-meta">
+                <span>📅 Mon, 20 Oct 2025 18:45:52 -0400</span>
+                <span>📍 PBS</span>
+                <span><a href="https://www.pbs.org/newshour/show/trump-clashes-with-colombian-president-over-caribbean-boat-strikes" target="_blank" style="color: #667eea;">🔗 Original</a></span>
+            </div>
+            
+            <div class="field-label">📌 Description</div>
+            <div class="field-content">Colombia recalled its ambassador to the U.S. amid rising tensions after strikes against boats the Trump administration claimed were drug traffickers. Colombian President Gustavo Petro accused President Trump of murdering a Colombian fisherman in one of those strikes. Trump called Petro an &ldquo;illegal drug dealer." Amna Nawaz discussed more with Ivan Duque, the president of Colombia from 2018 to 2022.</div>
+            
+            <div class="field-label">📝 Full Content (Grabbed)</div>
+            <div class="field-content">Colombia recalled its ambassador to the U.S. amid rising tensions after strikes against boats the Trump administration claimed were drug traffickers. Colombian President Gustavo Petro accused President Trump of murdering a Colombian fisherman in one of those strikes. Trump called Petro an &ldquo;illegal drug dealer." Amna Nawaz discussed more with Ivan Duque, the president of Colombia from 2018 to 2022.</div>
+
+            <div class="field-label">🖼️ Image</div>
+            <div><img src="article_images/article_3.jpg" class="article-image" alt="Trump clashes with Colombian president over Caribbean boat strikes"></div>
+
+        </div>
+
+        <div class="article-section pbs">
+            <div class="article-id">ID #4</div>
+            <div class="article-title">How GOP-led redistricting efforts may disenfranchise Black voters</div>
+            
+            <div class="article-meta">
+                <span>📅 Mon, 20 Oct 2025 18:40:34 -0400</span>
+                <span>📍 PBS</span>
+                <span><a href="https://www.pbs.org/newshour/show/how-gop-led-redistricting-efforts-may-disenfranchise-black-voters" target="_blank" style="color: #667eea;">🔗 Original</a></span>
+            </div>
+            
+            <div class="field-label">📌 Description</div>
+            <div class="field-content">Republicans in North Carolina moved forward with a plan to redraw the state&rsquo;s congressional map and eliminate its only swing district. It's part of a GOP push to maintain control of Congress through maps that have the effect of diluting Black political power and diminishing the voting strength of communities of color. Geoff Bennett discussed more with Janai Nelson of the NAACP Legal Defense Fund.</div>
+            
+            <div class="field-label">📝 Full Content (Grabbed)</div>
+            <div class="field-content">Republicans in North Carolina moved forward with a plan to redraw the state&rsquo;s congressional map and eliminate its only swing district. It's part of a GOP push to maintain control of Congress through maps that have the effect of diluting Black political power and diminishing the voting strength of communities of color. Geoff Bennett discussed more with Janai Nelson of the NAACP Legal Defense Fund.</div>
+
+            <div class="field-label">🖼️ Image</div>
+            <div><img src="article_images/article_4.jpg" class="article-image" alt="How GOP-led redistricting efforts may disenfranchise Black voters"></div>
+
+        </div>
+
+        <div class="article-section pbs">
+            <div class="article-id">ID #5</div>
+            <div class="article-title">Permafrost thawed by climate change threatens remote villages in Alaska</div>
+            
+            <div class="article-meta">
+                <span>📅 Mon, 20 Oct 2025 18:35:33 -0400</span>
+                <span>📍 PBS</span>
+                <span><a href="https://www.pbs.org/newshour/show/permafrost-thawed-by-climate-change-threatens-remote-villages-in-alaska" target="_blank" style="color: #667eea;">🔗 Original</a></span>
+            </div>
+            
+            <div class="field-label">📌 Description</div>
+            <div class="field-content">In the Arctic tundra of Alaska, climate change is forcing an Alaska Native village to relocate. Rising temperatures are melting the underground permafrost. The melted ice then mixes with the soil, creating unstable land the Yup&#700;ik people call Alaskan quicksand. Amalia Huot-Marchand and a team from the Medill School of Journalism report.</div>
+            
+            <div class="field-label">📝 Full Content (Grabbed)</div>
+            <div class="field-content">In the Arctic tundra of Alaska, climate change is forcing an Alaska Native village to relocate. Rising temperatures are melting the underground permafrost. The melted ice then mixes with the soil, creating unstable land the Yup&#700;ik people call Alaskan quicksand. Amalia Huot-Marchand and a team from the Medill School of Journalism report.</div>
+
+            <div class="field-label">🖼️ Image</div>
+            <div><img src="article_images/article_5.jpg" class="article-image" alt="Permafrost thawed by climate change threatens remote villages in Alaska"></div>
+
+        </div>
+
+        <div class="source-title">🔹 SCIENCE (5 articles)</div>
+
+        <div class="article-section science">
+            <div class="article-id">ID #6</div>
+            <div class="article-title">Breaking down rare earth element magnets for recycling</div>
+            
+            <div class="article-meta">
+                <span>📅 Mon, 20 Oct 2025 20:01:59 +0000</span>
+                <span>📍 SCIENCE</span>
+                <span><a href="https://arstechnica.com/science/2025/10/breaking-down-rare-earth-element-magnets-for-recycling/" target="_blank" style="color: #667eea;">🔗 Original</a></span>
+            </div>
+            
+            <div class="field-label">📌 Description</div>
+            <div class="field-content">
+                        New method extracts desirable elements from waste magnets using less energy and acid.
+                    </div>
+            
+            <div class="field-label">📝 Full Content (Grabbed)</div>
+            <div class="field-content">
+                            <p>All the world’s discarded phones, bricked laptops, and other trashed electronics are collectively a treasure trove of rare earth elements (REEs). But separating out and recovering these increasingly sought-after materials is no easy task.</p>
+<p>However, a team of researchers says it has developed a way of separating REEs from waste—magnets, in this case—that is relatively easy, uses less energy, and isn’t nearly as emissions and pollution intensive as current methods. The team published <a href="https://www.pnas.org/doi/10.1073/pnas.2507819122">a paper</a> describing this method in the Proceedings of the National Academy of Sciences.</p>
+<p>In short, this process involves using an electric current to heat waste magnets to very high temperatures very fast, and using chlorine gas to react with the non-REEs in the mix, keeping them in the vapor phase. James Tour, one of the authors and a professor of materials science and nanoengineering at Rice University, says that the research can help the United States meet its growing need for these elements.</p><p><a href="https://arstechnica.com/science/2025/10/breaking-down-rare-earth-element-magnets-for-recycling/">Read full article</a></p>
+<p><a href="https://arstechnica.com/science/2025/10/breaking-down-rare-earth-element-magnets-for-recycling/#comments">Comments</a></p>
+
+                        </div>
+
+            <div class="field-label">🖼️ Image</div>
+            <div><img src="article_images/article_6.jpg" class="article-image" alt="Breaking down rare earth element magnets for recycling"></div>
+
+        </div>
+
+        <div class="article-section science">
+            <div class="article-id">ID #7</div>
+            <div class="article-title">Do animals fall for optical illusions? It’s complicated.</div>
+            
+            <div class="article-meta">
+                <span>📅 Mon, 20 Oct 2025 19:15:24 +0000</span>
+                <span>📍 SCIENCE</span>
+                <span><a href="https://arstechnica.com/science/2025/10/do-animals-fall-for-optical-illusions-its-complicated/" target="_blank" style="color: #667eea;">🔗 Original</a></span>
+            </div>
+            
+            <div class="field-label">📌 Description</div>
+            <div class="field-content">
+                        Guppies are highly susceptible to the Ebbinghaus illusion. Ring doves? Not so much.
+                    </div>
+            
+            <div class="field-label">📝 Full Content (Grabbed)</div>
+            <div class="field-content">
+                            <p>Chances are you’ve encountered some version of the “<a href="https://en.wikipedia.org/wiki/Ebbinghaus_illusion">Ebbinghaus illusion</a>,” in which a central circle appears to be smaller when encircled by larger circles and seems larger when surrounded by smaller circles. It’s an example of context-dependent size perception. But is this unique to humans or are some animals susceptible as well? According to a <a href="https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2025.1653695/full">new paper</a> published in the journal Frontiers in Psychology, it might depend on the specific sensory environment, since the illusion relies on contextual clues to be effective.</p>
+<p>Prior research has produced mixed results on the question of animals and their susceptibility to optical illusions, per the authors. Dolphins, chicks, and redtail splitfins seem to be susceptible, for example, while pigeons, baboons, and gray bamboo snakes are not.</p>
+<p>Perhaps the best-known example is <a href="https://arstechnica.com/science/2021/05/what-cats-love-of-boxes-and-squares-can-tell-us-about-their-visual-perception/">cats’ undeniable love of boxes</a> and squares—the “if it fits, I sits” phenomenon documented all over the Internet. This behavior is <a href="https://theconversation.com/why-cant-cats-resist-thinking-inside-the-box-76287">generally attributed</a> to the fact that cats feel safer when squeezed into small spaces, but it also tells us something about feline visual perception. <a href="https://pubmed.ncbi.nlm.nih.gov/3250081/">A 1988 study</a> and <a href="https://www.sciencedirect.com/science/article/abs/pii/S0168159121001258?fbclid=IwAR0NkvhAGEDRgD4xwynVFuaXl6JUFZ0ZSgDYNJH7tEwiPIMZrYv7tkxUoIw">a 2021 study</a> concluded that cats are susceptible to the <a href="https://en.wikipedia.org/wiki/Illusory_contour">Kanizsa square illusion</a>, suggesting that they perceive subjective contours much like humans.</p><p><a href="https://arstechnica.com/science/2025/10/do-animals-fall-for-optical-illusions-its-complicated/">Read full article</a></p>
+<p><a href="https://arstechnica.com/science/2025/10/do-animals-fall-for-optical-illusions-its-complicated/#comments">Comments</a></p>
+
+                        </div>
+
+            <div class="field-label">🖼️ Image</div>
+            <div><img src="article_images/article_7.jpg" class="article-image" alt="Do animals fall for optical illusions? It’s complicated."></div>
+
+        </div>
+
+        <div class="article-section science">
+            <div class="article-id">ID #8</div>
+            <div class="article-title">Dead Ends is a fun, macabre medical history for kids</div>
+            
+            <div class="article-meta">
+                <span>📅 Fri, 17 Oct 2025 18:36:18 +0000</span>
+                <span>📍 SCIENCE</span>
+                <span><a href="https://arstechnica.com/science/2025/10/dead-ends-is-a-fun-macabre-medical-history-for-kids/" target="_blank" style="color: #667eea;">🔗 Original</a></span>
+            </div>
+            
+            <div class="field-label">📌 Description</div>
+            <div class="field-content">
+                        Ars chats with co-authors Lindsey Fitzharris and Adrian Teal about their delightful new children's book.
+                    </div>
+            
+            <div class="field-label">📝 Full Content (Grabbed)</div>
+            <div class="field-content">
+                            <p>In 1890, a German scientist named <a href="https://en.wikipedia.org/wiki/Robert_Koch">Robert Koch</a> thought he’d invented a cure for tuberculosis, a substance derived from the infecting bacterium itself that he dubbed Tuberculin. His substance didn’t actually cure anyone, but it was eventually widely used as a <a href="https://en.wikipedia.org/wiki/Tuberculin">diagnostic skin test</a>. Koch’s successful failure is just one of the many colorful cases featured in <a href="https://www.amazon.com/Dead-Ends-Failures-Sparked-Medical/dp/1547615028"><em>Dead Ends! Flukes, Flops, and Failures</em> <em>that Sparked Medical Marvels</em></a>, a new nonfiction illustrated children’s book by science historian Lindsey Fitzharris and her husband, cartoonist Adrian Teal.</p>
+<p>A noted science communicator with a fondness for the medically macabre, Fitzharris published a biography of surgical pioneer Joseph Lister, <a href="https://www.amazon.com/dp/0374117292/?ots=1&amp;slotNum=0&amp;imprToken=26c0af77-ed11-8f74-19c&amp;tag=arstech20-20" rel="nofollow" data-orig-url="https://www.amazon.com/dp/0374117292/?ots=1&amp;slotNum=0&amp;imprToken=26c0af77-ed11-8f74-19c&amp;tag=arstech20-20" data-ml-id="0" data-ml="true" data-uri="ad6f0422bfaaccb498271fe8ac321b3d" data-xid="fr1760646290574dbd"><em>The Butchering Art</em></a>, in 2017—a great, if occasionally grisly, read. She followed up with 2022’s  <a href="https://www.amazon.com/Facemaker-Visionary-Surgeons-Disfigured-Soldiers/dp/0374282307"><em>The Facemaker: A Visionary Surgeon’s Battle to Mend the Disfigured Soldiers of World War I</em></a>, about a WWI surgeon named Harold Gillies <a href="https://arstechnica.com/science/2022/06/meet-harold-gillies-the-wwi-surgeon-who-rebuilt-the-faces-of-injured-soldiers/">who rebuilt</a> the faces of injured soldiers.</p>
+<p>And in 2020, she hosted a documentary for the Smithsonian Channel, <a href="https://arstechnica.com/gaming/2020/10/famous-strange-demises-get-a-second-look-in-the-curious-life-and-death-of/"><em>The Curious Life and Death Of</em></a>…, exploring famous deaths, ranging from drug lord Pablo Escobar to magician Harry Houdini. Fitzharris performed virtual autopsies, experimented with blood samples, interviewed witnesses, and conducted real-time demonstrations in hopes of gleaning fresh insights. For his part, Teal is a well-known caricaturist and illustrator, best known for his work on the British TV series <em>Spitting Image</em>. His work has also appeared in The Guardian and the Sunday Telegraph, among other outlets.</p><p><a href="https://arstechnica.com/science/2025/10/dead-ends-is-a-fun-macabre-medical-history-for-kids/">Read full article</a></p>
+<p><a href="https://arstechnica.com/science/2025/10/dead-ends-is-a-fun-macabre-medical-history-for-kids/#comments">Comments</a></p>
+
+                        </div>
+
+            <div class="field-label">🖼️ Image</div>
+            <div><img src="article_images/article_8.jpg" class="article-image" alt="Dead Ends is a fun, macabre medical history for kids"></div>
+
+        </div>
+
+        <div class="article-section science">
+            <div class="article-id">ID #9</div>
+            <div class="article-title">NASA’s next Moonship reaches last stop before launch pad</div>
+            
+            <div class="article-meta">
+                <span>📅 Fri, 17 Oct 2025 16:54:32 +0000</span>
+                <span>📍 SCIENCE</span>
+                <span><a href="https://arstechnica.com/space/2025/10/nasas-next-moonship-reaches-last-stop-before-launch-pad/" target="_blank" style="color: #667eea;">🔗 Original</a></span>
+            </div>
+            
+            <div class="field-label">📌 Description</div>
+            <div class="field-content">
+                        Preparations for the Artemis II mission continue despite the federal government shutdown.
+                    </div>
+            
+            <div class="field-label">📝 Full Content (Grabbed)</div>
+            <div class="field-content">
+                            <p>The Orion spacecraft, which will fly four people around the Moon, arrived inside the cavernous Vehicle Assembly Building at NASA’s Kennedy Space Center in Florida late Thursday night, ready to be stacked on top of its rocket for launch early next year.</p>
+<p>The late-night transfer covered about 6 miles (10 kilometers) from one facility to another at the Florida spaceport. NASA and its contractors are continuing preparations for the Artemis II mission after the White House approved the program as an exception to work through the ongoing government shutdown, which began on October 1.</p>
+<p>The sustained work could set up Artemis II for a launch opportunity as soon as February 5 of next year. Astronauts Reid Wiseman, Victor Glover, Christina Koch, and Jeremy Hansen will be the <a href="https://arstechnica.com/space/2025/10/in-their-own-words-the-artemis-ii-crew-on-the-frenetic-first-hours-of-their-flight/">first humans to fly on the Orion spacecraft</a>, a vehicle that has been in development for nearly two decades. The Artemis II crew will make history on their 10-day flight by becoming the first people to travel to the vicinity of the Moon since 1972.</p><p><a href="https://arstechnica.com/space/2025/10/nasas-next-moonship-reaches-last-stop-before-launch-pad/">Read full article</a></p>
+<p><a href="https://arstechnica.com/space/2025/10/nasas-next-moonship-reaches-last-stop-before-launch-pad/#comments">Comments</a></p>
+
+                        </div>
+
+            <div class="field-label">🖼️ Image</div>
+            <div><img src="article_images/article_9.jpg" class="article-image" alt="NASA’s next Moonship reaches last stop before launch pad"></div>
+
+        </div>
+
+        <div class="article-section science">
+            <div class="article-id">ID #10</div>
+            <div class="article-title">Lead poisoning has been a feature of our evolution</div>
+            
+            <div class="article-meta">
+                <span>📅 Fri, 17 Oct 2025 15:40:15 +0000</span>
+                <span>📍 SCIENCE</span>
+                <span><a href="https://arstechnica.com/science/2025/10/hominins-suffered-lead-poisoning-starting-at-least-2-million-years-ago/" target="_blank" style="color: #667eea;">🔗 Original</a></span>
+            </div>
+            
+            <div class="field-label">📌 Description</div>
+            <div class="field-content">
+                        A recent study found lead in teeth from 2 million-year-old hominin fossils.
+                    </div>
+            
+            <div class="field-label">📝 Full Content (Grabbed)</div>
+            <div class="field-content">
+                            <p>Our hominid ancestors faced a Pleistocene world full of dangers—and apparently one of those dangers was lead poisoning.</p>
+<p>Lead exposure sounds like a modern problem, at least if you define “modern” the way a paleoanthropologist might: a time that started a few thousand years ago with <a href="https://arstechnica.com/science/2018/05/greenland-ice-cores-track-roman-lead-pollution-in-year-by-year-detail/">ancient Roman silver smelting</a> and lead pipes. According to a recent study, however, lead is a much more ancient nemesis, one that predates not just the Romans but the existence of our genus <i>Homo</i>. Paleoanthropologist Renaud Joannes-Boyau of Australia’s Southern Cross University and his colleagues found evidence of exposure to dangerous amounts of lead in the teeth of fossil apes and hominins dating back almost 2 million years. And somewhat controversially, they suggest that the toxic element’s pervasiveness may have helped shape our evolutionary history.</p>
+<img width="1024" height="998" src="https://cdn.arstechnica.net/wp-content/uploads/2025/05/image-1.jpeg" class="fullwidth full" alt="The skull of an early hominid, aged to a dark brown color. The skull is fragmentary, but the fragments are held in the appropriate locations by an underlying beige material." decoding="async" loading="lazy" srcset="https://cdn.arstechnica.net/wp-content/uploads/2025/05/image-1.jpeg 1024w, https://cdn.arstechnica.net/wp-content/uploads/2025/05/image-1-640x624.jpeg 640w, https://cdn.arstechnica.net/wp-content/uploads/2025/05/image-1-768x749.jpeg 768w, https://cdn.arstechnica.net/wp-content/uploads/2025/05/image-1-980x955.jpeg 980w" sizes="auto, (max-width: 1024px) 100vw, 1024px">
+      The skull of an early hominid.
+        Credit:
+          <a href="https://creativecommons.org/licenses/by-sa/4.0" target="_blank">Einsamer Schütze / Wikimedia</a>
+      
+<h2>The Romans didn’t invent lead poisoning</h2>
+<p>Joannes-Boyau and his colleagues took tiny samples of preserved enamel and dentin from the teeth of 51 fossils. In most of those teeth, the paleoanthropologists found evidence that these apes and hominins had been exposed to lead—sometimes in dangerous quantities—fairly often during their early years.</p><p><a href="https://arstechnica.com/science/2025/10/hominins-suffered-lead-poisoning-starting-at-least-2-million-years-ago/">Read full article</a></p>
+<p><a href="https://arstechnica.com/science/2025/10/hominins-suffered-lead-poisoning-starting-at-least-2-million-years-ago/#comments">Comments</a></p>
+
+                        </div>
+
+            <div class="field-label">🖼️ Image</div>
+            <div><img src="article_images/article_10.jpg" class="article-image" alt="Lead poisoning has been a feature of our evolution"></div>
+
+        </div>
+
+        <div class="source-title">🔹 SWIMMING (5 articles)</div>
+
+        <div class="article-section swimming">
+            <div class="article-id">ID #15</div>
+            <div class="article-title">Following Retirement, Ariarne Titmus Confirms Withdrawal From Anti-Doping Testing Pool</div>
+            
+            <div class="article-meta">
+                <span>📅 Mon, 20 Oct 2025 23:14:12 +0000</span>
+                <span>📍 SWIMMING</span>
+                <span><a href="https://www.swimmingworldmagazine.com/news/ariarne-titmus-confirms-withdrawal-from-anti-doping-testing-pool/" target="_blank" style="color: #667eea;">🔗 Original</a></span>
+            </div>
+            
+            <div class="field-label">📌 Description</div>
+            <div class="field-content"><p>Ariarne Titmus Confirms Withdrawal From Anti-Doping Testing Pool Just a handful of days after announcing her surprise retirement from the sport, reports from Australia indicate that Ariarne Titmus has officially</p>
+<p>The post <a href="https://www.swimmingworldmagazine.com/news/ariarne-titmus-confirms-withdrawal-from-anti-doping-testing-pool/">Following Retirement, Ariarne Titmus Confirms Withdrawal From Anti-Doping Testing Pool</a> appeared first on <a href="https://www.swimmingworldmagazin</div>
+            
+            <div class="field-label">📝 Full Content (Grabbed)</div>
+            <div class="field-content"><p>Ariarne Titmus Confirms Withdrawal From Anti-Doping Testing Pool Just a handful of days after announcing her surprise retirement from the sport, reports from Australia indicate that Ariarne Titmus has officially</p>
+<p>The post <a href="https://www.swimmingworldmagazine.com/news/ariarne-titmus-confirms-withdrawal-from-anti-doping-testing-pool/">Following Retirement, Ariarne Titmus Confirms Withdrawal From Anti-Doping Testing Pool</a> appeared first on <a href="https://www.swimmingworldmagazine.com/news">Swimming World</a>.</p>
+</div>
+
+            <div class="field-label">🖼️ Image</div>
+            <div><img src="article_images/article_15.jpg" class="article-image" alt="Following Retirement, Ariarne Titmus Confirms Withdrawal From Anti-Doping Testing Pool"></div>
+
+        </div>
+
+        <div class="article-section swimming">
+            <div class="article-id">ID #16</div>
+            <div class="article-title">World Cup Standings: Women’s Race Coming Down to Battle Between Gretchen Walsh and Kate Douglass</div>
+            
+            <div class="article-meta">
+                <span>📅 Mon, 20 Oct 2025 15:48:04 +0000</span>
+                <span>📍 SWIMMING</span>
+                <span><a href="https://www.swimmingworldmagazine.com/news/world-cup-standings-womens-race-coming-down-to-battle-between-gretchen-walsh-and-kate-douglass/" target="_blank" style="color: #667eea;">🔗 Original</a></span>
+            </div>
+            
+            <div class="field-label">📌 Description</div>
+            <div class="field-content"><p>World Cup Standings: Women&#8217;s Race Coming Down to Battle Between Gretchen Walsh and Kate Douglass Who will emerge on top of the points standings when the World Cup wraps up</p>
+<p>The post <a href="https://www.swimmingworldmagazine.com/news/world-cup-standings-womens-race-coming-down-to-battle-between-gretchen-walsh-and-kate-douglass/">World Cup Standings: Women&#8217;s Race Coming Down to Battle Between Gretchen Walsh and Kate Douglass</a> appeared first on <a href="https://www.swimming</div>
+            
+            <div class="field-label">📝 Full Content (Grabbed)</div>
+            <div class="field-content"><p>World Cup Standings: Women&#8217;s Race Coming Down to Battle Between Gretchen Walsh and Kate Douglass Who will emerge on top of the points standings when the World Cup wraps up</p>
+<p>The post <a href="https://www.swimmingworldmagazine.com/news/world-cup-standings-womens-race-coming-down-to-battle-between-gretchen-walsh-and-kate-douglass/">World Cup Standings: Women&#8217;s Race Coming Down to Battle Between Gretchen Walsh and Kate Douglass</a> appeared first on <a href="https://www.swimmingworldmagazine.com/news">Swimming World</a>.</p>
+</div>
+
+            <div class="field-label">🖼️ Image</div>
+            <div><img src="article_images/article_16.jpg" class="article-image" alt="World Cup Standings: Women’s Race Coming Down to Battle Between Gretchen Walsh and Kate Douglass"></div>
+
+        </div>
+
+        <div class="article-section swimming">
+            <div class="article-id">ID #17</div>
+            <div class="article-title">Schedule Released for 2026 Open Water Swimming World Cup</div>
+            
+            <div class="article-meta">
+                <span>📅 Mon, 20 Oct 2025 14:29:00 +0000</span>
+                <span>📍 SWIMMING</span>
+                <span><a href="https://www.swimmingworldmagazine.com/news/schedule-released-for-2026-open-water-swimming-world-cup/" target="_blank" style="color: #667eea;">🔗 Original</a></span>
+            </div>
+            
+            <div class="field-label">📌 Description</div>
+            <div class="field-content"><p>Schedule Released for 2026 Open Water Swimming World Cup World Aquatics has announced the four stops of the Open Water Swimming World Cup, which will mark the 20th year of</p>
+<p>The post <a href="https://www.swimmingworldmagazine.com/news/schedule-released-for-2026-open-water-swimming-world-cup/">Schedule Released for 2026 Open Water Swimming World Cup</a> appeared first on <a href="https://www.swimmingworldmagazine.com/news">Swimming World</a>.</p>
+</div>
+            
+            <div class="field-label">📝 Full Content (Grabbed)</div>
+            <div class="field-content"><p>Schedule Released for 2026 Open Water Swimming World Cup World Aquatics has announced the four stops of the Open Water Swimming World Cup, which will mark the 20th year of</p>
+<p>The post <a href="https://www.swimmingworldmagazine.com/news/schedule-released-for-2026-open-water-swimming-world-cup/">Schedule Released for 2026 Open Water Swimming World Cup</a> appeared first on <a href="https://www.swimmingworldmagazine.com/news">Swimming World</a>.</p>
+</div>
+
+            <div class="field-label">🖼️ Image</div>
+            <div><img src="article_images/article_17.jpg" class="article-image" alt="Schedule Released for 2026 Open Water Swimming World Cup"></div>
+
+        </div>
+
+        <div class="article-section swimming">
+            <div class="article-id">ID #18</div>
+            <div class="article-title">Storylines to Look Out for in SEC Swimming in 2025-26</div>
+            
+            <div class="article-meta">
+                <span>📅 Mon, 20 Oct 2025 13:12:51 +0000</span>
+                <span>📍 SWIMMING</span>
+                <span><a href="https://www.swimmingworldmagazine.com/news/storylines-to-look-out-for-in-sec-swimming-in-2025-26/" target="_blank" style="color: #667eea;">🔗 Original</a></span>
+            </div>
+            
+            <div class="field-label">📌 Description</div>
+            <div class="field-content"><p>Storylines to Look Out for in SEC Swimming in 2025-26 With the college swimming season underway for the 2025-2026 year, there’s no shortage of storylines to follow. Between up and</p>
+<p>The post <a href="https://www.swimmingworldmagazine.com/news/storylines-to-look-out-for-in-sec-swimming-in-2025-26/">Storylines to Look Out for in SEC Swimming in 2025-26</a> appeared first on <a href="https://www.swimmingworldmagazine.com/news">Swimming World</a>.</p>
+</div>
+            
+            <div class="field-label">📝 Full Content (Grabbed)</div>
+            <div class="field-content"><p>Storylines to Look Out for in SEC Swimming in 2025-26 With the college swimming season underway for the 2025-2026 year, there’s no shortage of storylines to follow. Between up and</p>
+<p>The post <a href="https://www.swimmingworldmagazine.com/news/storylines-to-look-out-for-in-sec-swimming-in-2025-26/">Storylines to Look Out for in SEC Swimming in 2025-26</a> appeared first on <a href="https://www.swimmingworldmagazine.com/news">Swimming World</a>.</p>
+</div>
+
+            <div class="field-label">🖼️ Image</div>
+            <div><img src="article_images/article_18.jpg" class="article-image" alt="Storylines to Look Out for in SEC Swimming in 2025-26"></div>
+
+        </div>
+
+        <div class="article-section swimming">
+            <div class="article-id">ID #19</div>
+            <div class="article-title">Hubert Kos, Torri Huske, Claire Curzan Have Decisions to Make After NCAA Schedule Change</div>
+            
+            <div class="article-meta">
+                <span>📅 Mon, 20 Oct 2025 12:26:14 +0000</span>
+                <span>📍 SWIMMING</span>
+                <span><a href="https://www.swimmingworldmagazine.com/news/hubert-kos-torri-huske-claire-curzan-have-decisions-to-make-after-ncaa-schedule-change/" target="_blank" style="color: #667eea;">🔗 Original</a></span>
+            </div>
+            
+            <div class="field-label">📌 Description</div>
+            <div class="field-content"><p>Hubert Kos, Torri Huske, Claire Curzan Have Decisions to Make After NCAA Schedule Change Over the past several years, Hubert Kos and Torri Huske have established themselves securely among the world&#8217;s</p>
+<p>The post <a href="https://www.swimmingworldmagazine.com/news/hubert-kos-torri-huske-claire-curzan-have-decisions-to-make-after-ncaa-schedule-change/">Hubert Kos, Torri Huske, Claire Curzan Have Decisions to Make After NCAA Schedule Change</a> appeared first on <a href="https://www.sw</div>
+            
+            <div class="field-label">📝 Full Content (Grabbed)</div>
+            <div class="field-content"><p>Hubert Kos, Torri Huske, Claire Curzan Have Decisions to Make After NCAA Schedule Change Over the past several years, Hubert Kos and Torri Huske have established themselves securely among the world&#8217;s</p>
+<p>The post <a href="https://www.swimmingworldmagazine.com/news/hubert-kos-torri-huske-claire-curzan-have-decisions-to-make-after-ncaa-schedule-change/">Hubert Kos, Torri Huske, Claire Curzan Have Decisions to Make After NCAA Schedule Change</a> appeared first on <a href="https://www.swimmingworldmagazine.com/news">Swimming World</a>.</p>
+</div>
+
+            <div class="field-label">🖼️ Image</div>
+            <div><img src="article_images/article_19.jpg" class="article-image" alt="Hubert Kos, Torri Huske, Claire Curzan Have Decisions to Make After NCAA Schedule Change"></div>
+
+        </div>
+
+        <div class="source-title">🔹 TECHNOLOGY (4 articles)</div>
+
+        <div class="article-section technology">
+            <div class="article-id">ID #11</div>
+            <div class="article-title">NSO permanently barred from targeting WhatsApp users with Pegasus spyware</div>
+            
+            <div class="article-meta">
+                <span>📅 Mon, 20 Oct 2025 22:18:22 +0000</span>
+                <span>📍 TECHNOLOGY</span>
+                <span><a href="https://arstechnica.com/security/2025/10/nso-permanently-barred-from-targeting-whatsapp-users-with-pegasus-spyware/" target="_blank" style="color: #667eea;">🔗 Original</a></span>
+            </div>
+            
+            <div class="field-label">📌 Description</div>
+            <div class="field-content">
+                        Ruling holds that defeating end-to-end encryption in WhatsApp harms Meta's business.
+                    </div>
+            
+            <div class="field-label">📝 Full Content (Grabbed)</div>
+            <div class="field-content">
+                            <p>A federal judge has ordered spyware maker <a href="https://www.nsogroup.com/">NSO</a> to stop using its Pegasus app to target or infect users of WhatsApp.</p>
+<p>The <a href="https://storage.courtlistener.com/recap/gov.uscourts.cand.350613/gov.uscourts.cand.350613.802.0.pdf">ruling</a>, issued Friday by Phyllis J. Hamilton of of the US District Court of the District of Northern California, grants a permanent injunction sought by WhatsApp owner Meta in a case it brought against NSO <a href="https://arstechnica.com/information-technology/2019/10/whatsapp-suit-says-israeli-spyware-maker-exploited-its-app-to-infect-1400-users/">in 2019</a>. The lawsuit alleged that Meta caught NSO trying to surreptitiously infect about 1,400 mobile phones—many belonging to attorneys, journalists, human-rights activists, political dissidents, diplomats, and senior foreign government officials—with Pegasus. As part of the campaign, NSO created fake WhatsApp accounts and targeted Meta infrastructure. The suit sought monetary awards and an injunction against the practice.</p>
+<h2>Setting a precedent</h2>
+<p>Friday’s ruling ordered NSO to permanently cease targeting WhatsApp users, attempting to infect their devices, or intercepted WhatsApp messages, which are end-to-end encrypted using the open source <a href="https://arstechnica.com/security/2025/10/why-signals-post-quantum-makeover-is-an-amazing-engineering-achievement/">Signal Protocol</a>. Hamilton also ruled that NSO must delete any data it obtained when targeting the WhatsApp users.</p><p><a href="https://arstechnica.com/security/2025/10/nso-permanently-barred-from-targeting-whatsapp-users-with-pegasus-spyware/">Read full article</a></p>
+<p><a href="https://arstechnica.com/security/2025/10/nso-permanently-barred-from-targeting-whatsapp-users-with-pegasus-spyware/#comments">Comments</a></p>
+
+                        </div>
+
+            <div class="field-label">🖼️ Image</div>
+            <div><img src="article_images/article_11.jpg" class="article-image" alt="NSO permanently barred from targeting WhatsApp users with Pegasus spyware"></div>
+
+        </div>
+
+        <div class="article-section technology">
+            <div class="article-id">ID #12</div>
+            <div class="article-title">Why did NASA’s chief just shake up the agency’s plans to land on the Moon?</div>
+            
+            <div class="article-meta">
+                <span>📅 Mon, 20 Oct 2025 21:53:54 +0000</span>
+                <span>📍 TECHNOLOGY</span>
+                <span><a href="https://arstechnica.com/space/2025/10/nasas-acting-leader-seeks-to-keep-his-job-with-new-lunar-lander-announcement/" target="_blank" style="color: #667eea;">🔗 Original</a></span>
+            </div>
+            
+            <div class="field-label">📌 Description</div>
+            <div class="field-content">
+                        "The president wants to make sure we beat the Chinese."
+                    </div>
+            
+            <div class="field-label">📝 Full Content (Grabbed)</div>
+            <div class="field-content">
+                            <p>NASA acting administrator Sean Duffy made two television appearances on Monday morning in which he shook up the space agency’s plans to return humans to the Moon.</p>
+<p>Speaking on Fox News, where the secretary of transportation frequently appears in his acting role as NASA chief, Duffy said SpaceX has fallen behind in its efforts to develop the Starship vehicle as a lunar lander. Duffy also indirectly acknowledged that NASA’s projected target of a 2027 crewed lunar landing is no longer achievable. Accordingly, he said he intended to expand the competition to develop a lander capable of carrying humans down to the Moon from lunar orbit and back.</p>
+<p>“They’re behind schedule, and so the President wants to make sure we beat the Chinese,” <a href="https://x.com/SecDuffyNASA/status/1980243865400701369">Duffy said</a> of SpaceX. “He wants to get there in his term. So I’m in the process of opening that contract up. I think we’ll see companies like Blue [Origin] get involved, and maybe others. We’re going to have a space race in regard to American companies competing to see who can actually lead us back to the Moon first.”</p><p><a href="https://arstechnica.com/space/2025/10/nasas-acting-leader-seeks-to-keep-his-job-with-new-lunar-lander-announcement/">Read full article</a></p>
+<p><a href="https://arstechnica.com/space/2025/10/nasas-acting-leader-seeks-to-keep-his-job-with-new-lunar-lander-announcement/#comments">Comments</a></p>
+
+                        </div>
+
+            <div class="field-label">🖼️ Image</div>
+            <div><img src="article_images/article_12.jpg" class="article-image" alt="Why did NASA’s chief just shake up the agency’s plans to land on the Moon?"></div>
+
+        </div>
+
+        <div class="article-section technology">
+            <div class="article-id">ID #13</div>
+            <div class="article-title">Claude Code gets a web version—but it’s the new sandboxing that really matters</div>
+            
+            <div class="article-meta">
+                <span>📅 Mon, 20 Oct 2025 20:45:26 +0000</span>
+                <span>📍 TECHNOLOGY</span>
+                <span><a href="https://arstechnica.com/ai/2025/10/claude-code-gets-a-web-version-but-its-the-new-sandboxing-that-really-matters/" target="_blank" style="color: #667eea;">🔗 Original</a></span>
+            </div>
+            
+            <div class="field-label">📌 Description</div>
+            <div class="field-content">
+                        Sandboxing lessens hassle, but fire-and-forget agentic tools still pose risks.
+                    </div>
+            
+            <div class="field-label">📝 Full Content (Grabbed)</div>
+            <div class="field-content">
+                            <p>Anthropic has <a href="https://www.anthropic.com/news/claude-code-on-the-web">added web and mobile interfaces</a> for Claude Code, its immensely popular command-line interface (CLI) agentic AI coding tool.</p>
+<p>The web interface appears to be well-baked at launch, but the mobile version is limited to iOS and is in an earlier stage of development.</p>
+<p>The web version of Claude Code can be given access to a GitHub repository. Once that’s done, developers can give it general marching orders like “add real-time inventory tracking to the dashboard.” As with the CLI version, it gets to work, with updates along the way approximating where it’s at and what it’s doing. The web interface supports the recently implemented Claude Code capability to take suggestions or requested changes while it’s in the middle of working on a task. (Previously, if you saw it doing something wrong or missing something, you often had to cancel and start over.)</p><p><a href="https://arstechnica.com/ai/2025/10/claude-code-gets-a-web-version-but-its-the-new-sandboxing-that-really-matters/">Read full article</a></p>
+<p><a href="https://arstechnica.com/ai/2025/10/claude-code-gets-a-web-version-but-its-the-new-sandboxing-that-really-matters/#comments">Comments</a></p>
+
+                        </div>
+
+            <div class="field-label">🖼️ Image</div>
+            <div><img src="article_images/article_13.png" class="article-image" alt="Claude Code gets a web version—but it’s the new sandboxing that really matters"></div>
+
+        </div>
+
+        <div class="article-section technology">
+            <div class="article-id">ID #14</div>
+            <div class="article-title">Google reportedly searching for 15 Pixel “Superfans” to test unreleased phones</div>
+            
+            <div class="article-meta">
+                <span>📅 Mon, 20 Oct 2025 20:14:29 +0000</span>
+                <span>📍 TECHNOLOGY</span>
+                <span><a href="https://arstechnica.com/gadgets/2025/10/google-reportedly-searching-for-15-pixel-superfans-to-test-unreleased-phones/" target="_blank" style="color: #667eea;">🔗 Original</a></span>
+            </div>
+            
+            <div class="field-label">📌 Description</div>
+            <div class="field-content">
+                        Selected testers will have to sign an NDA and use a disguised case. 
+                    </div>
+            
+            <div class="field-label">📝 Full Content (Grabbed)</div>
+            <div class="field-content">
+                            <p>It took awhile, but Google’s Pixel line of smartphones has established itself as a mainstay of Android after 10 generations. The company has long operated a “Superfans” group to help promote Pixels, but now members have a slim chance to get their hands on Google’s next phones ahead of time. Google is reportedly looking for some lucky Superfans to test and provide feedback on unreleased devices, but they’ll have to promise not to leak anything.</p>
+<p>It’s not unheard of for companies to have loyal customers help test new products, but it’s not usually big companies like Google with well-established products like Pixel. Google usually keeps its circle of hardware testers small and limited to employees. <a href="https://www.bloomberg.com/news/articles/2025-10-20/google-to-let-superfans-test-pixel-11-before-it-s-announced">According to Bloomberg</a>, Google is running a contest among Superfans to find 15 non-employees suited to test in-development hardware. An official document reviewed by Bloomberg describes the program as a chance to “provide feedback and help shape a Pixel phone currently in development.”</p>
+<p>To apply, interested Superfans have to prove they are more super than the rest. They must demonstrate deep knowledge of the Pixel product family and suggest ways the phones can be improved. However, Google is asking this of its biggest supporters—people who still care enough about their smartphones to seek out a group specifically to talk about how much they care about their phones. Is Google going to get gushing praise or constructive criticism?</p><p><a href="https://arstechnica.com/gadgets/2025/10/google-reportedly-searching-for-15-pixel-superfans-to-test-unreleased-phones/">Read full article</a></p>
+<p><a href="https://arstechnica.com/gadgets/2025/10/google-reportedly-searching-for-15-pixel-superfans-to-test-unreleased-phones/#comments">Comments</a></p>
+
+                        </div>
+
+            <div class="field-label">🖼️ Image</div>
+            <div><img src="article_images/article_14.jpg" class="article-image" alt="Google reportedly searching for 15 Pixel “Superfans” to test unreleased phones"></div>
+
+        </div>
+
+    </div>
+</body>
+</html>

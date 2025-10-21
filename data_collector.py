@@ -236,30 +236,95 @@ def is_video_article(title, description, url):
     return False
 
 
-def is_transcript_article(content):
+def is_transcript_article(content, title=""):
     """Check if article is a transcript-style piece (mixed speaker names and dialogue).
     These are hard to clean and should be skipped for now."""
     if not content:
         return False
     
-    # Transcript-style indicators: speaker names mixed throughout content
-    # Common PBS and news transcript patterns
-    transcript_indicators = [
+    content_lower = content.lower()
+    title_lower = title.lower() if title else ""
+    
+    # EXPLICIT FILTERS: Skip if contains both "transcript" AND "audio"
+    # These are clearly transcript/audio content, not news articles
+    has_transcript = 'transcript' in content_lower or 'transcript' in title_lower
+    has_audio = 'audio' in content_lower or 'audio' in title_lower
+    
+    if has_transcript and has_audio:
+        return True
+    
+    # Also skip if just "transcript" appears prominently in title
+    if 'transcript' in title_lower:
+        return True
+    
+    # INTERVIEW DETECTION: "joins us" or "joins tonight" + speaker name patterns
+    # These indicate interview-format articles, not news
+    has_joins_phrase = ('joins us' in content_lower or 'joins tonight' in content_lower)
+    
+    # Check for speaker name patterns like "Name, Title:" or "Name:"
+    import re
+    speaker_pattern = r'^[A-Z][a-z\s\-\']+(?:,\s+[A-Z][a-z\s\-\.]+)?:\s*\w'
+    speaker_lines = len([line for line in content.split('\n') if re.match(speaker_pattern, line)])
+    
+    # If has "joins us/tonight" + multiple speaker lines, it's an interview
+    if has_joins_phrase and speaker_lines >= 2:
+        return True
+    
+    # Strong transcript indicators - these strongly suggest it's a transcript
+    strong_indicators = [
         'has the details.',
         'reports:',
-        'says:',
-        'tells ',
-        'NewsHour:',
-        'the details.',
+        'tells the story.',
+        'the full story.',
+        'tells us more.',
+        'has more.',
+        'has this report.',
+        'reports more.',
+        'has our report.',
     ]
     
-    content_lower = content.lower()
+    # Speaker/dialogue markers - mixed throughout content
+    dialogue_indicators = [
+        'speaker:',
+        'interviewer:',
+        'voice-over:',
+        'correspondent:',
+        ': [',  # Format like: "Speaker: [quote]"
+        ':" ',  # Format like speaker: "quote
+    ]
     
-    # Check if content has transcript markers
-    indicator_count = sum(1 for indicator in transcript_indicators if indicator in content_lower)
+    # Pattern: repeated "Name: quote" or "Name says" patterns (transcript style)
+    interview_patterns = [
+        'tells us',
+        'tells the',
+        'explains that',
+        'argues that',
+        'argues the',
+        'contends that',
+        'contends the',
+        'warns that',
+        'warns the',
+    ]
     
-    # If multiple transcript indicators found, it's likely a transcript
-    if indicator_count >= 2:
+    # Count indicators
+    strong_count = sum(1 for indicator in strong_indicators if indicator in content_lower)
+    dialogue_count = sum(1 for indicator in dialogue_indicators if indicator in content_lower)
+    interview_count = sum(1 for pattern in interview_patterns if pattern in content_lower)
+    
+    # If strong indicators found, it's a transcript
+    if strong_count >= 1:
+        return True
+    
+    # If multiple dialogue patterns, it's likely a transcript
+    if dialogue_count >= 2:
+        return True
+    
+    # If multiple interview patterns mixed with other markers, it's a transcript
+    if interview_count >= 3:
+        return True
+    
+    # If combination of dialogue and interview patterns, it's a transcript
+    if dialogue_count >= 1 and interview_count >= 2:
         return True
     
     return False
@@ -407,18 +472,32 @@ def collect_articles(num_per_source=1):
     for feed_id, feed_name, feed_url, category_id, category_name in feeds:
         print(f"\n[{feed_name}]")
         
+        # For PBS, get more articles since we filter transcripts
+        max_to_fetch = num_per_source
+        target_count = num_per_source
+        if feed_name.upper() == "PBS":
+            max_to_fetch = 20  # Get up to 20 PBS articles
+            target_count = 5    # But only keep 5 after filtering transcripts
+            print(f"  PBS Special Mode: Fetching up to {max_to_fetch}, targeting {target_count} clean articles")
+        
         # Fetch RSS feed
-        articles = parse_rss_feed(feed_url, feed_name, category_id, num_per_source)
+        articles = parse_rss_feed(feed_url, feed_name, category_id, max_to_fetch)
         
         # Insert articles
+        pbs_clean_count = 0
         for article in articles:
+            # For PBS, stop after getting 5 clean articles
+            if feed_name.upper() == "PBS" and pbs_clean_count >= target_count:
+                print(f"  ✓ PBS: Reached target of {target_count} clean articles, stopping")
+                break
+            
             # Skip video articles
             if is_video_article(article['title'], article['description'], article['url']):
                 print(f"  ⊘ Skipped (VIDEO): {article['title'][:60]}...")
                 continue
             
             # Skip transcript-style articles (PBS news interviews/reports with mixed speakers)
-            if is_transcript_article(article['content']):
+            if is_transcript_article(article['content'], article['title']):
                 print(f"  ⊘ Skipped (TRANSCRIPT): {article['title'][:60]}...")
                 continue
             
@@ -439,6 +518,9 @@ def collect_articles(num_per_source=1):
                 if article_id:
                     print(f"  ✓ Inserted (ID {article_id}): {article['title'][:60]}...")
                     collected += 1
+                    # Track PBS clean articles
+                    if feed_name.upper() == "PBS":
+                        pbs_clean_count += 1
     
     conn.close()
     

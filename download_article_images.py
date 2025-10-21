@@ -12,8 +12,16 @@ from pathlib import Path
 from urllib.parse import urljoin
 from datetime import datetime
 
-DB_PATH = '/Users/jidai/news/articles.db'
-IMAGES_DIR = Path('/Users/jidai/news/article_images')
+# Environment detection
+if os.path.exists('/var/www/news/articles.db'):
+    # EC2 Server
+    DB_PATH = '/var/www/news/articles.db'
+    IMAGES_DIR = Path('/var/www/news/article_images')
+else:
+    # Local Mac
+    DB_PATH = '/Users/jidai/news/articles.db'
+    IMAGES_DIR = Path('/Users/jidai/news/article_images')
+
 IMAGES_DIR.mkdir(exist_ok=True)
 
 def download_article_image(article_id, article_url, title):
@@ -38,14 +46,30 @@ def download_article_image(article_id, article_url, title):
             img_url = og_image['content']
             img_tag = {'src': img_url, 'url': img_url}
         
-        # Try to find first substantial image in article
+        # Try to find first substantial image in article content
         if not img_tag:
-            for img in soup.find_all('img'):
-                src = img.get('src', '')
-                if src and ('article' in src.lower() or 'content' in src.lower() or len(src) > 10):
-                    img_url = urljoin(article_url, src)
-                    img_tag = {'src': img_url, 'url': img_url}
-                    break
+            # Look for images in article body/content divs
+            article_content = soup.find('article') or soup.find('div', class_='article-content') or soup.find('div', class_='entry-content')
+            
+            if article_content:
+                for img in article_content.find_all('img'):
+                    src = img.get('src', '')
+                    if src and ('cdn' in src.lower() or 'arstechnica' in src or 'jpg' in src.lower() or 'png' in src.lower()):
+                        img_url = urljoin(article_url, src)
+                        img_tag = {'src': img_url, 'url': img_url}
+                        break
+            
+            # If still not found, check all images on page
+            if not img_tag:
+                for img in soup.find_all('img'):
+                    src = img.get('src', '')
+                    alt = img.get('alt', '')
+                    # Skip logos, icons, and ads
+                    if src and not any(skip in src.lower() for skip in ['logo', 'icon', 'avatar', 'ad-']):
+                        if any(pattern in src.lower() for pattern in ['cdn', 'uploads', 'wp-content', 'jpg', 'png']):
+                            img_url = urljoin(article_url, src)
+                            img_tag = {'src': img_url, 'url': img_url}
+                            break
         
         if not img_tag:
             return None, "No image found"

@@ -108,6 +108,25 @@ def init_database():
         """)
         print("✓ Article images table created")
         
+        # 5.5. Deepseek feedback table (source table for processed content)
+        print("[5.5/13] Creating deepseek_feedback table...")
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS deepseek_feedback (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                article_id INTEGER NOT NULL,
+                summary_en TEXT,
+                summary_zh TEXT,
+                key_words TEXT,
+                background_reading TEXT,
+                multiple_choice_questions TEXT,
+                discussion_both_sides TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (article_id) REFERENCES articles(id)
+            )
+        """)
+        print("✓ Deepseek feedback table created")
+        
         # 6. Article summaries table
         print("[6/13] Creating article_summaries table...")
         cursor.execute("""
@@ -376,7 +395,7 @@ def populate_lookup_tables(conn, cursor):
         print("\n[4/4] Populating feeds table...")
         feeds_data = [
             ('US News', 'https://feeds.nytimes.com/services/xml/rss/nyt/US.xml', 'US News'),
-            ('Swimming', 'https://www.swimmingworldmagazine.com/feed/', 'Swimming'),
+            ('Swimming', 'https://www.swimmingworldmagazine.com/news/feed/', 'Swimming'),
             ('Technology', 'https://feeds.arstechnica.com/arstechnica/index', 'Technology'),
             ('Science', 'https://feeds.arstechnica.com/arstechnica/science', 'Science'),
             ('Politics', 'https://feeds.nytimes.com/services/xml/rss/nyt/Politics.xml', 'Politics'),
