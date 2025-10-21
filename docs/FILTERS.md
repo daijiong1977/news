@@ -62,7 +62,11 @@ Image selection and rules
   - Skip images with URL hints of favicons/logo/placeholders (filename or path containing `favicon`, `logo`, `placeholder`, `spacer`, `blank`, `icons`, etc.).
   - Prefer JPG/JPEG/WEBP; skip PNGs by default (PNG often used for logos/placeholders).
   - Exclude images whose download Content-Type is `image/png`.
-  - Minimal bytes gate: require `>= 2000` bytes for preview downloads (used in quick previews); stricter runs use higher thresholds (common strict value: `>= 70000` bytes). These values are settable in code.
+  - Minimal bytes gate: the code and scripts use different defaults depending on the runner. These are configurable per-caller but the canonical defaults are:
+    - `collect_preview()` default: `min_image_bytes = 100_000` (100 KB) — this is the default enforced when you run the interactive `collect_preview()` function (see `data_collector.py`).
+    - Quick preview: `min_image_bytes = 2000` (2 KB) — used for very fast previews (accepts smaller images).
+    - Batch/strict threshold: `min_image_bytes = 70000` (70 KB) — used by batch scripts and some filter runners to prefer full-resolution article images.
+    - All values are overrideable by callers and scripts (e.g., `scripts/batch_collect_preview.py` and `scripts/run_age13_filter.py` explicitly pass 70000 in their runs).
     - Explicit image byte thresholds used by scripts and in code:
       - Quick preview threshold: `min_image_bytes = 2000` (2KB) — used for fast previews where any reasonable image is acceptable.
       - Batch/strict threshold: `min_image_bytes = 70000` (70KB) — used for batch collection and sport short-listing to prefer full-resolution article images.
@@ -154,7 +158,8 @@ Where to change behavior
     - Sport strict: cleaned_chars >= 1500 and image_bytes >= 70000.
     - Sport relaxed: cleaned_chars >= 1200 and image_bytes >= 70000.
     - Batch collect: uses `min_image_bytes = 70000` and otherwise follows the global default cleaned_chars range unless the batch caller explicitly sets a different `min_chars`/override for a feed.
-    - Quick preview: `min_image_bytes = 2000` (2 KB) and quick previews typically do not enforce the global upper/lower char bounds unless the caller passes `min_chars`/`max_chars`.
+  - Quick preview: `min_image_bytes = 2000` (2 KB) and quick previews typically do not enforce the global upper/lower char bounds unless the caller passes `min_chars`/`max_chars`.
+  - Note: `collect_preview()` (the interactive preview collector) uses `min_image_bytes=100_000` by default; batch scripts such as `batch_collect_preview.py` override this to `70000` where appropriate.
   - Image candidate acceptance:
     - Skip if URL contains any of: `favicon`, `logo`, `placeholder`, `spacer`, `blank`, `icon`, `icons`, `sprite`.
     - Reject if HTTP Content-Type == `image/png`.
