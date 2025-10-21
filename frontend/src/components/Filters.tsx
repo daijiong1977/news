@@ -43,8 +43,9 @@ const FilterComponent: React.FC<Props> = ({ filters, onFilterChange }) => {
 
   return (
     <div className="filters">
+      <h2 style={{ fontSize: '1.5em', color: '#333', margin: 0, flexShrink: 0 }}>📰 News Reader</h2>
+      
       <div className="filter-categories">
-        <label>Categories:</label>
         <div className="category-button-group">
           <button 
             className={`category-btn ${filters.category === '' ? 'active' : ''}`}
