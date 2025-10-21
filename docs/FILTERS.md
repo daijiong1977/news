@@ -18,6 +18,7 @@ Principles
 Global filters (applied by `clean_paragraphs()`)
 - HTML unescape: raw feed HTML entities are unescaped and normalized (smart ASCII replacements for common punctuation and ellipses).
 - Drop very short paragraphs: paragraphs shorter than ~30 characters are removed (to skip bylines, tags, or boilerplate).
+  - Exact threshold used in code: paragraphs with length < 30 characters are removed by default. This value is configurable in `clean_paragraphs()`.
 - Byline detection and removal:
   - Exact matches to a configured set of publisher byline names are removed.
   - Repeated two-word names (e.g., "Nick Schifrin Nick Schifrin") are treated as bylines and removed.
@@ -33,6 +34,10 @@ Global filters (applied by `clean_paragraphs()`)
 - 'Related:' lines: paragraphs starting with `Related:` are removed.
 - Duplicate paragraphs: consecutive duplicate paragraphs are suppressed.
 - Minimum paragraph/content thresholds: content must produce a non-empty cleaned result; separate pipelines (sport preview, batch) may require extra character-length thresholds.
+  - Explicit content-length thresholds currently used in the codebase:
+    - Sport preview/short-listing (strict): cleaned content length >= 1500 characters (historical value).
+    - Sport preview (relaxed): cleaned content length >= 1200 characters (applied during later re-runs to improve yield).
+    - Default preview acceptance: no single global hard minimum is enforced beyond producing non-empty cleaned content, but scripts that call `collect_preview()` may pass `min_chars` to require a minimum cleaned character count.
 
 Age-13 banned-word filter (strict removal)
 - Location: `config/age13_banned.txt` — a newline-separated list of words/phrases.
@@ -58,6 +63,10 @@ Image selection and rules
   - Prefer JPG/JPEG/WEBP; skip PNGs by default (PNG often used for logos/placeholders).
   - Exclude images whose download Content-Type is `image/png`.
   - Minimal bytes gate: require `>= 2000` bytes for preview downloads (used in quick previews); stricter runs use higher thresholds (common strict value: `>= 70000` bytes). These values are settable in code.
+    - Explicit image byte thresholds used by scripts and in code:
+      - Quick preview threshold: `min_image_bytes = 2000` (2KB) — used for fast previews where any reasonable image is acceptable.
+      - Batch/strict threshold: `min_image_bytes = 70000` (70KB) — used for batch collection and sport short-listing to prefer full-resolution article images.
+      - When selecting an image candidate the downloader also checks the HTTP `Content-Type` header and rejects `image/png`.
 - Srcset parsing: `_choose_best_from_srcset(srcset)` picks the largest width or highest density entry from a comma-separated srcset.
 - Scoring (present but used primarily for DB path): `_score_image_candidate()` scores preferred hosts (e.g., BBC's `ichef.bbci.co.uk`), same-origin images, and larger width markers; however preview downloads generally accept the first valid candidate following the preference order to avoid selecting unrelated large CDN assets.
 
@@ -86,6 +95,7 @@ Batch and preview runners (rules summary)
 
 Timeouts and robustness
 - Per-feed timeout: `collect_preview()` and `collect_articles()` accept a `per_feed_timeout` (default 240 seconds). If a feed's per-item processing exceeds this, the feed results are aborted and the collector moves to the next feed.
+  - Exact timeout default: `per_feed_timeout = 240` seconds (4 minutes) in the current implementation.
 - Request timeouts are used on HTTP calls (typical `requests.get(..., timeout=10)` for pages; preview runs sometimes use lower thresholds to speed up runs).
 
 Where to change behavior
@@ -94,6 +104,25 @@ Where to change behavior
   - `download_image_preview()` and `download_and_record_image()` — modify image candidate rules, min byte thresholds, and PNG handling.
   - `is_video_article()`, `is_transcript_article()`, `is_games_or_filler_article()` — change skip heuristics.
   - `collect_preview()` and `collect_articles()` — adjust `num_per_source`, `min_image_bytes`, and `per_feed_timeout`.
+
+  Summary of numeric thresholds and filter conditions (one place)
+
+  - Paragraph removal: paragraph.length < 30 → drop.
+  - Duplicate paragraph suppression: consecutive duplicates removed.
+  - Promo/emoji short-line drop: short lines (typically < 80 chars) starting with promo emojis or matching promo/ad patterns are removed.
+  - Minimum cleaned content length (per-run):
+    - Sport strict: cleaned_chars >= 1500 and image_bytes >= 70000
+    - Sport relaxed: cleaned_chars >= 1200 and image_bytes >= 70000
+    - Batch collect: uses min_image_bytes = 70000 and will accept cleaned content that is non-empty; callers may set `min_chars` if required.
+    - Quick preview: min_image_bytes = 2000 (no global min_chars unless caller sets one).
+  - Image candidate acceptance:
+    - Skip if URL contains any of: `favicon`, `logo`, `placeholder`, `spacer`, `blank`, `icon`, `icons`, `sprite`.
+    - Reject if HTTP Content-Type == `image/png`.
+    - Require downloaded bytes >= configured `min_image_bytes`.
+  - Age-13 banned words: match anywhere in title + cleaned paragraphs using case-insensitive word boundaries; if any match → drop article entirely (not included in preview).
+  - Skip filters: if `is_video_article()` or `is_transcript_article()` returns True → skip article.
+
+  If you'd like, I can also change the code to centralize these numeric defaults into a single `config/thresholds.json` (or constants block) so they're easier to review and tune. That would be a small code change (1 file edit + tests).
 - `config/age13_banned.txt` — add/remove banned words for the age-13 filter.
 - `scripts/*` — batch scripts implement particular collection strategies and thresholds.
 
