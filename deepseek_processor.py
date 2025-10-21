@@ -153,7 +153,7 @@ def get_article_content(article_id: int) -> Optional[dict]:
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     
-    cursor.execute("SELECT * FROM articles WHERE id = ?", (article_id,))
+    cursor.execute("SELECT * FROM articles_enhanced WHERE id = ?", (article_id,))
     article = cursor.fetchone()
     conn.close()
     
@@ -186,7 +186,7 @@ def get_unprocessed_articles(limit: int = 5) -> list[dict]:
     cursor = conn.cursor()
     
     cursor.execute("""
-        SELECT id FROM articles 
+        SELECT id FROM articles_enhanced 
         WHERE deepseek_processed = 0
         ORDER BY date_iso DESC
         LIMIT ?
@@ -215,6 +215,8 @@ For EACH article, provide a JSON response with the following structure:
 
 {{
     "article_id": <id>,
+    "rewritten_title": "<rewrite the title to be more engaging and clear, 8-12 words>",
+    "rewritten_title_zh": "<Chinese translation of the rewritten title>",
     "summary_en": "<500-700 word summary in English>",
     "summary_zh": "<Chinese translation of the English summary, 500-700 words>",
     "key_words": [
@@ -254,24 +256,28 @@ For EACH article, provide a JSON response with the following structure:
 }}
 
 IMPORTANT INSTRUCTIONS:
-1. Ensure summaries are EXACTLY 500-700 words (not less, not more)
-2. Chinese translation should be natural and idiomatic, not literal
-3. **CRITICAL FOR KEYWORDS: ONLY include words that appear 3 or more times in the article. Completely skip/exclude any words with frequency 1 or 2. If a word appears only once or twice, do NOT include it in the list.**
-4. Keywords should be genuinely important/frequent (technical terms, named entities, significant concepts that are repeated)
-5. FOR EACH KEYWORD, provide THREE separate explanations tailored to different learning levels:
+1. **TITLE REWRITING (NEW)**: 
+   - Rewrite the title to be more engaging, clear, and informative (8-12 words)
+   - The rewritten title should capture the essence of the article better than the original
+   - Translate the rewritten title to Chinese naturally
+2. Ensure summaries are EXACTLY 500-700 words (not less, not more)
+3. Chinese translation should be natural and idiomatic, not literal
+4. **CRITICAL FOR KEYWORDS: ONLY include words that appear 3 or more times in the article. Completely skip/exclude any words with frequency 1 or 2. If a word appears only once or twice, do NOT include it in the list.**
+5. Keywords should be genuinely important/frequent (technical terms, named entities, significant concepts that are repeated)
+6. FOR EACH KEYWORD, provide THREE separate explanations tailored to different learning levels:
    - easy_explanation: Simple language for beginners, avoid jargon, 30-50 words
    - medium_explanation: Intermediate level with some technical terms, 50-80 words
    - hard_explanation: Advanced technical explanation with nuances and depth, 80-120 words
-6. Background reading should help someone with no prior knowledge understand the topic
-7. Generate 10 multiple choice questions per article (NOT 5):
+7. Background reading should help someone with no prior knowledge understand the topic
+8. Generate 10 multiple choice questions per article (NOT 5):
    - 3-4 "what" questions (word_type: "what") - questions about facts and definitions
    - 3-4 "how" questions (word_type: "how") - questions about processes and mechanisms
    - 3-4 "why" questions (word_type: "why") - questions about reasons and implications
-8. Each question should be academic level with 4 clear options
-9. Only ONE correct answer per question
-10. Perspectives should represent genuinely different viewpoints on the topic/technology/issue
-11. Return ONLY valid JSON, one object per article
-12. If articles are in array, return array of JSON objects, one per article
+9. Each question should be academic level with 4 clear options
+10. Only ONE correct answer per question
+11. Perspectives should represent genuinely different viewpoints on the topic/technology/issue
+12. Return ONLY valid JSON, one object per article
+13. If articles are in array, return array of JSON objects, one per article
 
 ARTICLES TO PROCESS:
 {articles_json}
@@ -403,6 +409,19 @@ def process_articles_in_batches(batch_size: int = 5, max_batches: Optional[int] 
                         cursor = conn.cursor()
                         
                         try:
+                            # Update articles table with rewritten title and Chinese title
+                            if 'rewritten_title' in fb and fb['rewritten_title']:
+                                cursor.execute("""
+                                    UPDATE articles 
+                                    SET title = ?, zh_title = ?
+                                    WHERE id = ?
+                                """, (
+                                    fb.get('rewritten_title', ''),
+                                    fb.get('rewritten_title_zh', ''),
+                                    fb.get('article_id')
+                                ))
+                            
+                            # Insert or replace feedback
                             cursor.execute("""
                                 INSERT OR REPLACE INTO deepseek_feedback
                                 (article_id, summary_en, summary_zh, key_words, 
@@ -429,6 +448,9 @@ def process_articles_in_batches(batch_size: int = 5, max_batches: Optional[int] 
                             conn.commit()
                             stored_count += 1
                             print(f"  ✓ Stored feedback for article {fb.get('article_id')}")
+                            if 'rewritten_title' in fb:
+                                print(f"    ✓ Updated title: {fb.get('rewritten_title')}")
+                                print(f"    ✓ Updated zh_title: {fb.get('rewritten_title_zh')}")
                         except Exception as e:
                             print(f"  ✗ Error storing feedback for article {fb.get('article_id')}: {e}")
                         finally:
