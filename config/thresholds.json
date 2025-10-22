@@ -1,0 +1,12 @@
+{
+  "paragraph_min_length": 30,
+  "cleaned_chars_min_global": 2300,
+  "cleaned_chars_max_global": 4500,
+  "sport_strict_min_chars": 1500,
+  "sport_relaxed_min_chars": 1700,
+  "collect_preview_min_image_bytes": 100000,
+  "batch_min_image_bytes": 70000,
+  "quick_min_image_bytes": 2000,
+  "per_feed_timeout": 240,
+  "num_per_source": 5
+}

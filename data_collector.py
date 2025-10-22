@@ -15,6 +15,25 @@ from html.parser import HTMLParser
 import time
 
 DB_FILE = pathlib.Path("articles.db")
+import json
+CONFIG_PATH = pathlib.Path('config/thresholds.json')
+try:
+    with open(CONFIG_PATH, 'r', encoding='utf-8') as _f:
+        THRESHOLDS = json.load(_f)
+except Exception:
+    # Fallback defaults if config not available
+    THRESHOLDS = {
+        'paragraph_min_length': 30,
+        'cleaned_chars_min_global': 2300,
+        'cleaned_chars_max_global': 4500,
+        'sport_strict_min_chars': 1500,
+        'sport_relaxed_min_chars': 1200,
+        'collect_preview_min_image_bytes': 100000,
+        'batch_min_image_bytes': 70000,
+        'quick_min_image_bytes': 2000,
+        'per_feed_timeout': 240,
+        'num_per_source': 5,
+    }
 
 
 class ParagraphExtractor(HTMLParser):
@@ -301,14 +320,36 @@ def clean_paragraphs(paragraphs):
         if stripped.lower().startswith('related:'):
             continue
         
-        # Skip if less than 30 chars (too short to be real content)
-        if len(text) < 30:
+        # Skip if less than paragraph_min_length (too short to be real content)
+        if len(text) < THRESHOLDS.get('paragraph_min_length', 30):
             continue
         
         # Skip duplicates
         if cleaned and text == cleaned[-1]:
             continue
-        
+
+        # Remove sentences that mention specific source tokens (e.g., 'bbc', 'ars technica')
+        # This helps drop publisher-credit sentences that sometimes appear inside content.
+        SOURCE_TOKENS = [
+            'bbc', 'ars technica', 'the street', 'science daily', 'techradar', 'pbs',
+            'new york times', 'nyt'
+        ]
+        # Split into sentences (simple heuristic: split on sentence-ending punctuation)
+        parts = re.split(r'(?<=[\.\?!])\s+', text)
+        kept_parts = []
+        low_tokens = [t.lower() for t in SOURCE_TOKENS]
+        for part in parts:
+            lp = part.lower()
+            # If any source token appears in the sentence, drop this sentence
+            if any(tok in lp for tok in low_tokens):
+                continue
+            kept_parts.append(part)
+
+        # Rejoin kept sentences; if nothing remains, skip this paragraph
+        if not kept_parts:
+            continue
+        text = ' '.join(kept_parts).strip()
+
         cleaned.append(text)
     
     # Post-processing: strip trailing footer lines that look like publisher addresses or copyright
@@ -666,7 +707,8 @@ def download_and_record_image(conn, article_id, article_url, html_text):
                 continue
             data = resp.content
             # tiny images are likely icons/placeholders; require minimal bytes
-            if not data or len(data) < 2000:
+            min_bytes_gate = THRESHOLDS.get('quick_min_image_bytes', 2000)
+            if not data or len(data) < min_bytes_gate:
                 continue
             img_url = cand
             img_bytes = data
@@ -785,6 +827,9 @@ def download_image_preview(article_url, html_text, min_bytes=100_000):
     os.makedirs('article_images', exist_ok=True)
     from urllib.parse import urlparse
 
+    # Determine effective minimum bytes: prefer explicit param, else config
+    effective_min = min_bytes if min_bytes is not None else THRESHOLDS.get('collect_preview_min_image_bytes', 100000)
+
     # Try candidates in collected order and accept first valid one
     for cand in norm:
         try:
@@ -794,7 +839,8 @@ def download_image_preview(article_url, html_text, min_bytes=100_000):
             if 'image/png' in ctype:
                 continue
             data = r.content
-            if not data or len(data) < 2000:
+            # Require at least the effective minimum bytes
+            if not data or len(data) < effective_min:
                 continue
             from urllib.parse import urlparse
             ext = os.path.splitext(urlparse(cand).path)[1]
@@ -811,20 +857,67 @@ def download_image_preview(article_url, html_text, min_bytes=100_000):
     return None
 
 
-def collect_preview(num_per_source=5, min_image_bytes=100_000, per_feed_timeout=240):
+def collect_preview(num_per_source=None, min_image_bytes=None, per_feed_timeout=None, max_articles=20, enable_all_feeds=False, feeds_override=None):
     """Collect articles but only download images for preview. Do NOT insert into DB.
     Produces a preview HTML file `preview_articles.html` showing accepted articles and local image paths.
     An article is accepted only if a qualifying image (>= min_image_bytes) is found and content passes cleaning.
     """
-    feeds = get_feeds_from_db(sqlite3.connect(DB_FILE))
-    import os
+    # Apply defaults from THRESHOLDS if not provided
+    if num_per_source is None:
+        num_per_source = THRESHOLDS.get('num_per_source', 5)
+    if min_image_bytes is None:
+        min_image_bytes = THRESHOLDS.get('collect_preview_min_image_bytes', 100000)
+    if per_feed_timeout is None:
+        per_feed_timeout = THRESHOLDS.get('per_feed_timeout', 240)
+
+    # If requested, temporarily enable all feeds for this run and restore later
+    conn = None
+    restore_flags = None
+    import os, json
+    try:
+        if feeds_override is not None:
+            feeds = feeds_override
+            conn = None
+        else:
+            if not DB_FILE.exists():
+                print(f"Warning: database {DB_FILE} not found — running with no feeds")
+                feeds = []
+                conn = None
+            else:
+                conn = sqlite3.connect(DB_FILE)
+                if enable_all_feeds:
+                    try:
+                        cur = conn.cursor()
+                        cur.execute('SELECT feed_id, enable FROM feeds')
+                        restore_flags = cur.fetchall()
+                        cur.execute('UPDATE feeds SET enable = 1')
+                        conn.commit()
+                    except Exception as e:
+                        print(f"Warning: could not enable all feeds: {e}")
+                try:
+                    feeds = get_feeds_from_db(conn)
+                except Exception as e:
+                    print(f"Warning: failed to read feeds from DB: {e}")
+                    feeds = []
+    except Exception as e:
+        print(f"Warning during feed setup: {e}")
+        feeds = []
+    import os, json
     preview_items = []
+    per_feed_stats = []
 
     for feed_id, feed_name, feed_url, category_id, category_name in feeds:
-        print(f"\n[{feed_name}] Fetching up to 20, targeting {num_per_source} clean preview articles")
-        articles = parse_rss_feed(feed_url, feed_name, category_id, max_articles=20)
+        print(f"\n[{feed_name}] Fetching up to {max_articles}, targeting {num_per_source} clean preview articles")
+        try:
+            articles = parse_rss_feed(feed_url, feed_name, category_id, max_articles=max_articles)
+        except Exception as e:
+            print(f"  ✗ Failed to parse feed {feed_name}: {e}")
+            # Skip this feed but do not abort the whole preview run
+            articles = []
         kept = 0
         feed_start = time.time()
+        found_total = len(articles)
+        accepted_total = 0
         for art in articles:
             # If this feed is taking too long, abort remaining items and move to next feed
             if per_feed_timeout and (time.time() - feed_start) > per_feed_timeout:
@@ -842,15 +935,55 @@ def collect_preview(num_per_source=5, min_image_bytes=100_000, per_feed_timeout=
             cleaned = clean_paragraphs(paras)
             if not cleaned:
                 continue
-            # fetch page and try preview image
-            try:
-                resp = requests.get(art['url'], timeout=10)
-                resp.raise_for_status()
-                img_local = download_image_preview(art['url'], resp.text, min_bytes=min_image_bytes)
-                if not img_local:
-                    print(f"  ⊘ Skipped (no large image): {art['title'][:60]}...")
+            # Try RSS-provided image first (avoids JS/anti-bot pages)
+            img_local = None
+            rss_img = art.get('rss_image')
+            if rss_img:
+                try:
+                    # Attempt to download the RSS image and enforce min size/type
+                    # Use download_image_preview by passing article URL and a fake HTML containing the image tag
+                    fake_html = f"<html><body><img src=\"{rss_img}\"/></body></html>"
+                    img_local = download_image_preview(art['url'], fake_html, min_bytes=min_image_bytes)
+                    if img_local:
+                        print(f"  ✓ Preview accepted via RSS image: {art['title'][:60]}... -> {img_local}")
+                        # Before accepting based on RSS image, fetch the article content
+                        full_content = fetch_article_content(art['url'])
+                        if full_content:
+                            preview_items.append({
+                                'title': art['title'],
+                                'url': art['url'],
+                                'source': art['source'],
+                                'content': full_content,
+                                'image': img_local
+                            })
+                            kept += 1
+                            accepted_total += 1
+                            continue
+                        else:
+                            # If fetching/cleaning full content failed, ignore this item
+                            print(f"  ⊘ Skipped (no full content): {art['title'][:60]}...")
+                            img_local = None
+                except Exception:
+                    img_local = None
+
+            # If no RSS image or it didn't qualify, fetch page and try preview image
+            if not img_local:
+                try:
+                    resp = requests.get(art['url'], timeout=10)
+                    resp.raise_for_status()
+                    img_local = download_image_preview(art['url'], resp.text, min_bytes=min_image_bytes)
+                    if not img_local:
+                        print(f"  ⊘ Skipped (no large image): {art['title'][:60]}...")
+                        continue
+                    # We have a page image; ensure we can fetch & clean full article content
+                    full_content = fetch_article_content(art['url'])
+                    if not full_content:
+                        print(f"  ⊘ Skipped (no full content after page fetch): {art['title'][:60]}...")
+                        continue
+                except Exception:
+                    print(f"  ⊘ Skipped (page fetch/error): {art['title'][:60]}...")
                     continue
-                # accepted
+                # accepted via page image
                 preview_items.append({
                     'title': art['title'],
                     'url': art['url'],
@@ -859,15 +992,31 @@ def collect_preview(num_per_source=5, min_image_bytes=100_000, per_feed_timeout=
                     'image': img_local
                 })
                 kept += 1
+                accepted_total += 1
                 print(f"  ✓ Preview accepted: {art['title'][:60]}... -> {img_local}")
-            except Exception:
-                continue
+
+        # record per-feed stats
+        per_feed_stats.append({
+            'feed_id': feed_id,
+            'feed_name': feed_name,
+            'feed_url': feed_url,
+            'found_total': found_total,
+            'accepted_total': accepted_total,
+            'target': num_per_source
+        })
 
     # generate preview HTML
     import html as _html
     out = ['<!doctype html>', '<html><head><meta charset="utf-8"><title>Preview Articles</title>',
            '<style>body{font-family:Arial,Helvetica,sans-serif;line-height:1.45;margin:20px} .article{margin-bottom:50px} img{max-width:700px;height:auto}</style>',
            '</head><body>', '<h1>Preview Articles</h1>']
+
+    # Insert a simple per-feed summary table at the top
+    out.append('<h2>Per-feed Summary</h2>')
+    out.append('<ul>')
+    for s in per_feed_stats:
+        out.append(f"<li>{_html.escape(s['feed_name'])}: found={s['found_total']}, accepted={s['accepted_total']}, target={s['target']}</li>")
+    out.append('</ul>')
 
     for it in preview_items:
         # Titles from feeds may contain numeric HTML entities (e.g. &#8216;) —
@@ -885,6 +1034,31 @@ def collect_preview(num_per_source=5, min_image_bytes=100_000, per_feed_timeout=
     with open('preview_articles.html', 'w', encoding='utf-8') as f:
         f.write('\n'.join(out))
     print('\nGenerated preview_articles.html with', len(preview_items), 'items')
+    # Also write a machine-readable catalog for automated runs
+    catalog = {
+        'generated_at': datetime.now().isoformat(),
+        'total_items': len(preview_items),
+        'per_feed': per_feed_stats
+    }
+    try:
+        with open('preview_catalog.json', 'w', encoding='utf-8') as cf:
+            json.dump(catalog, cf, indent=2)
+        print('Wrote preview_catalog.json')
+    except Exception:
+        print('Failed to write preview_catalog.json')
+
+    # Restore feed enable flags if we modified them
+    if conn and enable_all_feeds and restore_flags is not None:
+        try:
+            cur = conn.cursor()
+            for fid, flag in restore_flags:
+                cur.execute('UPDATE feeds SET enable = ? WHERE feed_id = ?', (flag, fid))
+            conn.commit()
+            print('Restored feed enable flags')
+        except Exception:
+            print('Warning: failed to restore feed enable flags')
+    if conn:
+        conn.close()
     return preview_items
 
 
@@ -942,7 +1116,28 @@ def parse_rss_feed(feed_url, source_name, category_id, max_articles=1):
                 full_content = fetch_article_content(url)
                 if not full_content:
                     full_content = content  # Fall back to RSS content
-                
+
+                # Try to extract an image from the RSS item itself (media:content, enclosure, or <img> in description)
+                rss_image = None
+                # media:content or enclosure
+                media = item.find('{http://search.yahoo.com/mrss/}content')
+                if media is None:
+                    media = item.find('enclosure')
+                if media is not None:
+                    # prefer url attribute
+                    rss_image = media.get('url') if hasattr(media, 'get') else None
+
+                # fallback: try to find an <img> tag in the description HTML
+                if not rss_image and description:
+                    try:
+                        from bs4 import BeautifulSoup
+                        dsoup = BeautifulSoup(description, 'html.parser')
+                        img = dsoup.find('img')
+                        if img and img.get('src'):
+                            rss_image = img.get('src')
+                    except Exception:
+                        rss_image = None
+
                 articles.append({
                     'title': title,
                     'source': source_name,
@@ -950,7 +1145,8 @@ def parse_rss_feed(feed_url, source_name, category_id, max_articles=1):
                     'description': description[:500] if description else "",
                     'content': full_content[:5000] if full_content else "",
                     'pub_date': pub_date,
-                    'category_id': category_id
+                    'category_id': category_id,
+                    'rss_image': rss_image
                 })
                 
                 # Be respectful - add delay between requests
@@ -967,12 +1163,18 @@ def parse_rss_feed(feed_url, source_name, category_id, max_articles=1):
         return []
 
 
-def collect_articles(num_per_source=1, per_feed_timeout=240):
+def collect_articles(num_per_source=None, per_feed_timeout=None):
     """Collect articles from RSS feeds stored in database.
 
     Policy: For each active feed, fetch up to 20 items and keep up to
     `num_per_source` clean articles (stop early when the target is reached).
     """
+
+    # Apply defaults from THRESHOLDS if not provided
+    if num_per_source is None:
+        num_per_source = THRESHOLDS.get('num_per_source', 1)
+    if per_feed_timeout is None:
+        per_feed_timeout = THRESHOLDS.get('per_feed_timeout', 240)
 
     if not DB_FILE.exists():
         print(f"✗ Database not found: {DB_FILE}")
@@ -1036,10 +1238,30 @@ def collect_articles(num_per_source=1, per_feed_timeout=240):
                 print(f"  ⊘ Skipped (GAMES/FILLER): {article['title'][:60]}...")
                 continue
 
-            # Skip articles outside character range (2000-4500 chars)
+            # Skip articles outside character range (configured bounds)
             content_length = len(article['content'] or "")
-            if content_length < 2000 or content_length > 4500:
-                print(f"  ⊘ Skipped (LENGTH {content_length}): {article['title'][:60]}...")
+            # Allow per-category overrides: sports feeds often have shorter articles
+            min_chars = THRESHOLDS.get('cleaned_chars_min_global', 2300)
+            # detect sports/tennis feeds by category name or feed name
+            is_sport = False
+            try:
+                if category_name and 'sport' in category_name.lower():
+                    is_sport = True
+            except Exception:
+                pass
+            try:
+                if not is_sport and feed_name and 'tennis' in feed_name.lower():
+                    is_sport = True
+            except Exception:
+                pass
+
+            if is_sport:
+                # prefer relaxed sport threshold if configured, else a strict sport one
+                min_chars = THRESHOLDS.get('sport_relaxed_min_chars', THRESHOLDS.get('sport_strict_min_chars', min_chars))
+
+            max_chars = THRESHOLDS.get('cleaned_chars_max_global', 4500)
+            if content_length < min_chars or content_length > max_chars:
+                print(f"  ⊘ Skipped (LENGTH {content_length} < min {min_chars} or > max {max_chars}): {article['title'][:60]}...")
                 continue
 
             # Skip duplicates
