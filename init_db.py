@@ -472,6 +472,10 @@ def populate_lookup_tables(conn, cursor):
 
         # Clear feeds table before inserting to ensure a clean seed
         cursor.execute('DELETE FROM feeds')
+
+        # Names we prefer to keep disabled on initial seed (case-insensitive match)
+        disable_names = {"the street", "bbc science", "ars technology lab", "science", "technology"}
+
         for feed_name, feed_url, category_name in feeds_list:
             try:
                 # Get category_id for this feed
@@ -481,10 +485,14 @@ def populate_lookup_tables(conn, cursor):
                 result = cursor.fetchone()
                 if result:
                     category_id = result[0]
+                    # Determine if this feed should be initially disabled
+                    en_flag = 1
+                    if feed_name and feed_name.strip().lower() in disable_names:
+                        en_flag = 0
                     cursor.execute("""
-                        INSERT INTO feeds (feed_name, feed_url, category_id, created_at)
-                        VALUES (?, ?, ?, ?)
-                    """, (feed_name, feed_url, category_id, now))
+                        INSERT INTO feeds (feed_name, feed_url, category_id, created_at, enable)
+                        VALUES (?, ?, ?, ?, ?)
+                    """, (feed_name, feed_url, category_id, now, en_flag))
                     print(f"  ✓ Added verified feed: {feed_name} -> {category_name}")
                 else:
                     # If the category is missing, create it on the fly
@@ -493,10 +501,13 @@ def populate_lookup_tables(conn, cursor):
                         VALUES (?, ?, ?, ?)
                     """, (category_name, f"{category_name} (auto-created)", 'default', now))
                     category_id = cursor.lastrowid
+                    en_flag = 1
+                    if feed_name and feed_name.strip().lower() in disable_names:
+                        en_flag = 0
                     cursor.execute("""
-                        INSERT INTO feeds (feed_name, feed_url, category_id, created_at)
-                        VALUES (?, ?, ?, ?)
-                    """, (feed_name, feed_url, category_id, now))
+                        INSERT INTO feeds (feed_name, feed_url, category_id, created_at, enable)
+                        VALUES (?, ?, ?, ?, ?)
+                    """, (feed_name, feed_url, category_id, now, en_flag))
                     print(f"  ✓ Created category+feed: {category_name} -> {feed_name}")
                 
                 # Also ensure there's a catalog token for this category (first word)
