@@ -36,31 +36,7 @@ def init_deepseek_tables():
         # Column already exists
         pass
     
-    # Create new table for DeepSeek feedback
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS deepseek_feedback (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            article_id INTEGER NOT NULL UNIQUE,
-            summary_en TEXT,
-            summary_zh TEXT,
-            key_words TEXT,
-            background_reading TEXT,
-            multiple_choice_questions TEXT,
-            discussion_both_sides TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (article_id) REFERENCES articles(id)
-        )
-    """)
-    
-    # Create index for faster lookups
-    try:
-        cursor.execute("""
-            CREATE INDEX IF NOT EXISTS idx_article_deepseek 
-            ON deepseek_feedback(article_id)
-        """)
-    except:
-        pass
+    # deepseek_feedback table deprecated — runtime storage uses normalized tables
     
     # Create dedicated quiz questions table for game development
     cursor.execute("""
@@ -110,74 +86,55 @@ def store_quiz_questions(article_id: int, questions_data: list[dict]):
     """Store quiz questions in separate table for easy game development."""
     if not questions_data:
         return
-    
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
-    
+
     try:
-        # First, delete existing questions for this article
-        cursor.execute("DELETE FROM quiz_questions WHERE article_id = ?", (article_id,))
-        
-        # Insert each question
+        # Best-effort: write into normalized questions/choices tables.
+        # Ensure question_number column exists in questions (migration script will add it if needed).
+        cursor.execute("PRAGMA table_info(questions)")
+        qcols = [r[1] for r in cursor.fetchall()]
+
+        # Delete existing normalized questions for this article (we'll re-insert fresh)
+        try:
+            cursor.execute("DELETE FROM choices WHERE question_id IN (SELECT question_id FROM questions WHERE article_id = ?)", (article_id,))
+            cursor.execute("DELETE FROM questions WHERE article_id = ?", (article_id,))
+        except Exception:
+            pass
+
         for idx, q in enumerate(questions_data, 1):
-            cursor.execute("""
-                INSERT INTO quiz_questions
-                (article_id, question_number, question_type, question_text,
-                 option_a, option_b, option_c, option_d,
-                 correct_answer, explanation)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                article_id,
-                idx,
-                q.get('type', ''),
-                q.get('question', ''),
-                q.get('options', ['', '', '', ''])[0] if len(q.get('options', [])) > 0 else '',
-                q.get('options', ['', '', '', ''])[1] if len(q.get('options', [])) > 1 else '',
-                q.get('options', ['', '', '', ''])[2] if len(q.get('options', [])) > 2 else '',
-                q.get('options', ['', '', '', ''])[3] if len(q.get('options', [])) > 3 else '',
-                q.get('correct_answer', ''),
-                q.get('explanation', '')
-            ))
-        
+            qtext = q.get('question', '')
+            opts = q.get('options', ['', '', '', ''])
+            correct = q.get('correct_answer', '')
+            explanation = q.get('explanation', None)
+            created_at = None
+
+            # Insert into questions. Include question_number if column exists.
+            if 'question_number' in qcols:
+                cursor.execute('INSERT INTO questions (article_id, difficulty_id, question_text, created_at, question_number) VALUES (?, NULL, ?, ?, ?)', (article_id, qtext, created_at, idx))
+            else:
+                cursor.execute('INSERT INTO questions (article_id, difficulty_id, question_text, created_at) VALUES (?, NULL, ?, ?)', (article_id, qtext, created_at))
+
+            question_id = cursor.lastrowid
+
+            # Insert choices
+            letters = ['A', 'B', 'C', 'D']
+            for opt_text, letter in zip(opts, letters):
+                if not opt_text:
+                    continue
+                is_correct = 1 if (correct and str(correct).strip().upper().startswith(letter)) else 0
+                cur_expl = explanation if is_correct else None
+                cursor.execute('INSERT INTO choices (question_id, choice_text, is_correct, explanation, created_at) VALUES (?, ?, ?, ?, ?)', (question_id, opt_text, is_correct, cur_expl, created_at))
+
         conn.commit()
-        print(f"  ✓ Stored {len(questions_data)} quiz questions for article {article_id}")
+
     except Exception as e:
-        print(f"  ✗ Error storing quiz questions for article {article_id}: {e}")
-    finally:
-        conn.close()
+        # If normalized insert fails, log and re-raise — we no longer write to legacy quiz_questions
+        print(f"ERROR storing quiz questions for article {article_id}: {e}")
+        conn.rollback()
+        raise
 
-
-def get_article_content(article_id: int) -> Optional[dict]:
-    """Get article content from database and files."""
-    conn = sqlite3.connect(DB_FILE)
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-    
-    cursor.execute("SELECT * FROM articles_enhanced WHERE id = ?", (article_id,))
-    article = cursor.fetchone()
-    conn.close()
-    
-    if not article:
-        return None
-    
-    # Read full content from file
-    content = ""
-    if article['content_file']:
-        content_path = pathlib.Path(article['content_file'])
-        if content_path.exists():
-            with open(content_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-    
-    return {
-        "id": article['id'],
-        "title": article['title'],
-        "source": article['source'],
-        "link": article['link'],
-        "snippet": article['snippet'],
-        "content": content,
-        "date": article['date_iso']
-    }
-
+    conn.commit()
 
 def get_unprocessed_articles(limit: int = 5) -> list[dict]:
     """Get articles that haven't been processed by DeepSeek yet."""
@@ -401,66 +358,91 @@ def process_articles_in_batches(batch_size: int = 5, max_batches: Optional[int] 
                         print(f"✗ Could not parse response as JSON")
                         feedbacks = []
                 
-                # Store feedback in database
+                # Insert processed data into normalized tables using the verified inserter
+                try:
+                    from insert_from_response import insert_data_into_db
+                except Exception as e:
+                    insert_data_into_db = None
+                    print(f"  ⚠ Could not import insert_from_response inserter: {e}")
+
                 stored_count = 0
                 for fb in feedbacks:
-                    if 'article_id' in fb:
-                        conn = sqlite3.connect(DB_FILE)
-                        cursor = conn.cursor()
-                        
-                        try:
-                            # Update articles table with rewritten title and Chinese title
-                            if 'rewritten_title' in fb and fb['rewritten_title']:
-                                cursor.execute("""
-                                    UPDATE articles 
-                                    SET title = ?, zh_title = ?
-                                    WHERE id = ?
-                                """, (
-                                    fb.get('rewritten_title', ''),
-                                    fb.get('rewritten_title_zh', ''),
-                                    fb.get('article_id')
-                                ))
-                            
-                            # Insert or replace feedback
-                            cursor.execute("""
-                                INSERT OR REPLACE INTO deepseek_feedback
-                                (article_id, summary_en, summary_zh, key_words, 
-                                 background_reading, multiple_choice_questions, 
-                                 discussion_both_sides)
-                                VALUES (?, ?, ?, ?, ?, ?, ?)
-                            """, (
-                                fb.get('article_id'),
-                                fb.get('summary_en', ''),
-                                fb.get('summary_zh', ''),
-                                json.dumps(fb.get('key_words', []), ensure_ascii=False),
-                                fb.get('background_reading', ''),
-                                json.dumps(fb.get('multiple_choice_questions', []), ensure_ascii=False),
-                                json.dumps(fb.get('discussion_both_sides', {}), ensure_ascii=False)
-                            ))
-                            
-                            # Mark article as processed
+                    if 'article_id' not in fb:
+                        continue
+                    article_id = fb.get('article_id')
+
+                    # Update rewritten titles in articles table if present
+                    try:
+                        if fb.get('rewritten_title'):
+                            conn = sqlite3.connect(DB_FILE)
+                            cursor = conn.cursor()
                             cursor.execute("""
                                 UPDATE articles 
-                                SET deepseek_processed = 1
+                                SET title = ?, zh_title = ?
                                 WHERE id = ?
-                            """, (fb.get('article_id'),))
-                            
+                            """, (
+                                fb.get('rewritten_title', ''),
+                                fb.get('rewritten_title_zh', ''),
+                                article_id
+                            ))
                             conn.commit()
-                            stored_count += 1
-                            print(f"  ✓ Stored feedback for article {fb.get('article_id')}")
-                            if 'rewritten_title' in fb:
-                                print(f"    ✓ Updated title: {fb.get('rewritten_title')}")
-                                print(f"    ✓ Updated zh_title: {fb.get('rewritten_title_zh')}")
-                        except Exception as e:
-                            print(f"  ✗ Error storing feedback for article {fb.get('article_id')}: {e}")
-                        finally:
                             conn.close()
-                        
-                        # Store quiz questions separately (for game development)
-                        if fb.get('multiple_choice_questions'):
-                            store_quiz_questions(fb.get('article_id'), fb.get('multiple_choice_questions'))
-                
-                print(f"✓ Stored feedback for {stored_count}/{len(articles)} articles")
+                            print(f"  ✓ Updated title for article {article_id}")
+                    except Exception as e:
+                        print(f"  ✗ Failed to update title for article {article_id}: {e}")
+
+                    # Use the dedicated inserter to populate summaries, keywords, questions, etc.
+                    if insert_data_into_db:
+                        try:
+                            ok = insert_data_into_db(article_id, fb)
+                            if ok:
+                                stored_count += 1
+                                print(f"  ✓ Inserted processed data for article {article_id}")
+                            else:
+                                print(f"  ✗ Inserter returned False for article {article_id}")
+                                # treat as failure: increment failed counter
+                                conn = sqlite3.connect(DB_FILE)
+                                cur = conn.cursor()
+                                cur.execute("UPDATE articles SET deepseek_failed = deepseek_failed + 1 WHERE id = ?", (article_id,))
+                                conn.commit()
+                                # check threshold and delete if exceeded
+                                cur.execute("SELECT deepseek_failed FROM articles WHERE id = ?", (article_id,))
+                                val = cur.fetchone()
+                                try:
+                                    failed_count = val[0] if val else 0
+                                except Exception:
+                                    failed_count = 0
+                                if failed_count and failed_count > 3:
+                                    print(f"  ⚠ deepseek_failed > 3 for article {article_id}; deleting article")
+                                    cur.execute("DELETE FROM articles WHERE id = ?", (article_id,))
+                                    conn.commit()
+                                conn.close()
+                        except Exception as e:
+                            print(f"  ✗ Error inserting processed data for article {article_id}: {e}")
+                            # increment failed counter
+                            try:
+                                conn = sqlite3.connect(DB_FILE)
+                                cur = conn.cursor()
+                                cur.execute("UPDATE articles SET deepseek_failed = deepseek_failed + 1, deepseek_last_error = ? WHERE id = ?", (str(e)[:1000], article_id))
+                                conn.commit()
+                                cur.execute("SELECT deepseek_failed FROM articles WHERE id = ?", (article_id,))
+                                val = cur.fetchone()
+                                failed_count = val[0] if val else 0
+                                if failed_count and failed_count > 3:
+                                    print(f"  ⚠ deepseek_failed > 3 for article {article_id}; deleting article")
+                                    cur.execute("DELETE FROM articles WHERE id = ?", (article_id,))
+                                    conn.commit()
+                                conn.close()
+                            except Exception:
+                                pass
+                    else:
+                        print(f"  ✗ No inserter available; skipping insert for article {article_id}")
+
+                    # Store quiz questions separately (for game development)
+                    if fb.get('multiple_choice_questions'):
+                        store_quiz_questions(article_id, fb.get('multiple_choice_questions'))
+
+                print(f"✓ Processed and inserted data for {stored_count}/{len(articles)} articles")
                 
             except Exception as e:
                 print(f"✗ Error processing response: {e}")
@@ -474,27 +456,11 @@ def process_articles_in_batches(batch_size: int = 5, max_batches: Optional[int] 
 
 
 def query_feedback(article_id: int) -> Optional[dict]:
-    """Query DeepSeek feedback for a specific article."""
-    conn = sqlite3.connect(DB_FILE)
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-    
-    cursor.execute("SELECT * FROM deepseek_feedback WHERE article_id = ?", (article_id,))
-    row = cursor.fetchone()
-    conn.close()
-    
-    if not row:
-        return None
-    
-    return {
-        "article_id": row['article_id'],
-        "summary_en": row['summary_en'],
-        "summary_zh": row['summary_zh'],
-        "key_words": json.loads(row['key_words']) if row['key_words'] else [],
-        "background_reading": row['background_reading'],
-        "multiple_choice_questions": json.loads(row['multiple_choice_questions']) if row['multiple_choice_questions'] else [],
-        "discussion_both_sides": json.loads(row['discussion_both_sides']) if row['discussion_both_sides'] else {}
-    }
+    """Query DeepSeek feedback for a specific article.
+
+    Deprecated: use normalized tables (article_summaries, keywords, questions, background_read, comments) instead.
+    """
+    return None
 
 
 def get_quiz_questions(article_id: int) -> list[dict]:
@@ -502,32 +468,80 @@ def get_quiz_questions(article_id: int) -> list[dict]:
     conn = sqlite3.connect(DB_FILE)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    
-    cursor.execute("""
-        SELECT id, question_number, question_type, question_text,
-               option_a, option_b, option_c, option_d,
-               correct_answer, explanation
-        FROM quiz_questions
-        WHERE article_id = ?
-        ORDER BY question_number
-    """, (article_id,))
-    
-    rows = cursor.fetchall()
-    conn.close()
-    
-    questions = []
-    for row in rows:
-        questions.append({
-            "id": row['id'],
-            "question_number": row['question_number'],
-            "type": row['question_type'],
-            "question": row['question_text'],
-            "options": [row['option_a'], row['option_b'], row['option_c'], row['option_d']],
-            "correct_answer": row['correct_answer'],
-            "explanation": row['explanation']
-        })
-    
-    return questions
+
+    # Try normalized tables first
+    try:
+        cursor.execute('SELECT question_id, question_text, question_number FROM questions WHERE article_id = ? ORDER BY question_number NULLS LAST, question_id', (article_id,))
+        qrows = cursor.fetchall()
+        if qrows:
+            out = []
+            for qr in qrows:
+                qid = qr['question_id'] if 'question_id' in qr.keys() else qr[0]
+                qnum = qr['question_number'] if 'question_number' in qr.keys() else (qr['question_number'] if 'question_number' in qr.keys() else None)
+                qtext = qr['question_text'] if 'question_text' in qr.keys() else qr[1]
+
+                cursor.execute('SELECT choice_text, is_correct, explanation FROM choices WHERE question_id = ? ORDER BY choice_id', (qid,))
+                opts = cursor.fetchall()
+                options = [o['choice_text'] if 'choice_text' in o.keys() else o[0] for o in opts]
+                correct = None
+                expl = None
+                for o in opts:
+                    is_corr = o['is_correct'] if 'is_correct' in o.keys() else o[1]
+                    if is_corr:
+                        correct = o['choice_text'] if 'choice_text' in o.keys() else o[0]
+                        expl = o['explanation'] if 'explanation' in o.keys() else o[2]
+
+                # Convert correct choice text to letter if possible
+                correct_letter = None
+                if correct and options:
+                    try:
+                        idx = options.index(correct)
+                        correct_letter = ['A', 'B', 'C', 'D'][idx]
+                    except Exception:
+                        correct_letter = str(correct).strip()
+
+                out.append({
+                    'id': qid,
+                    'question_number': qnum,
+                    'type': None,
+                    'question': qtext,
+                    'options': options,
+                    'correct_answer': correct_letter,
+                    'explanation': expl
+                })
+
+            conn.close()
+            return out
+
+    except Exception:
+        # if normalized read fails, fall back to legacy table
+        pass
+
+    # Fallback to legacy quiz_questions table
+    try:
+        cursor.execute("""
+            SELECT id, question_number, question_type, question_text,
+                   option_a, option_b, option_c, option_d,
+                   correct_answer, explanation
+            FROM quiz_questions
+            WHERE article_id = ?
+            ORDER BY question_number
+        """, (article_id,))
+        rows = cursor.fetchall()
+        questions = []
+        for row in rows:
+            questions.append({
+                "id": row['id'],
+                "question_number": row['question_number'],
+                "type": row['question_type'],
+                "question": row['question_text'],
+                "options": [row['option_a'], row['option_b'], row['option_c'], row['option_d']],
+                "correct_answer": row['correct_answer'],
+                "explanation": row['explanation']
+            })
+        return questions
+    finally:
+        conn.close()
 
 
 def get_quiz_question_by_id(question_id: int) -> Optional[dict]:

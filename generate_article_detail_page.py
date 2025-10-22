@@ -13,35 +13,71 @@ def get_article_data(article_id: int) -> dict:
     conn = sqlite3.connect(DB_FILE)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    
-    cursor.execute("""
-        SELECT 
-            a.id, a.title, a.date_iso, a.image_file, a.snippet, a.link, a.source,
-            df.summary_en, df.summary_zh, df.key_words, df.background_reading,
-            df.multiple_choice_questions, df.discussion_both_sides,
-            GROUP_CONCAT(
-                json_object(
-                    'id', q.id,
-                    'question', q.question_text,
-                    'type', q.question_type,
-                    'options', json_array(q.option_a, q.option_b, q.option_c, q.option_d),
-                    'correct_answer', q.correct_answer,
-                    'explanation', q.explanation
-                )
-            ) as quiz_questions
-        FROM articles a
-        LEFT JOIN deepseek_feedback df ON a.id = df.article_id
-        LEFT JOIN quiz_questions q ON a.id = q.article_id
-        WHERE a.id = ?
-        GROUP BY a.id
-    """, (article_id,))
-    
+
+    # Get article base data
+    cursor.execute("SELECT id, title, date_iso, image_file, snippet, link, source FROM articles WHERE id = ?", (article_id,))
     row = cursor.fetchone()
-    conn.close()
-    
     if not row:
+        conn.close()
         return None
-    
+
+    # Gather summaries (grouped by language, difficulty)
+    cursor.execute("SELECT language_id, difficulty_id, title, summary FROM article_summaries WHERE article_id = ?", (article_id,))
+    summaries = cursor.fetchall()
+    # Build simplified summary object (choose English summary for summary_en, Chinese for summary_zh when available)
+    summary_en = None
+    summary_zh = None
+    summaries_list = []
+    for s in summaries:
+        summaries_list.append(dict(s))
+        if s['language_id'] == 1 and not summary_en:
+            summary_en = s['summary']
+        if s['language_id'] == 2 and not summary_zh:
+            summary_zh = s['summary']
+
+    # Keywords
+    cursor.execute("SELECT word, explanation FROM keywords WHERE article_id = ?", (article_id,))
+    keywords = [dict(row) for row in cursor.fetchall()]
+
+    # Background reading (concatenate per difficulty)
+    cursor.execute("SELECT background_text FROM background_read WHERE article_id = ?", (article_id,))
+    background_texts = [r[0] for r in cursor.fetchall()]
+    background_reading = "\n\n".join(background_texts) if background_texts else None
+
+    # Quiz questions - read from normalized questions + choices
+    cursor.execute("SELECT question_id, question_text, difficulty_id FROM questions WHERE article_id = ? ORDER BY question_id", (article_id,))
+    qrows = cursor.fetchall()
+    quiz_questions = []
+    for q in qrows:
+        qid = q[0]
+        qtext = q[1]
+        # fetch choices
+        cursor.execute("SELECT choice_text, is_correct, explanation FROM choices WHERE question_id = ? ORDER BY choice_id", (qid,))
+        choices = cursor.fetchall()
+        options = [c[0] for c in choices]
+        correct = None
+        explanation = None
+        for c in choices:
+            if c[1]:
+                correct = chr(65 + choices.index(c))
+                explanation = c[2]
+                break
+
+        quiz_questions.append(json.dumps({
+            'id': qid,
+            'question': qtext,
+            'type': None,
+            'options': options,
+            'correct_answer': correct,
+            'explanation': explanation
+        }))
+
+    # Discussion/perspectives (comments table)
+    cursor.execute("SELECT attitude, com_content, who_comment FROM comments WHERE article_id = ? ORDER BY comment_id", (article_id,))
+    comments = [dict(r) for r in cursor.fetchall()]
+
+    conn.close()
+
     data = {
         'id': row['id'],
         'title': row['title'],
@@ -50,12 +86,12 @@ def get_article_data(article_id: int) -> dict:
         'snippet': row['snippet'],
         'link': row['link'],
         'source': row['source'],
-        'summary_en': row['summary_en'],
-        'summary_zh': row['summary_zh'],
-        'key_words': json.loads(row['key_words']) if row['key_words'] else [],
-        'background_reading': row['background_reading'],
-        'questions_all': json.loads(row['multiple_choice_questions']) if row['multiple_choice_questions'] else [],
-        'discussion': json.loads(row['discussion_both_sides']) if row['discussion_both_sides'] else {},
+        'summary_en': summary_en,
+        'summary_zh': summary_zh,
+        'key_words': keywords,
+        'background_reading': background_reading,
+        'questions_all': [json.loads(q) for q in quiz_questions],
+        'discussion': {'comments': comments},
     }
     
     return data

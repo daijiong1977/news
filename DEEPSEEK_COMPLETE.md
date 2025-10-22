@@ -53,7 +53,8 @@ python3 deepseek_processor.py --init
 
 This creates:
 - `deepseek_processed` column in articles table (tracks completion)
-- `deepseek_feedback` table (stores all 6 components)
+NOTE: The `deepseek_feedback` table is deprecated for runtime writes. New processing stores normalized data across `article_summaries`, `keywords`, `questions`, `choices`, `background_read`, and `article_analysis`.
+If you have legacy `deepseek_feedback` rows to migrate, use `populate_all_summary_tables.py` (migration-only) after backing up your DB.
 
 ### Step 3: Start Processing
 ```bash

@@ -41,7 +41,7 @@ PROCESS: Batch up to 5 articles → Send to DeepSeek API
         ↓
 OUTPUT: JSON with 6 analytical components
         ↓
-STORE:  Save in deepseek_feedback database table
+STORE:  (DEPRECATED) Previously saved to `deepseek_feedback` table. Runtime now writes to normalized tables (`article_summaries`, `keywords`, `questions`, `choices`, `background_read`, `article_analysis`). Use migration helpers if you have legacy `deepseek_feedback` data.
         ↓
 QUERY:  Retrieve results anytime
 

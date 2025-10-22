@@ -11,7 +11,6 @@ print('=' * 60)
 
 # Clear all processed data
 tables_to_clear = [
-    'deepseek_feedback',
     'article_summaries',
     'keywords',
     'questions',

@@ -18,28 +18,29 @@ def get_article_and_research_data(article_id):
         cursor = conn.cursor()
         
         # Get article data
-        cursor.execute('''
-            SELECT a.*, df.summary_en, df.summary_zh, df.key_words, 
-                   df.background_reading, df.multiple_choice_questions,
-                   df.discussion_both_sides
-            FROM articles a
-            LEFT JOIN deepseek_feedback df ON a.id = df.article_id
-            WHERE a.id = ?
-        ''', (article_id,))
-        
+        cursor.execute('SELECT id, title, date_iso, image_file, snippet, link, source FROM articles WHERE id = ?', (article_id,))
         article = cursor.fetchone()
         if not article:
             print(f"❌ Article {article_id} not found")
             return None
         
-        # Get quiz questions with cognitive levels if available
-        cursor.execute('''
-            SELECT * FROM quiz_questions 
-            WHERE article_id = ?
-            ORDER BY question_number
-        ''', (article_id,))
-        
-        questions = cursor.fetchall()
+        # Get quiz questions from normalized tables
+        cursor.execute('SELECT question_id, question_text, question_number FROM questions WHERE article_id = ? ORDER BY question_number', (article_id,))
+        qrows = cursor.fetchall()
+        questions = []
+        for q in qrows:
+            qid = q[0]
+            qtext = q[1]
+            qnum = q[2]
+            cursor.execute('SELECT choice_text, is_correct FROM choices WHERE question_id = ? ORDER BY choice_id', (qid,))
+            choices = cursor.fetchall()
+            options = [c[0] for c in choices]
+            correct = None
+            for idx, c in enumerate(choices):
+                if c[1]:
+                    correct = chr(65 + idx)
+                    break
+            questions.append({'question_id': qid, 'question_text': qtext, 'question_number': qnum, 'options': options, 'correct_answer': correct})
         conn.close()
         
         return {
@@ -96,13 +97,26 @@ def generate_research_page(article_id, output_dir='article_pages'):
     questions = data['questions']
     
     # Parse stored data
-    summary_en = article['summary_en'] or "Summary not available"
-    summary_zh = article['summary_zh'] or "摘要不可用"
-    
+    # Fetch normalized data
+    conn = sqlite3.connect('/Users/jidai/news/articles.db')
+    cursor = conn.cursor()
     try:
-        keywords_data = json.loads(article['key_words']) if article['key_words'] else []
-    except:
+        cursor.execute('SELECT summary FROM article_summaries WHERE article_id = ? AND language_id = 1 LIMIT 1', (article_id,))
+        summary_en_row = cursor.fetchone()
+        summary_en = summary_en_row[0] if summary_en_row else "Summary not available"
+
+        cursor.execute('SELECT summary FROM article_summaries WHERE article_id = ? AND language_id = 2 LIMIT 1', (article_id,))
+        summary_zh_row = cursor.fetchone()
+        summary_zh = summary_zh_row[0] if summary_zh_row else "摘要不可用"
+
+        cursor.execute('SELECT word, explanation, frequency FROM keywords WHERE article_id = ?', (article_id,))
+        keywords_data = [dict(row) for row in cursor.fetchall()]
+    except Exception:
+        summary_en = "Summary not available"
+        summary_zh = "摘要不可用"
         keywords_data = []
+    finally:
+        conn.close()
     
     # Filter keywords by frequency >= 3
     filtered_keywords = [kw for kw in keywords_data if isinstance(kw, dict) and kw.get('frequency', 1) >= 3]

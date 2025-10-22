@@ -105,6 +105,21 @@ def insert_data_into_db(article_id, response_data):
     
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
+
+    # Ensure database schema has the new 'title' column in article_summaries
+    def ensure_title_column():
+        try:
+            cursor.execute("PRAGMA table_info(article_summaries)")
+            cols = [r[1] for r in cursor.fetchall()]
+            if 'title' not in cols:
+                print("INFO: 'title' column missing in article_summaries — adding column")
+                cursor.execute("ALTER TABLE article_summaries ADD COLUMN title TEXT")
+                # Do not commit here; caller will commit after inserts
+        except Exception as e:
+            print(f"ERROR ensuring title column exists: {e}")
+            raise
+
+    ensure_title_column()
     
     try:
         # Expect article_analysis with nested levels
@@ -145,22 +160,27 @@ def insert_data_into_db(article_id, response_data):
             
             # 1. Insert Summaries (English and Chinese if hard)
             if 'summary' in level_data and level_data['summary']:
-                # English summary
+                # Extract possible per-level title fields: generic 'title' or specific ones
+                title_val = level_data.get('title') or level_data.get('title_ea') or level_data.get('title_mi') or level_data.get('title_hd') or None
+
+                # English summary (store title if provided)
                 cursor.execute("""
-                    INSERT INTO article_summaries (article_id, difficulty_id, language_id, summary, generated_at)
-                    VALUES (?, ?, ?, ?, ?)
-                """, (article_id, difficulty_id, LANGUAGE_MAP['en'], level_data['summary'], datetime.now().isoformat()))
+                    INSERT INTO article_summaries (article_id, difficulty_id, language_id, title, summary, generated_at)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                """, (article_id, difficulty_id, LANGUAGE_MAP['en'], title_val, level_data['summary'], datetime.now().isoformat()))
                 insert_count += 1
                 print(f"  ✓ Inserted {level_name} English summary")
-                
+
                 # Chinese summary (hard level only) - if API provides zh_hard or zh_summary
                 if level_name == 'hard':
                     zh_text = level_data.get('zh_hard') or level_data.get('zh_summary') or level_data.get('zh_hard_summary')
                     if zh_text:
+                        # For Chinese, prefer a Chinese-specific title if provided, otherwise reuse English title
+                        zh_title_val = level_data.get('title_zh') or title_val
                         cursor.execute("""
-                            INSERT INTO article_summaries (article_id, difficulty_id, language_id, summary, generated_at)
-                            VALUES (?, ?, ?, ?, ?)
-                        """, (article_id, difficulty_id, LANGUAGE_MAP['zh'], zh_text, datetime.now().isoformat()))
+                            INSERT INTO article_summaries (article_id, difficulty_id, language_id, title, summary, generated_at)
+                            VALUES (?, ?, ?, ?, ?, ?)
+                        """, (article_id, difficulty_id, LANGUAGE_MAP['zh'], zh_title_val, zh_text, datetime.now().isoformat()))
                         insert_count += 1
                         print(f"  ✓ Inserted {level_name} Chinese summary")
             
@@ -292,10 +312,10 @@ def insert_data_into_db(article_id, response_data):
                 else:
                     print(f"  ⚠ No perspectives provided by API for {level_name} level")
         
-        # Update article as processed
+        # Update article as processed and clear in_progress
         cursor.execute("""
             UPDATE articles 
-            SET deepseek_processed = 1, processed_at = ?
+            SET deepseek_processed = 1, processed_at = ?, deepseek_in_progress = 0
             WHERE id = ?
         """, (datetime.now().isoformat(), article_id))
         insert_count += 1
@@ -393,6 +413,22 @@ def main():
         print(f"\n✓ Article {article_id} fully processed and inserted!")
     else:
         print(f"\n✗ Failed to insert data for article {article_id}")
+        # increment failure counter, set last error, clear in_progress and possibly delete
+        try:
+            conn = sqlite3.connect(DB_PATH)
+            cur = conn.cursor()
+            cur.execute("UPDATE articles SET deepseek_failed = deepseek_failed + 1, deepseek_last_error = ?, deepseek_in_progress = 0 WHERE id = ?", ("insert_failed", article_id))
+            conn.commit()
+            cur.execute("SELECT deepseek_failed FROM articles WHERE id = ?", (article_id,))
+            val = cur.fetchone()
+            failed_count = val[0] if val else 0
+            if failed_count and failed_count > 3:
+                print(f"⚠ deepseek_failed > 3 for article {article_id}; deleting article")
+                cur.execute("DELETE FROM articles WHERE id = ?", (article_id,))
+                conn.commit()
+            conn.close()
+        except Exception:
+            pass
         sys.exit(1)
 
 if __name__ == '__main__':

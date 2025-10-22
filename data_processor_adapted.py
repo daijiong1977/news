@@ -29,22 +29,32 @@ def get_unprocessed_articles(limit: int = 5) -> list[dict]:
     cursor = conn.cursor()
     
     # Updated query for new schema
+    # Select candidate ids with precondition and attempt to claim them atomically
     cursor.execute("""
         SELECT id FROM articles 
-        WHERE deepseek_processed = 0
+        WHERE deepseek_processed = 0 AND deepseek_failed < 3 AND (deepseek_in_progress = 0 OR deepseek_in_progress IS NULL)
         ORDER BY pub_date DESC
         LIMIT ?
     """, (limit,))
-    
-    article_ids = [row['id'] for row in cursor.fetchall()]
-    conn.close()
-    
+
+    candidate_ids = [row['id'] for row in cursor.fetchall()]
+
     articles = []
-    for article_id in article_ids:
-        article = get_article_content(article_id)
-        if article:
-            articles.append(article)
-    
+    for aid in candidate_ids:
+        try:
+            # Try to claim the article for processing
+            c = conn.cursor()
+            c.execute("UPDATE articles SET deepseek_in_progress = 1 WHERE id = ? AND deepseek_processed = 0 AND deepseek_failed < 3 AND (deepseek_in_progress = 0 OR deepseek_in_progress IS NULL)", (aid,))
+            if c.rowcount != 1:
+                continue
+            conn.commit()
+            article = get_article_content(aid)
+            if article:
+                articles.append(article)
+        except Exception:
+            conn.rollback()
+
+    conn.close()
     return articles
 
 
@@ -338,9 +348,9 @@ def insert_into_new_schema(article_id: int, data: dict):
                     datetime.now().isoformat()
                 ))
         
-        # Mark as processed
+        # Mark as processed and clear in_progress
         cursor.execute("""
-            UPDATE articles SET deepseek_processed = 1, processed_at = ? WHERE id = ?
+            UPDATE articles SET deepseek_processed = 1, processed_at = ?, deepseek_in_progress = 0 WHERE id = ?
         """, (datetime.now().isoformat(), article_id))
         
         conn.commit()
@@ -349,43 +359,54 @@ def insert_into_new_schema(article_id: int, data: dict):
     except Exception as e:
         print(f"  ✗ Error storing data for article {article_id}: {e}")
         conn.rollback()
+        try:
+            cursor.execute("UPDATE articles SET deepseek_failed = deepseek_failed + 1, deepseek_last_error = ?, deepseek_in_progress = 0 WHERE id = ?", (str(e), article_id))
+            conn.commit()
+            cursor.execute("SELECT deepseek_failed FROM articles WHERE id = ?", (article_id,))
+            val = cursor.fetchone()
+            failed_count = val[0] if val else 0
+            if failed_count and failed_count > 3:
+                cursor.execute("DELETE FROM articles WHERE id = ?", (article_id,))
+                conn.commit()
+        except Exception:
+            conn.rollback()
     finally:
         conn.close()
 
 
 def process_articles_in_batches(batch_size: int = 5, max_batches: Optional[int] = None):
     """Process unprocessed articles in batches (the working approach!)."""
-    
+
     batch_num = 1
     while True:
         if max_batches and batch_num > max_batches:
             break
-            
+
         # Get next batch
         articles = get_unprocessed_articles(limit=batch_size)
-        
+
         if not articles:
             print("\n✓ All articles have been processed!")
             break
-        
+
         print(f"\n{'='*70}")
         print(f"BATCH {batch_num}: Processing {len(articles)} articles")
         print(f"{'='*70}")
-        
+
         for article in articles:
             print(f"  - Article {article['id']}: {article['title'][:50]}")
-        
+
         # Create and send prompt
         prompt = create_deepseek_prompt(articles)
         response_text = send_to_deepseek(prompt, batch_num=batch_num)
-        
+
         if response_text:
             # Save response for inspection
             response_file = f"deepseek_batch_{batch_num}.json"
             with open(response_file, 'w', encoding='utf-8') as f:
                 f.write(response_text)
             print(f"✓ Response saved to {response_file}")
-            
+
             # Parse response
             try:
                 data = json.loads(response_text)
@@ -393,19 +414,19 @@ def process_articles_in_batches(batch_size: int = 5, max_batches: Optional[int] 
                     feedbacks = data
                 else:
                     feedbacks = [data]
-                
+
                 # Store each article's data
                 for fb in feedbacks:
                     if 'id' in fb:
                         insert_into_new_schema(fb['id'], fb)
                     elif 'article_id' in fb:
                         insert_into_new_schema(fb['article_id'], fb)
-                
+
                 print(f"✓ Batch {batch_num} complete")
-                
+
             except json.JSONDecodeError as e:
                 print(f"✗ Failed to parse response: {e}")
-        
+
         batch_num += 1
 
 

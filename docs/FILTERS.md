@@ -136,6 +136,28 @@ Batch and preview runners (rules summary)
   - Default: iterate enabled feeds, parse top 20 items, accept up to `num_per_source` (default 5) items with a qualifying preview image.
   - `min_image_bytes` parameter controls preview strictness.
 
+Preview catalog (machine-readable)
+---------------------------------
+- After running `collect_preview()` a JSON catalog called `preview_catalog.json` is produced alongside `preview_articles.html`.
+- Format (example):
+
+- generated_at: ISO timestamp when the catalog was written
+- total_items: total number of preview items accepted across all feeds
+- per_feed: array of objects with per-feed stats
+
+Example `per_feed` entry:
+
+{
+  "feed_id": 12,
+  "feed_name": "BBC News",
+  "feed_url": "https://feeds.bbci.co.uk/news/rss.xml",
+  "found_total": 20,
+  "accepted_total": 5,
+  "target": 5
+}
+
+- The produced `preview_articles.html` also includes a small per-feed summary at the top (found vs accepted and the target), for quick human inspection.
+
 Timeouts and robustness
 - Per-feed timeout: `collect_preview()` and `collect_articles()` accept a `per_feed_timeout` (default 240 seconds). If a feed's per-item processing exceeds this, the feed results are aborted and the collector moves to the next feed.
   - Exact timeout default: `per_feed_timeout = 240` seconds (4 minutes) in the current implementation.

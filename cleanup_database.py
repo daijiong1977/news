@@ -22,7 +22,6 @@ def cleanup_database():
     print("=" * 60)
     
     tables_to_clear = [
-        ('deepseek_feedback', 'deepseek feedback records'),
         ('article_summaries', 'article summaries'),
         ('keywords', 'keywords'),
         ('questions', 'quiz questions'),
@@ -61,7 +60,7 @@ def cleanup_database():
     print("✅ Database cleanup complete!")
     print("\n📋 Next steps:")
     print("   1. Run: python3 process_single_article.py <article_id>")
-    print("   2. Then: python3 populate_all_summary_tables.py")
+    print("   2. If you need to migrate old deepseek_feedback rows, run populate_all_summary_tables.py manually (migration-only)")
     print("   3. Restart: db_server")
 
 if __name__ == '__main__':

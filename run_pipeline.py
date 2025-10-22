@@ -44,7 +44,8 @@ def count_processed():
     import sqlite3
     conn = sqlite3.connect('articles.db')
     c = conn.cursor()
-    c.execute('SELECT COUNT(*) FROM deepseek_feedback')
+    # deepseek_feedback table deprecated; use articles.deepseek_processed flag
+    c.execute('SELECT COUNT(*) FROM articles WHERE deepseek_processed = 1')
     count = c.fetchone()[0]
     conn.close()
     return count
@@ -115,19 +116,14 @@ def main():
     
     processed = count_processed()
     print(f"\n📊 Articles processed with Deepseek: {processed}/{article_count}")
-    
-    # Step 4: Populate target tables
+
+    # Note: populate_all_summary_tables.py is now migration-only. If you need to
+    # run migration for legacy deepseek_feedback rows, run the script manually.
     if processed > 0:
-        if run_command(
-            "Step 4/4: Populating summary tables from Deepseek feedback",
-            "python3 populate_all_summary_tables.py"
-        ):
-            print("\n" + "="*70)
-            print("✅ PIPELINE COMPLETE!")
-            print("="*70)
-            return 0
+        print("⚠️ populate_all_summary_tables.py is migration-only and will not be run automatically.")
+        return 0
     else:
-        print("⚠️  No articles processed, skipping table population")
+        print("⚠️  No articles processed, nothing to do")
         return 1
 
 if __name__ == "__main__":

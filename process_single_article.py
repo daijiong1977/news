@@ -167,57 +167,41 @@ Generate the analysis now. Return ONLY the JSON response."""
             
             print("✓ Received response from DeepSeek")
             
-            # Parse and store in database
+            # Parse and store in normalized tables using the inserter
             try:
                 feedback = json.loads(content)
-                
-                conn = sqlite3.connect(DB_FILE)
-                cursor = conn.cursor()
-                
-                # Update articles table with rewritten title and Chinese title
-                if 'rewritten_title' in feedback and feedback['rewritten_title']:
-                    cursor.execute("""
-                        UPDATE articles 
-                        SET title = ?, zh_title = ?
-                        WHERE id = ?
-                    """, (
-                        feedback.get('rewritten_title', ''),
-                        feedback.get('rewritten_title_zh', ''),
-                        article_id
-                    ))
-                    print(f"✓ Updated title: {feedback.get('rewritten_title')}")
-                    print(f"✓ Updated zh_title: {feedback.get('rewritten_title_zh')}")
-                
-                # Insert or replace feedback
-                cursor.execute("""
-                    INSERT OR REPLACE INTO deepseek_feedback
-                    (article_id, summary_en, summary_zh, key_words, 
-                     background_reading, multiple_choice_questions, 
-                     discussion_both_sides)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
-                """, (
-                    article_id,
-                    feedback.get('summary_en', ''),
-                    feedback.get('summary_zh', ''),
-                    json.dumps(feedback.get('key_words', []), ensure_ascii=False),
-                    feedback.get('background_reading', ''),
-                    json.dumps(feedback.get('multiple_choice_questions', []), ensure_ascii=False),
-                    json.dumps(feedback.get('discussion_both_sides', {}), ensure_ascii=False)
-                ))
-                
-                # Mark article as processed
-                cursor.execute("""
-                    UPDATE articles 
-                    SET deepseek_processed = 1
-                    WHERE id = ?
-                """, (article_id,))
-                
-                conn.commit()
-                conn.close()
-                
-                print(f"✓ Stored analysis for article {article_id}")
-                print(f"✓ Generated {len(feedback.get('multiple_choice_questions', []))} questions")
-                print(f"✓ Extracted {len(feedback.get('key_words', []))} keywords")
+
+                # Update articles table with rewritten title and Chinese title if present
+                try:
+                    if 'rewritten_title' in feedback and feedback['rewritten_title']:
+                        conn = sqlite3.connect(DB_FILE)
+                        cursor = conn.cursor()
+                        cursor.execute("""
+                            UPDATE articles 
+                            SET title = ?, zh_title = ?
+                            WHERE id = ?
+                        """, (
+                            feedback.get('rewritten_title', ''),
+                            feedback.get('rewritten_title_zh', ''),
+                            article_id
+                        ))
+                        conn.commit()
+                        conn.close()
+                        print(f"✓ Updated title: {feedback.get('rewritten_title')}")
+                        print(f"✓ Updated zh_title: {feedback.get('rewritten_title_zh')}")
+                except Exception as e:
+                    print(f"✗ Failed to update title: {e}")
+
+                # Use inserter to populate normalized tables
+                try:
+                    from insert_from_response import insert_data_into_db
+                    ok = insert_data_into_db(article_id, feedback)
+                    if ok:
+                        print(f"✓ Inserted processed data for article {article_id}")
+                    else:
+                        print(f"✗ Inserter reported failure for article {article_id}")
+                except Exception as e:
+                    print(f"✗ Could not insert processed data: {e}")
                 
             except json.JSONDecodeError as e:
                 print(f"✗ Failed to parse JSON response: {e}")

@@ -1,0 +1,136 @@
+{
+  "article_analysis": {
+    "title": "Breaking down rare earth element magnets for recycling",
+    "zh_title": "稀土元素磁体回收解析",
+    "levels": {
+      "easy": {
+        "title": "Rare earth magnets: a simple guide",
+        "summary": "Easy summary of the article in about 150 words. These magnets use rare earth elements and are important in electronics. Recycling them reduces environmental harm.",
+        "keywords": [
+          {
+            "term": "rare earth",
+            "explanation": "A set of chemical elements used in magnets."
+          },
+          {
+            "term": "magnet",
+            "explanation": "Material that produces magnetic fields."
+          }
+        ],
+        "questions": [
+          {
+            "question": "What are rare earth magnets commonly used in?",
+            "options": [
+              "Smartphones",
+              "Wind turbines",
+              "Cooking pans",
+              "Paper clips"
+            ],
+            "correct_answer": "Smartphones"
+          },
+          {
+            "question": "Why recycle rare earth magnets?",
+            "options": [
+              "Reduce waste",
+              "Make them stronger",
+              "Increase price",
+              "Change color"
+            ],
+            "correct_answer": "Reduce waste"
+          }
+        ],
+        "background_reading": "Background reading for easy level.",
+        "perspectives": [
+          {
+            "perspective": "They are essential for modern devices.",
+            "attitude": "positive"
+          },
+          {
+            "perspective": "Recycling is costly but beneficial.",
+            "attitude": "neutral"
+          },
+          {
+            "perspective": "Supply is geopolitically sensitive.",
+            "attitude": "negative"
+          }
+        ]
+      },
+      "mid": {
+        "title": "How rare earth magnets power devices",
+        "summary": "Mid summary around 350 words describing production and reuse challenges.",
+        "keywords": [
+          {
+            "term": "neodymium",
+            "explanation": "A key rare earth element used in strong magnets."
+          }
+        ],
+        "questions": [
+          {
+            "question": "Which element is key for strong magnets?",
+            "options": [
+              "Neodymium",
+              "Iron",
+              "Gold",
+              "Aluminum"
+            ],
+            "correct_answer": "Neodymium"
+          }
+        ],
+        "background_reading": "Background reading for mid level.",
+        "analysis": "Mid-level analysis of supply chains and recycling economics.",
+        "perspectives": {
+          "perspective_1": {
+            "content": "Recycling can reduce dependence on imports",
+            "attitude": "positive"
+          },
+          "perspective_2": {
+            "content": "Recycling infrastructure is uneven",
+            "attitude": "neutral"
+          },
+          "synthesis": {
+            "content": "Balancing reuse and new production is necessary"
+          }
+        }
+      },
+      "hard": {
+        "title": "Technical and policy challenges in rare earth magnet recycling",
+        "summary": "Hard summary about 550 words covering metallurgy and policy hurdles.",
+        "keywords": [
+          {
+            "term": "rare-earth metallurgy",
+            "explanation": "Study of extracting and processing rare earth metals."
+          }
+        ],
+        "questions": [
+          {
+            "question": "Which process complicates recycling rare earth magnets?",
+            "options": [
+              "Bonding alloys",
+              "Polishing",
+              "Painting",
+              "Annealing"
+            ],
+            "correct_answer": "Bonding alloys"
+          }
+        ],
+        "background_reading": "Background reading for hard level.",
+        "analysis": "Hard-level analysis of trade flows and material recovery metrics.",
+        "zh_hard": "这是一个硬核的中文摘要，涵盖金属提取、合金分离以及政策挑战。",
+        "perspectives": [
+          {
+            "perspective": "Advanced recovery tech is promising",
+            "attitude": "positive"
+          },
+          {
+            "perspective": "Policy lag hinders scaling",
+            "attitude": "neutral"
+          },
+          {
+            "perspective": "Environmental impacts remain significant",
+            "attitude": "negative"
+          }
+        ]
+      }
+    }
+  },
+  "article_id": 2
+}

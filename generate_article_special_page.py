@@ -17,34 +17,28 @@ def get_article_data(article_id):
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         
-        # Get article data
-        cursor.execute('''
-            SELECT a.*, df.summary_en, df.summary_zh, df.key_words, 
-                   df.background_reading, df.multiple_choice_questions,
-                   df.discussion_both_sides
-            FROM articles a
-            LEFT JOIN deepseek_feedback df ON a.id = df.article_id
-            WHERE a.id = ?
-        ''', (article_id,))
-        
+        # Get core article data
+        cursor.execute('SELECT id, title, date_iso, image_file, snippet, link, source, content_file FROM articles WHERE id = ?', (article_id,))
         article = cursor.fetchone()
         if not article:
+            conn.close()
             return None
-        
-        # Get quiz questions
-        cursor.execute('''
-            SELECT * FROM quiz_questions 
-            WHERE article_id = ?
-            ORDER BY question_number
-        ''', (article_id,))
-        
-        questions = cursor.fetchall()
+
+        # Get quiz questions from normalized tables
+        cursor.execute('SELECT question_id, question_text, question_number FROM questions WHERE article_id = ? ORDER BY question_number', (article_id,))
+        qrows = cursor.fetchall()
+        questions = []
+        for q in qrows:
+            qid = q[0]
+            qtext = q[1]
+            qnum = q[2]
+            cursor.execute('SELECT choice_text, is_correct FROM choices WHERE question_id = ? ORDER BY choice_id', (qid,))
+            choices = cursor.fetchall()
+            options = [c[0] for c in choices]
+            questions.append({'question_id': qid, 'question_text': qtext, 'question_number': qnum, 'options': options})
+
         conn.close()
-        
-        return {
-            'article': article,
-            'questions': questions
-        }
+        return {'article': article, 'questions': questions}
     except Exception as e:
         print(f"Error: {e}")
         return None

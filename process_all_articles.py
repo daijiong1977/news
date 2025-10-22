@@ -63,15 +63,7 @@ def main():
     print(f"❌ Failed: {failed}")
     
     if successful > 0:
-        print(f"\n📊 Populating target tables from deepseek_feedback...")
-        result = subprocess.run(
-            ["python3", "populate_all_summary_tables.py"],
-            capture_output=True,
-            text=True
-        )
-        print(result.stdout)
-        if result.returncode != 0:
-            print(result.stderr)
+        print("\n⚠️ Migration note: `deepseek_feedback` is deprecated. If you need to migrate legacy rows, run populate_all_summary_tables.py manually (it's migration-only).")
     
     return 0 if failed == 0 else 1
 

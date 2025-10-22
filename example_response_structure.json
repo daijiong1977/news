@@ -4,6 +4,7 @@
     "zh_title": "文章中文标题",
     "levels": {
       "easy": {
+        "title": "A simple, clear title for easy readers",
         "summary": "100-200 word summary written for easy level readers",
         "keywords": [
           {
@@ -44,6 +45,7 @@
         ]
       },
       "mid": {
+        "title": "A slightly more detailed title for mid readers",
         "summary": "300-500 word summary written for mid level readers",
         "keywords": [
           {
@@ -81,6 +83,7 @@
         ]
       },
       "hard": {
+        "title": "A comprehensive, precise title for hard readers",
         "summary": "500-700 word summary written for hard level readers",
         "keywords": [
           {
@@ -103,6 +106,7 @@
         "background_reading": "200-300 word background reading for hard level",
         "analysis": "100 word analysis of article structure and arguments for hard level",
         "zh_hard": "500-700 word Chinese summary for hard level",
+  "title_zh": "中文的详细标题（适用于难度高）",
         "perspectives": [
           {
             "perspective": "First perspective text here",

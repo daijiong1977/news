@@ -5,10 +5,13 @@ Create RSS feeds table and populate with feed URLs
 
 import sqlite3
 import pathlib
+import json
+import sys
 
 DB_FILE = pathlib.Path("articles.db")
+CONFIG_FEEDS = pathlib.Path("config/feeds.json")
 
-# Feed data
+# Default embedded feed list (used if no config file present)
 FEEDS = [
     ("US News", "https://feeds.nytimes.com/services/xml/rss/nyt/US.xml", "US News", True),
     ("Swimming", "https://www.swimmingworldmagazine.com/news/feed/", "Swimming", True),
@@ -17,6 +20,31 @@ FEEDS = [
     ("Politics", "https://feeds.nytimes.com/services/xml/rss/nyt/Politics.xml", "Politics", True),
     ("PBS", "https://www.pbs.org/newshour/feeds/rss/headlines", "PBS", True),
 ]
+
+def load_feeds_from_config():
+    """Load feeds from config/feeds.json if available.
+
+    Returns a list of tuples: (name, url, category, enabled)
+    """
+    if not CONFIG_FEEDS.exists():
+        print(f"i No config file at {CONFIG_FEEDS}, using embedded feed list")
+        return FEEDS
+    try:
+        with CONFIG_FEEDS.open("r", encoding="utf-8") as f:
+            doc = json.load(f)
+        feeds = []
+        for item in doc.get("feeds", []):
+            name = item.get("name") or item.get("url")
+            url = item.get("url")
+            category = item.get("category") or "Uncategorized"
+            enabled = bool(item.get("enabled", True))
+            feeds.append((name, url, category, enabled))
+        print(f"i Loaded {len(feeds)} feeds from {CONFIG_FEEDS}")
+        return feeds
+    except Exception as e:
+        print(f"! Failed to load {CONFIG_FEEDS}: {e}", file=sys.stderr)
+        print("i Falling back to embedded feed list")
+        return FEEDS
 
 conn = sqlite3.connect(DB_FILE)
 cur = conn.cursor()
@@ -35,6 +63,8 @@ cur.execute("""
 """)
 
 # Insert feeds (ignore if already exist)
+FEEDS = load_feeds_from_config()
+
 for name, url, category, active in FEEDS:
     try:
         cur.execute("""

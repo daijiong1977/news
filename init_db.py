@@ -7,7 +7,14 @@ This script creates a clean, normalized database schema ready for production.
 import sqlite3
 import pathlib
 import sys
+import argparse
+import shutil
 from datetime import datetime
+import json
+
+ROOT = pathlib.Path(__file__).resolve().parent
+VERIFIED_FEEDS_FILE = ROOT / "config" / "verified_feeds.dm"
+BACKUP_DIR = ROOT / "backups"
 
 DB_FILE = pathlib.Path("articles.db")
 
@@ -34,7 +41,20 @@ def init_database():
             )
         """)
         print("✓ Categories table created")
-        
+
+        # Catalog table (store a short catalog token, e.g., first word)
+        print("[1.5/13] Creating catalog table...")
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS catalog (
+                catalog_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                catalog_token TEXT UNIQUE NOT NULL,
+                category_id INTEGER,
+                created_at TEXT,
+                FOREIGN KEY (category_id) REFERENCES categories(category_id)
+            )
+        """)
+        print("✓ Catalog table created")
+
         # 2. Feeds table
         print("[2/13] Creating feeds table...")
         cursor.execute("""
@@ -109,23 +129,8 @@ def init_database():
         print("✓ Article images table created")
         
         # 5.5. Deepseek feedback table (source table for processed content)
-        print("[5.5/13] Creating deepseek_feedback table...")
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS deepseek_feedback (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                article_id INTEGER NOT NULL,
-                summary_en TEXT,
-                summary_zh TEXT,
-                key_words TEXT,
-                background_reading TEXT,
-                multiple_choice_questions TEXT,
-                discussion_both_sides TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (article_id) REFERENCES articles(id)
-            )
-        """)
-        print("✓ Deepseek feedback table created")
+        # deepseek_feedback table deprecated: no runtime creation
+        print("[5.5/13] Skipping creation of deprecated deepseek_feedback table (handled via normalized tables)")
         
         # 6. Article summaries table
         print("[6/13] Creating article_summaries table...")
@@ -135,6 +140,7 @@ def init_database():
                 article_id INTEGER NOT NULL,
                 difficulty_id INTEGER,
                 language_id INTEGER,
+                title TEXT,
                 summary TEXT,
                 generated_at TEXT,
                 FOREIGN KEY (article_id) REFERENCES articles(id),
@@ -368,17 +374,46 @@ def populate_lookup_tables(conn, cursor):
                 print(f"  → Language '{lang}' already exists")
         
         # Populate categories
-        print("\n[3/3] Populating categories table...")
-        category_data = [
-            ('US News', 'United States news and current events', 'default'),
-            ('Swimming', 'Swimming sports and competitions', 'sports'),
-            ('PBS', 'Public Broadcasting Service content', 'default'),
-            ('Technology', 'Technology news and innovation', 'tech'),
-            ('Science', 'Science research and discoveries', 'science'),
-            ('Politics', 'Political news and analysis', 'politics'),
-            ('Business', 'Business and economics', 'business'),
-            ('Health', 'Health and medical news', 'health')
-        ]
+        print("\n[3/4] Populating categories table...")
+
+        # Build category set from verified feeds if available, otherwise fall back to defaults
+        category_set = {}
+        if VERIFIED_FEEDS_FILE.exists():
+            try:
+                with VERIFIED_FEEDS_FILE.open("r", encoding="utf-8") as f:
+                    vdoc = json.load(f)
+                for feed in vdoc.get("feeds", []):
+                    cat = feed.get("category", "Uncategorized")
+                    if cat not in category_set:
+                        # Use a generic prompt mapping based on category name
+                        prompt_name = 'default'
+                        if 'tech' in cat.lower():
+                            prompt_name = 'tech'
+                        elif 'science' in cat.lower():
+                            prompt_name = 'science'
+                        elif 'sport' in cat.lower():
+                            prompt_name = 'sports'
+                        elif 'business' in cat.lower():
+                            prompt_name = 'business'
+                        category_set[cat] = (cat, f"{cat} feed items", prompt_name)
+                print(f"  i Loaded {len(category_set)} categories from {VERIFIED_FEEDS_FILE}")
+            except Exception as e:
+                print(f"  ! Failed to parse {VERIFIED_FEEDS_FILE}: {e}")
+
+        # fallback defaults
+        if not category_set:
+            category_data = [
+                ('US News', 'United States news and current events', 'default'),
+                ('Swimming', 'Swimming sports and competitions', 'sports'),
+                ('PBS', 'Public Broadcasting Service content', 'default'),
+                ('Technology', 'Technology news and innovation', 'tech'),
+                ('Science', 'Science research and discoveries', 'science'),
+                ('Politics', 'Political news and analysis', 'politics'),
+                ('Business', 'Business and economics', 'business'),
+                ('Health', 'Health and medical news', 'health')
+            ]
+        else:
+            category_data = list(category_set.values())
         
         now = datetime.now().isoformat()
         for category_name, description, prompt_name in category_data:
@@ -390,19 +425,54 @@ def populate_lookup_tables(conn, cursor):
                 print(f"  ✓ Added category: {category_name} (prompt: {prompt_name})")
             except sqlite3.IntegrityError:
                 print(f"  → Category '{category_name}' already exists")
-        
-        # Populate feeds table
-        print("\n[4/4] Populating feeds table...")
-        feeds_data = [
-            ('US News', 'https://feeds.nytimes.com/services/xml/rss/nyt/US.xml', 'US News'),
-            ('Swimming', 'https://www.swimmingworldmagazine.com/news/feed/', 'Swimming'),
-            ('Technology', 'https://feeds.arstechnica.com/arstechnica/index', 'Technology'),
-            ('Science', 'https://feeds.arstechnica.com/arstechnica/science', 'Science'),
-            ('Politics', 'https://feeds.nytimes.com/services/xml/rss/nyt/Politics.xml', 'Politics'),
-            ('PBS', 'https://www.pbs.org/newshour/feeds/rss/headlines', 'PBS')
-        ]
-        
-        for feed_name, feed_url, category_name in feeds_data:
+
+        # Ensure there is a catalog token (first word) for each category
+        print("\n  i Ensuring catalog tokens exist for categories...")
+        cursor.execute("SELECT category_id, category_name FROM categories")
+        for cid, cname in cursor.fetchall():
+            catalog_token = cname.split()[0] if cname.strip() else cname
+            try:
+                cursor.execute("""
+                    INSERT INTO catalog (catalog_token, category_id, created_at)
+                    VALUES (?, ?, ?)
+                """, (catalog_token, cid, now))
+                print(f"    ✓ Added catalog token '{catalog_token}' for category '{cname}'")
+            except sqlite3.IntegrityError:
+                # already exists
+                pass
+
+        # Populate feeds table using verified_feeds.dm if present
+        print("\n[4/4] Populating feeds table from verified feeds...")
+        feeds_list = []
+        if VERIFIED_FEEDS_FILE.exists():
+            try:
+                with VERIFIED_FEEDS_FILE.open("r", encoding="utf-8") as f:
+                    vdoc = json.load(f)
+                for feed in vdoc.get("feeds", []):
+                    if not feed.get("enabled", True):
+                        continue
+                    feed_name = feed.get("name") or feed.get("url")
+                    feed_url = feed.get("url")
+                    category_name = feed.get("category") or 'Uncategorized'
+                    feeds_list.append((feed_name, feed_url, category_name))
+                print(f"  i Loaded {len(feeds_list)} verified feeds from {VERIFIED_FEEDS_FILE}")
+            except Exception as e:
+                print(f"  ! Failed to parse {VERIFIED_FEEDS_FILE}: {e}")
+
+        # If none loaded fall back to the small default set
+        if not feeds_list:
+            feeds_list = [
+                ('US News', 'https://feeds.nytimes.com/services/xml/rss/nyt/US.xml', 'US News'),
+                ('Swimming', 'https://www.swimmingworldmagazine.com/news/feed/', 'Swimming'),
+                ('Technology', 'https://feeds.arstechnica.com/arstechnica/index', 'Technology'),
+                ('Science', 'https://feeds.arstechnica.com/arstechnica/science', 'Science'),
+                ('Politics', 'https://feeds.nytimes.com/services/xml/rss/nyt/Politics.xml', 'Politics'),
+                ('PBS', 'https://www.pbs.org/newshour/feeds/rss/headlines', 'PBS')
+            ]
+
+        # Clear feeds table before inserting to ensure a clean seed
+        cursor.execute('DELETE FROM feeds')
+        for feed_name, feed_url, category_name in feeds_list:
             try:
                 # Get category_id for this feed
                 cursor.execute("""
@@ -415,9 +485,32 @@ def populate_lookup_tables(conn, cursor):
                         INSERT INTO feeds (feed_name, feed_url, category_id, created_at)
                         VALUES (?, ?, ?, ?)
                     """, (feed_name, feed_url, category_id, now))
-                    print(f"  ✓ Added feed: {feed_name} -> {category_name}")
+                    print(f"  ✓ Added verified feed: {feed_name} -> {category_name}")
                 else:
-                    print(f"  ✗ Category '{category_name}' not found for feed '{feed_name}'")
+                    # If the category is missing, create it on the fly
+                    cursor.execute("""
+                        INSERT INTO categories (category_name, description, prompt_name, created_at)
+                        VALUES (?, ?, ?, ?)
+                    """, (category_name, f"{category_name} (auto-created)", 'default', now))
+                    category_id = cursor.lastrowid
+                    cursor.execute("""
+                        INSERT INTO feeds (feed_name, feed_url, category_id, created_at)
+                        VALUES (?, ?, ?, ?)
+                    """, (feed_name, feed_url, category_id, now))
+                    print(f"  ✓ Created category+feed: {category_name} -> {feed_name}")
+                
+                # Also ensure there's a catalog token for this category (first word)
+                catalog_token = category_name.split()[0] if category_name.strip() else category_name
+                try:
+                    cursor.execute("""
+                        INSERT INTO catalog (catalog_token, category_id, created_at)
+                        VALUES (?, ?, ?)
+                    """, (catalog_token, category_id, now))
+                    print(f"    ✓ Added catalog token: {catalog_token} for category_id {category_id}")
+                except sqlite3.IntegrityError:
+                    # already exists
+                    pass
+                
             except sqlite3.IntegrityError as e:
                 print(f"  → Feed '{feed_name}' already exists: {e}")
         
@@ -507,18 +600,45 @@ def verify_database():
 
 def main():
     """Main initialization routine."""
-    
+    parser = argparse.ArgumentParser(description='Initialize articles.db schema')
+    parser.add_argument('--force', action='store_true', help='Backup and reinitialize DB without prompt')
+    args = parser.parse_args()
+
+    # Important backup policy:
+    # - This script creates a local, timestamped backup under the `backups/`
+    #   directory before deleting or reinitializing `articles.db`.
+    # - Backups are intended to be kept local only and MUST NOT be pushed
+    #   to remote repositories (see docs/GROUND_RULES.md).
+    # - The repository's `.gitignore` already excludes `backups/` and
+    #   `articles.db` to help prevent accidental commits.
+
     # Check if database already exists
     if DB_FILE.exists():
-        print(f"Found existing database: {DB_FILE}")
-        response = input("Do you want to reinitialize? (yes/no): ").lower().strip()
-        if response != 'yes':
-            print("Initialization cancelled.")
-            verify_database()
-            return
-        else:
+        if args.force:
+            # create backup
+            BACKUP_DIR.mkdir(parents=True, exist_ok=True)
+            stamp = datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')
+            backup_path = BACKUP_DIR / f'articles_db_backup_{stamp}.db'
+            shutil.copy2(DB_FILE, backup_path)
+            print(f"Created DB backup: {backup_path}")
             DB_FILE.unlink()
-            print("Existing database deleted.")
+            print("Existing database deleted (force mode)")
+        else:
+            print(f"Found existing database: {DB_FILE}")
+            response = input("Do you want to reinitialize? (yes/no): ").lower().strip()
+            if response != 'yes':
+                print("Initialization cancelled.")
+                verify_database()
+                return
+            else:
+                # backup before deleting
+                BACKUP_DIR.mkdir(parents=True, exist_ok=True)
+                stamp = datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')
+                backup_path = BACKUP_DIR / f'articles_db_backup_{stamp}.db'
+                shutil.copy2(DB_FILE, backup_path)
+                print(f"Created DB backup: {backup_path}")
+                DB_FILE.unlink()
+                print("Existing database deleted.")
     
     # Initialize database
     result = init_database()

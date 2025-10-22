@@ -532,9 +532,9 @@ IMPORTANT NOTES:
                                 dt.datetime.now().isoformat(),
                             ))
                         
-                        # Mark as processed
+                        # Mark as processed and clear in_progress
                         cursor.execute("""
-                            UPDATE articles SET deepseek_processed = 1, processed_at = ? 
+                            UPDATE articles SET deepseek_processed = 1, processed_at = ?, deepseek_in_progress = 0 
                             WHERE id = ?
                         """, (dt.datetime.now().isoformat(), article_id))
                         
@@ -543,8 +543,31 @@ IMPORTANT NOTES:
                         print(f"    ✓ Generated summaries: {', '.join(result['summaries'].keys())}", file=sys.stderr)
                 else:
                     print(f"    ✗ Could not parse JSON response", file=sys.stderr)
+                    # increment failed counter and possibly delete
+                    try:
+                        cursor.execute("UPDATE articles SET deepseek_failed = deepseek_failed + 1, deepseek_last_error = ? WHERE id = ?", ("parse_error", article_id))
+                        conn.commit()
+                        cursor.execute("SELECT deepseek_failed FROM articles WHERE id = ?", (article_id,))
+                        val = cursor.fetchone()
+                        failed_count = val[0] if val else 0
+                        if failed_count and failed_count > 3:
+                            cursor.execute("DELETE FROM articles WHERE id = ?", (article_id,))
+                            conn.commit()
+                    except Exception:
+                        conn.rollback()
             else:
                 print(f"    ✗ Deepseek API error: {response.status_code}", file=sys.stderr)
+                try:
+                    cursor.execute("UPDATE articles SET deepseek_failed = deepseek_failed + 1, deepseek_last_error = ? WHERE id = ?", (f"http_{response.status_code}", article_id))
+                    conn.commit()
+                    cursor.execute("SELECT deepseek_failed FROM articles WHERE id = ?", (article_id,))
+                    val = cursor.fetchone()
+                    failed_count = val[0] if val else 0
+                    if failed_count and failed_count > 3:
+                        cursor.execute("DELETE FROM articles WHERE id = ?", (article_id,))
+                        conn.commit()
+                except Exception:
+                    conn.rollback()
             
             # Rate limiting
             time.sleep(2)

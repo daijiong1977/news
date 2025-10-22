@@ -480,8 +480,8 @@ Content: {limited_content}
           f"{question_rows} questions, {choice_rows} choices, {background_rows} background, " +
           f"{analysis_rows} analysis, {perspective_rows} perspectives")
     
-    # Update article as processed
-    cursor.execute("UPDATE articles SET deepseek_processed = 1, processed_at = ? WHERE id = ?",
+    # Update article as processed and clear in_progress
+    cursor.execute("UPDATE articles SET deepseek_processed = 1, processed_at = ?, deepseek_in_progress = 0 WHERE id = ?",
                    (datetime.now().isoformat(), article_id))
     conn.commit()
     
@@ -516,7 +516,8 @@ def main():
     
     # Find unprocessed articles
     cursor = conn.cursor()
-    cursor.execute("SELECT id FROM articles WHERE deepseek_processed = 0 ORDER BY id")
+    # Select unprocessed articles but exclude those that have failed >=3 or are in progress
+    cursor.execute("SELECT id FROM articles WHERE deepseek_processed = 0 AND deepseek_failed < 3 AND (deepseek_in_progress = 0 OR deepseek_in_progress IS NULL) ORDER BY id")
     unprocessed_ids = [row[0] for row in cursor.fetchall()]
     
     print(f"\nUnprocessed articles: {len(unprocessed_ids)}")
@@ -526,8 +527,45 @@ def main():
     # Process articles
     success_count = 0
     for article_id in unprocessed_ids:
-        if process_article(conn, article_id, prompts):
-            success_count += 1
+        # Try to claim the article atomically
+        try:
+            cur = conn.cursor()
+            cur.execute("UPDATE articles SET deepseek_in_progress = 1 WHERE id = ? AND deepseek_processed = 0 AND deepseek_failed < 3 AND (deepseek_in_progress = 0 OR deepseek_in_progress IS NULL)", (article_id,))
+            if cur.rowcount != 1:
+                # someone else claimed it
+                continue
+            conn.commit()
+
+            ok = process_article(conn, article_id, prompts)
+            if ok:
+                success_count += 1
+                # mark processed and clear in_progress
+                try:
+                    cur.execute("UPDATE articles SET deepseek_processed = 1, processed_at = ?, deepseek_in_progress = 0 WHERE id = ?", (datetime.now().isoformat(), article_id))
+                    conn.commit()
+                except Exception:
+                    conn.rollback()
+            else:
+                # increment failed and possibly delete
+                try:
+                    cur.execute("UPDATE articles SET deepseek_failed = deepseek_failed + 1, deepseek_last_error = ? WHERE id = ?", ("processing_failed", article_id))
+                    conn.commit()
+                    cur.execute("SELECT deepseek_failed FROM articles WHERE id = ?", (article_id,))
+                    val = cur.fetchone()
+                    failed_count = val[0] if val else 0
+                    if failed_count and failed_count > 3:
+                        cur.execute("DELETE FROM articles WHERE id = ?", (article_id,))
+                        conn.commit()
+                except Exception:
+                    conn.rollback()
+            # ensure in_progress cleared if still present
+            try:
+                cur.execute("UPDATE articles SET deepseek_in_progress = 0 WHERE id = ?", (article_id,))
+                conn.commit()
+            except Exception:
+                conn.rollback()
+        except Exception:
+            conn.rollback()
     
     conn.close()
     

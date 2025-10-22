@@ -1202,7 +1202,7 @@ def collect_articles(num_per_source=None, per_feed_timeout=None):
     for feed_id, feed_name, feed_url, category_id, category_name in feeds:
         print(f"\n[{feed_name}]")
 
-        max_to_fetch = 20
+        max_to_fetch = THRESHOLDS.get('max_fetch_per_feed', 20)
         target_count = num_per_source
         print(f"  Fetching up to {max_to_fetch}, targeting {target_count} clean articles from {feed_name}")
 

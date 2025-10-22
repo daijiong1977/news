@@ -20,7 +20,6 @@ def delete_articles_and_images():
     
     # Delete all processed data
     tables_to_clear = [
-        'deepseek_feedback',
         'article_summaries',
         'keywords',
         'questions',

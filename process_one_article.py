@@ -12,10 +12,10 @@ import sqlite3
 from datetime import datetime
 import requests
 
-# Get API key
-api_key = os.environ.get('DEEPSEEK_API_KEY', 'sk-dd996c4863a04d3ebad13c7ee52ca31b')
+# Get API key (must be provided via environment)
+api_key = os.environ.get('DEEPSEEK_API_KEY')
 if not api_key:
-    print("ERROR: DEEPSEEK_API_KEY not set")
+    print("ERROR: DEEPSEEK_API_KEY not set.\nSet it with: export DEEPSEEK_API_KEY=your_key_here")
     sys.exit(1)
 
 # Configuration
@@ -32,17 +32,21 @@ with open(EXAMPLE_JSON_PATH) as f:
 
 # Compact prompts dictionary - WITH EXAMPLE JSON
 COMPACT_PROMPTS = {
-    'default': f"""You are an expert editorial analyst and educator. Analyze this article for three difficulty levels (easy/mid/hard) and return a JSON EXACTLY matching this structure:
+        'default': f"""You are an expert editorial analyst and educator. Analyze this article for three difficulty levels (easy/mid/hard) and return a JSON EXACTLY matching this structure.
 
 CRITICAL REQUIREMENTS:
 - Include zh_title: Chinese translation of the article title
+- For each difficulty level (easy/mid/hard) include a rewritten title field. Prefer one of these formats for titles:
+    - level-specific key inside levels, e.g. levels.easy.title (recommended), or
+    - top-level per-level keys: title_ea / title_mi / title_hd
 - Include zh_hard in hard level: 500-700 word Chinese summary for hard level
 - All other fields as specified below
 
-EXAMPLE STRUCTURE (follow this exactly):
+EXAMPLE STRUCTURE (follow this exactly). Note the added title fields for each level:
 {EXAMPLE_JSON_STR.replace('{', '{{').replace('}', '}}')}
 
 Requirements:
+- Titles: Provide a concise rewritten title for each level (easy: 6-10 words; mid: 8-12 words; hard: 10-16 words). If possible, provide a Chinese title variant for hard level as 'title_zh' inside the hard level or as 'title_zh_hard'.
 - Summaries: easy (100-200w), mid (300-500w), hard (500-700w), zh_hard (500-700w Chinese)
 - Keywords: 10 per level with explanations
 - Questions: 8 (easy), 10 (mid), 12 (hard) multiple choice with 4 options each
@@ -350,22 +354,27 @@ def insert_data_into_db(article_id, response_data):
             
             # 1. Insert Summaries (English and Chinese if hard)
             if 'summary' in level_data and level_data['summary']:
-                # English summary
+                # Extract possible per-level title fields: generic 'title' or specific ones
+                title_val = level_data.get('title') or level_data.get('title_ea') or level_data.get('title_mi') or level_data.get('title_hd') or None
+
+                # English summary (store title if provided)
                 cursor.execute("""
-                    INSERT INTO article_summaries (article_id, difficulty_id, language_id, summary, generated_at)
-                    VALUES (?, ?, ?, ?, ?)
-                """, (article_id, difficulty_id, LANGUAGE_MAP['en'], level_data['summary'], datetime.now().isoformat()))
+                    INSERT INTO article_summaries (article_id, difficulty_id, language_id, title, summary, generated_at)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                """, (article_id, difficulty_id, LANGUAGE_MAP['en'], title_val, level_data['summary'], datetime.now().isoformat()))
                 insert_count += 1
                 print(f"  ✓ Inserted {level_name} English summary")
-                
+
                 # Chinese summary (hard level only) - if API provides zh_hard or zh_summary
                 if level_name == 'hard':
                     zh_text = level_data.get('zh_hard') or level_data.get('zh_summary') or level_data.get('zh_hard_summary')
                     if zh_text:
+                        # For Chinese, prefer a Chinese-specific title if provided, otherwise reuse English title
+                        zh_title_val = level_data.get('title_zh') or title_val
                         cursor.execute("""
-                            INSERT INTO article_summaries (article_id, difficulty_id, language_id, summary, generated_at)
-                            VALUES (?, ?, ?, ?, ?)
-                        """, (article_id, difficulty_id, LANGUAGE_MAP['zh'], zh_text, datetime.now().isoformat()))
+                            INSERT INTO article_summaries (article_id, difficulty_id, language_id, title, summary, generated_at)
+                            VALUES (?, ?, ?, ?, ?, ?)
+                        """, (article_id, difficulty_id, LANGUAGE_MAP['zh'], zh_title_val, zh_text, datetime.now().isoformat()))
                         insert_count += 1
                         print(f"  ✓ Inserted {level_name} Chinese summary")
             
@@ -497,10 +506,10 @@ def insert_data_into_db(article_id, response_data):
                 else:
                     print(f"  ⚠ No perspectives provided by API for {level_name} level")
         
-        # Update article as processed
+        # Update article as processed and clear in_progress
         cursor.execute("""
             UPDATE articles 
-            SET deepseek_processed = 1, processed_at = ?
+            SET deepseek_processed = 1, processed_at = ?, deepseek_in_progress = 0
             WHERE id = ?
         """, (datetime.now().isoformat(), article_id))
         insert_count += 1
@@ -561,6 +570,22 @@ def main():
     
     if response is None:
         print("\nERROR: Failed to process article")
+        # increment failure counter and possibly delete
+        try:
+            conn = sqlite3.connect(DB_PATH)
+            cur = conn.cursor()
+            cur.execute("UPDATE articles SET deepseek_failed = deepseek_failed + 1, deepseek_last_error = ?, deepseek_in_progress = 0 WHERE id = ?", ("process_failed", article_id))
+            conn.commit()
+            cur.execute("SELECT deepseek_failed FROM articles WHERE id = ?", (article_id,))
+            val = cur.fetchone()
+            failed_count = val[0] if val else 0
+            if failed_count and failed_count > 3:
+                print(f"⚠ deepseek_failed > 3 for article {article_id}; deleting article")
+                cur.execute("DELETE FROM articles WHERE id = ?", (article_id,))
+                conn.commit()
+            conn.close()
+        except Exception:
+            pass
         sys.exit(1)
     
     # Save response to disk for verification
