@@ -31,7 +31,7 @@ def get_category_articles():
     }
 
 def generate_enhanced_email(payload_file: str, level: str, output_file: str = None):
-    """Generate enhanced email with side-by-side articles and category sections."""
+    """Generate enhanced email with modern Tailwind-based layout."""
     
     with open(payload_file) as f:
         payload = json.load(f)
@@ -45,324 +45,81 @@ def generate_enhanced_email(payload_file: str, level: str, output_file: str = No
     
     # Level display info
     level_info = {
-        'easy': ('🟢 Easy Level', 'Beginner-Friendly Content', '#10b981', 'For beginners and those learning the topic'),
-        'mid': ('🔵 Mid Level', 'Intermediate Content', '#3b82f6', 'For readers with moderate knowledge'),
-        'hard': ('🟠 Hard Level', 'Expert-Level Content', '#f59e0b', 'For experts and deep analysis'),
-        'CN': ('🔴 中文版本', 'Chinese Translation', '#ef4444', '中文版本的完整内容翻译')
+        'easy': ('🟢 Easy Level', 'Beginner-Friendly Content', '#10b981', 'Engaging News for High Schoolers - Easy Reading Level'),
+        'mid': ('🔵 Mid Level', 'Intermediate Content', '#3b82f6', 'Engaging News for High Schoolers - Intermediate Level'),
+        'hard': ('🟠 Hard Level', 'Expert-Level Content', '#f59e0b', 'Engaging News for High Schoolers - Advanced Level'),
+        'CN': ('🔴 中文版本', 'Chinese Translation', '#ef4444', '高中生新闻 - 中文版')
     }
     
-    emoji, title, color, description = level_info.get(level, ('📰', 'News Digest', '#667eea', 'News Digest'))
+    emoji, title, primary_color, description = level_info.get(level, ('📰', 'News Digest', '#13a4ec', 'News Digest'))
     category_articles = get_category_articles()
     
     html = f"""<!DOCTYPE html>
-<html lang="{'zh' if level == 'CN' else 'en'}">
+<html class="light" lang="{'zh' if level == 'CN' else 'en'}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{emoji} News Digest - {title}</title>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>{emoji} InsightFeed - {title}</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz@6..72&amp;family=Noto+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <script id="tailwind-config">
+      tailwind.config = {{
+        darkMode: "class",
+        theme: {{
+          extend: {{
+            colors: {{
+              "primary": "{primary_color}",
+              "background-light": "#f6f7f8",
+              "background-dark": "#101c22",
+              "text-light": "#111618",
+              "text-dark": "#f0f3f4",
+              "text-muted-light": "#617c89",
+              "text-muted-dark": "#9cb3bf",
+            }},
+            fontFamily: {{
+              "display": ["Newsreader", "serif"],
+              "sans": ["Noto Sans", "sans-serif"],
+            }},
+            borderRadius: {{"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"}},
+          }},
+        }},
+      }}
+    </script>
     <style>
-        * {{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }}
-        
         body {{
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
-            padding: 20px 0;
+            font-family: 'Noto Sans', sans-serif;
         }}
         
-        .email-wrapper {{
-            max-width: 1000px;
-            margin: 0 auto;
-            background-color: white;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-        }}
-        
-        /* HEADER */
-        .header {{
-            background: linear-gradient(135deg, {color} 0%, {color}dd 100%);
-            color: white;
-            padding: 60px 40px;
-            text-align: center;
-            border-bottom: 5px solid {color};
-        }}
-        
-        .header h1 {{
-            font-size: 42px;
-            margin-bottom: 15px;
-            font-weight: 800;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }}
-        
-        .header .level-name {{
-            font-size: 28px;
-            margin-bottom: 10px;
-            opacity: 0.98;
-            font-weight: 600;
-        }}
-        
-        .header .description {{
-            font-size: 14px;
-            opacity: 0.9;
-            max-width: 600px;
-            margin: 0 auto;
-        }}
-        
-        /* FEATURED ARTICLES SECTION */
-        .featured-section {{
-            padding: 50px 40px;
-            background: linear-gradient(to bottom, #ffffff 0%, #f9f9f9 100%);
-            border-bottom: 3px solid #f0f0f0;
-        }}
-        
-        .section-title {{
-            font-size: 24px;
-            font-weight: 700;
-            color: #1f2937;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 3px solid {color};
-            display: inline-block;
-        }}
-        
-        .articles-grid {{
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 30px;
-            margin-bottom: 20px;
-        }}
-        
-        .article {{
-            background-color: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
-            border-top: 4px solid {color};
-            display: flex;
-            flex-direction: column;
-            height: auto;
-        }}
-        
-        .article:hover {{
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            transform: translateY(-2px);
-        }}
-        
-        .article-image {{
-            width: 100%;
-            height: auto;
-            max-height: 250px;
-            object-fit: cover;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }}
-        
-        .article-content {{
-            padding: 25px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }}
-        
-        .article-id {{
-            display: inline-block;
-            background-color: {color}15;
-            color: {color};
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            letter-spacing: 0.5px;
-        }}
-        
-        .article-title {{
-            font-size: 18px;
-            font-weight: 700;
-            color: #1f2937;
-            margin-bottom: 12px;
-            line-height: 1.4;
-        }}
-        
-        .article-summary {{
-            font-size: 13px;
-            color: #5a6b7c;
-            line-height: 1.7;
-            text-align: justify;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            flex-grow: 1;
-        }}
-        
-        /* CATEGORY SECTIONS */
-        .category-sections {{
-            padding: 50px 40px;
-            background-color: #ffffff;
-        }}
-        
-        .category-section {{
-            margin-bottom: 35px;
-        }}
-        
-        .category-section:last-child {{
-            margin-bottom: 0;
-        }}
-        
-        .category-header {{
-            font-size: 16px;
-            font-weight: 700;
-            color: #1f2937;
-            margin-bottom: 15px;
-            display: inline-block;
-            padding-bottom: 8px;
-            border-bottom: 2px solid {color};
-        }}
-        
-        .category-header span {{
-            background-color: {color}15;
-            color: {color};
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-right: 8px;
-            display: inline-block;
-        }}
-        
-        .article-list {{
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }}
-        
-        .article-list li {{
-            display: inline-block;
-            background-color: #f3f4f6;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-            padding: 6px 12px;
-            font-size: 12px;
-            transition: all 0.2s;
-        }}
-        
-        .article-list li:hover {{
-            background-color: {color}10;
-            border-color: {color};
-        }}
-        
-        .article-list li a {{
-            color: #3b82f6;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s;
-        }}
-        
-        .article-list li a:hover {{
-            color: {color};
-        }}
-        
-        /* FOOTER */
-        .footer {{
-            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-            color: white;
-            padding: 50px 40px;
-            text-align: center;
-            border-top: 5px solid {color};
-        }}
-        
-        .footer h3 {{
-            font-size: 18px;
-            margin-bottom: 15px;
-            font-weight: 700;
-        }}
-        
-        .footer p {{
-            margin: 10px 0;
-            font-size: 13px;
-            opacity: 0.9;
-            line-height: 1.6;
-        }}
-        
-        .footer-links {{
-            margin: 25px 0;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.2);
-        }}
-        
-        .footer-links a {{
-            color: #60a5fa;
-            text-decoration: none;
-            margin: 0 15px;
-            font-size: 12px;
-            font-weight: 500;
-        }}
-        
-        .footer-links a:hover {{
-            color: white;
-            text-decoration: underline;
-        }}
-        
-        .generated-time {{
-            font-size: 11px;
-            color: #9ca3af;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }}
-        
-        /* RESPONSIVE */
-        @media (max-width: 1200px) {{
-            .articles-grid {{
-                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            }}
-        }}
-        
-        @media (max-width: 768px) {{
-            .articles-grid {{
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }}
-            
-            .header {{
-                padding: 40px 20px;
-            }}
-            
-            .header h1 {{
-                font-size: 32px;
-            }}
-            
-            .featured-section,
-            .category-sections {{
-                padding: 30px 20px;
-            }}
-            
-            .article-image {{
-                height: auto;
-                max-height: 200px;
-            }}
-        }}
     </style>
 </head>
-<body>
-    <div class="email-wrapper">
-        <!-- HEADER -->
-        <div class="header">
-            <h1>{emoji}</h1>
-            <div class="level-name">{title}</div>
-            <div class="description">{description}</div>
-        </div>
-        
-        <!-- FEATURED ARTICLES -->
-        <div class="featured-section">
-            <div class="section-title">Featured Articles</div>
-            <div class="articles-grid">
+<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark">
+<div class="relative flex min-h-screen w-full flex-col">
+<header class="sticky top-0 z-10 w-full bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm border-b border-text-light/10 dark:border-text-dark/10">
+<div class="mx-auto flex max-w-5xl items-center justify-between whitespace-nowrap px-4 sm:px-6 lg:px-8 py-3">
+<a class="flex items-center gap-3 text-text-light dark:text-text-dark" href="#">
+<div class="h-6 w-6">
+<svg fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_6_330)">
+<path clip-rule="evenodd" d="M24 0.757355L47.2426 24L24 47.2426L0.757355 24L24 0.757355ZM21 35.7574V12.2426L9.24264 24L21 35.7574Z" fill-rule="evenodd"></path>
+</g>
+<defs>
+<clipPath id="clip0_6_330"><rect fill="white" height="48" width="48"></rect></clipPath>
+</defs>
+</svg>
+</div>
+<h2 class="font-display text-2xl font-bold tracking-tight">InsightFeed {emoji}</h2>
+</a>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-sm font-medium text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">News</a>
+<a class="text-sm font-medium text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">Science</a>
+<a class="text-sm font-medium text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">Fun</a>
+</nav>
+</div>
+</header>
+<main class="flex-grow">
+<div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10 md:py-16">
+<div class="flex flex-col gap-12 md:gap-16">
 """
     
     # Add featured articles
@@ -374,65 +131,87 @@ def generate_enhanced_email(payload_file: str, level: str, output_file: str = No
             image = article.get('image', {})
             server_url = image.get('server_url', '')
             
-            # Use full summary - no truncation
+            # Determine category based on article content (simplified)
+            category = "Technology"  # Default category
             
-            html += f"""                <div class="article">
-                    {f'<img src="{server_url}" alt="{title_text}" class="article-image" loading="lazy">' if server_url else '<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 200px;"></div>'}
-                    <div class="article-content">
-                        <div class="article-id">Article #{article_id}</div>
-                        <div class="article-title">{title_text}</div>
-                        <div class="article-summary">{summary}</div>
-                    </div>
-                </div>
+            html += f"""<div class="w-full @container">
+<div class="flex flex-col items-stretch justify-start rounded-xl overflow-hidden bg-white dark:bg-background-dark shadow-sm border border-text-light/10 dark:border-text-dark/10">
+{f'<div class="w-full bg-center bg-no-repeat aspect-[16/7] bg-cover" data-alt="{title_text}" style=\'background-image: url("{server_url}");\' ></div>' if server_url else '<div class="w-full bg-center bg-no-repeat aspect-[16/7] bg-cover" style="background: linear-gradient(135deg, var(--tw-colors-primary) 0%, var(--tw-colors-primary) 100%);"></div>'}
+<div class="p-6 md:p-8">
+<p class="text-sm font-medium text-primary mb-1">{category}</p>
+<h3 class="font-display text-2xl md:text-3xl font-bold tracking-tight text-text-light dark:text-text-dark">{title_text}</h3>
+<div class="mt-2 flex items-center gap-x-2 text-xs text-text-muted-light dark:text-text-muted-dark">
+<span>Article #{article_id}</span>
+<span class="h-1 w-1 rounded-full bg-text-muted-light/50 dark:bg-text-muted-dark/50"></span>
+<span>{title}</span>
+</div>
+<p class="text-text-muted-light dark:text-text-muted-dark mt-3 text-base md:text-lg">
+{summary}
+</p>
+<div class="mt-6 flex">
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-5 bg-primary text-white text-sm font-medium leading-normal transition-transform hover:scale-105">
+<span class="truncate">Start Activity</span>
+</button>
+</div>
+</div>
+</div>
+</div>
 """
     
-    html += """            </div>
-        </div>
-        
-        <!-- CATEGORY SECTIONS -->
-        <div class="category-sections">
+    html += """</div>
+</div>
+</main>
+<footer class="bg-white dark:bg-background-dark border-t border-text-light/10 dark:border-text-dark/10">
+<div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10 md:py-16">
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 text-left">
 """
     
     # Add category sections
     for category, cat_articles in category_articles.items():
-        category_emoji = {'News': '📰', 'Science': '🔬', 'Sports': '⚽'}.get(category, '📌')
-        
-        html += f"""            <div class="category-section">
-                <div class="category-header"><span>{category_emoji} {category}</span></div>
-                <ul class="article-list">
+        html += f"""<div>
+<h4 class="font-display text-lg font-bold text-text-light dark:text-text-dark mb-4">{category}</h4>
+<ul class="space-y-3">
 """
         
-        for cat_article in cat_articles[:3]:  # Show max 3 articles per category
-            html += f"""                    <li><a href="#">{cat_article['title']}</a></li>
+        for cat_article in cat_articles[:2]:  # Show max 2 articles per category
+            html += f"""<li><a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors" href="#">{cat_article['title']}</a></li>
 """
         
-        html += """                </ul>
-            </div>
+        html += """</ul>
+</div>
 """
     
     # Footer
     generated_at = payload.get('generated_at', datetime.now().isoformat())
     
-    html += f"""        </div>
-        
-        <!-- FOOTER -->
-        <div class="footer">
-            <h3>📚 News Digest</h3>
-            <p>Your daily source of educational news content tailored to your reading level.</p>
-            <p>Stay informed, stay curious, keep learning!</p>
-            
-            <div class="footer-links">
-                <a href="#">Preferences</a>
-                <a href="#">Archive</a>
-                <a href="#">Unsubscribe</a>
-                <a href="#">Contact</a>
-            </div>
-            
-            <p class="generated-time">Generated: {generated_at}</p>
-        </div>
-    </div>
-</body>
-</html>
+    html += f"""</div>
+<div class="mt-12 pt-8 border-t border-text-light/10 dark:border-text-dark/10 flex flex-col sm:flex-row items-center justify-between gap-6">
+<div class="flex flex-wrap justify-center gap-x-6 gap-y-2">
+<a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors" href="#">About Us</a>
+<a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors" href="#">Privacy Policy</a>
+<a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors" href="#">Contact Us</a>
+</div>
+<div class="flex justify-center gap-4">
+<a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">alternate_email</span>
+</a>
+<a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">camera_alt</span>
+</a>
+<a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">group</span>
+</a>
+</div>
+<p class="text-text-muted-light dark:text-text-muted-dark text-sm order-first sm:order-last">© 2024 InsightFeed. All rights reserved.</p>
+</div>
+<div class="mt-4 text-center">
+<p class="text-text-muted-light dark:text-text-muted-dark text-xs">Generated: {generated_at}</p>
+</div>
+</div>
+</footer>
+</div>
+
+</body></html>
 """
     
     # Save HTML file

@@ -1,374 +1,165 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="light" lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔵 Mid Level News Digest - Intermediate Content</title>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>🔵 Mid Level InsightFeed - Intermediate Content</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz@6..72&amp;family=Noto+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#3b82f6",
+              "background-light": "#f6f7f8",
+              "background-dark": "#101c22",
+              "text-light": "#111618",
+              "text-dark": "#f0f3f4",
+              "text-muted-light": "#617c89",
+              "text-muted-dark": "#9cb3bf",
+            },
+            fontFamily: {
+              "display": ["Newsreader", "serif"],
+              "sans": ["Noto Sans", "sans-serif"],
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
-            padding: 20px 0;
+            font-family: 'Noto Sans', sans-serif;
         }
         
-        .email-wrapper {
-            max-width: 1000px;
-            margin: 0 auto;
-            background-color: white;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-        }
-        
-        /* HEADER */
-        .header {
-            background: linear-gradient(135deg, #3b82f6 0%, #3b82f6dd 100%);
-            color: white;
-            padding: 60px 40px;
-            text-align: center;
-            border-bottom: 5px solid #3b82f6;
-        }
-        
-        .header h1 {
-            font-size: 42px;
-            margin-bottom: 15px;
-            font-weight: 800;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .header .level-name {
-            font-size: 28px;
-            margin-bottom: 10px;
-            opacity: 0.98;
-            font-weight: 600;
-        }
-        
-        .header .description {
-            font-size: 14px;
-            opacity: 0.9;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        /* FEATURED ARTICLES SECTION */
-        .featured-section {
-            padding: 50px 40px;
-            background: linear-gradient(to bottom, #ffffff 0%, #f9f9f9 100%);
-            border-bottom: 3px solid #f0f0f0;
-        }
-        
-        .section-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: #1f2937;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 3px solid #3b82f6;
-            display: inline-block;
-        }
-        
-        .articles-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 30px;
-            margin-bottom: 20px;
-        }
-        
-        .article {
-            background-color: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
-            border-top: 4px solid #3b82f6;
-            display: flex;
-            flex-direction: column;
-            height: auto;
-        }
-        
-        .article:hover {
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            transform: translateY(-2px);
-        }
-        
-        .article-image {
-            width: 100%;
-            height: auto;
-            max-height: 250px;
-            object-fit: cover;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        
-        .article-content {
-            padding: 25px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .article-id {
-            display: inline-block;
-            background-color: #3b82f615;
-            color: #3b82f6;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            letter-spacing: 0.5px;
-        }
-        
-        .article-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #1f2937;
-            margin-bottom: 12px;
-            line-height: 1.4;
-        }
-        
-        .article-summary {
-            font-size: 13px;
-            color: #5a6b7c;
-            line-height: 1.7;
-            text-align: justify;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            flex-grow: 1;
-        }
-        
-        /* CATEGORY SECTIONS */
-        .category-sections {
-            padding: 50px 40px;
-            background-color: #ffffff;
-        }
-        
-        .category-section {
-            margin-bottom: 35px;
-        }
-        
-        .category-section:last-child {
-            margin-bottom: 0;
-        }
-        
-        .category-header {
-            font-size: 16px;
-            font-weight: 700;
-            color: #1f2937;
-            margin-bottom: 15px;
-            display: inline-block;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #3b82f6;
-        }
-        
-        .category-header span {
-            background-color: #3b82f615;
-            color: #3b82f6;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-right: 8px;
-            display: inline-block;
-        }
-        
-        .article-list {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        
-        .article-list li {
-            display: inline-block;
-            background-color: #f3f4f6;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-            padding: 6px 12px;
-            font-size: 12px;
-            transition: all 0.2s;
-        }
-        
-        .article-list li:hover {
-            background-color: #3b82f610;
-            border-color: #3b82f6;
-        }
-        
-        .article-list li a {
-            color: #3b82f6;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-        
-        .article-list li a:hover {
-            color: #3b82f6;
-        }
-        
-        /* FOOTER */
-        .footer {
-            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-            color: white;
-            padding: 50px 40px;
-            text-align: center;
-            border-top: 5px solid #3b82f6;
-        }
-        
-        .footer h3 {
-            font-size: 18px;
-            margin-bottom: 15px;
-            font-weight: 700;
-        }
-        
-        .footer p {
-            margin: 10px 0;
-            font-size: 13px;
-            opacity: 0.9;
-            line-height: 1.6;
-        }
-        
-        .footer-links {
-            margin: 25px 0;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.2);
-        }
-        
-        .footer-links a {
-            color: #60a5fa;
-            text-decoration: none;
-            margin: 0 15px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-        
-        .footer-links a:hover {
-            color: white;
-            text-decoration: underline;
-        }
-        
-        .generated-time {
-            font-size: 11px;
-            color: #9ca3af;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        /* RESPONSIVE */
-        @media (max-width: 1200px) {
-            .articles-grid {
-                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .articles-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            .header {
-                padding: 40px 20px;
-            }
-            
-            .header h1 {
-                font-size: 32px;
-            }
-            
-            .featured-section,
-            .category-sections {
-                padding: 30px 20px;
-            }
-            
-            .article-image {
-                height: auto;
-                max-height: 200px;
-            }
-        }
     </style>
 </head>
-<body>
-    <div class="email-wrapper">
-        <!-- HEADER -->
-        <div class="header">
-            <h1>🔵 Mid Level</h1>
-            <div class="level-name">Intermediate Content</div>
-            <div class="description">For readers with moderate knowledge</div>
-        </div>
-        
-        <!-- FEATURED ARTICLES -->
-        <div class="featured-section">
-            <div class="section-title">Featured Articles</div>
-            <div class="articles-grid">
-                <div class="article">
-                    <img src="http://localhost:8000/api/images/article_9_8fdf885cffc0.jpg" alt="Trump's $250 Million White House Ballroom Expansion" class="article-image" loading="lazy">
-                    <div class="article-content">
-                        <div class="article-id">Article #9</div>
-                        <div class="article-title">Trump's $250 Million White House Ballroom Expansion</div>
-                        <div class="article-summary">Construction has commenced on a $250 million ballroom addition to the White House, with demolition of the East Wing facade underway. The 90,000-square-foot structure will significantly exceed the size of the main White House building, nearly doubling its footprint. President Trump asserts the project will accommodate 999 guests, addressing what he describes as inadequate entertainment space in the current White House facilities. The East Room, currently the largest entertainment space, holds approximately 200 people, leading to previous administrations hosting large events in temporary tents on the South Lawn. Funding for the project comes entirely from private sources according to the administration, including $22 million from YouTube as part of a legal settlement from a 2021 lawsuit. While the White House has committed to disclosing donor information, no comprehensive list has been released. The administration initially claimed the White House structure would remain untouched, but demolition work contradicts these earlier assurances. The East Wing traditionally serves as the social entrance for White House events and sits adjacent to the Treasury Department.</div>
-                    </div>
-                </div>
-                <div class="article">
-                    <img src="http://localhost:8000/api/images/article_8_2f93a40bbd96.jpg" alt="Sinner's Strategic Absence from Italy's Davis Cup Defense" class="article-image" loading="lazy">
-                    <div class="article-content">
-                        <div class="article-id">Article #8</div>
-                        <div class="article-title">Sinner's Strategic Absence from Italy's Davis Cup Defense</div>
-                        <div class="article-summary">World number two tennis player Jannik Sinner has opted out of Italy's Davis Cup campaign as the team seeks a third consecutive title. The four-time Grand Slam champion, who recently lost his world number one ranking to Carlos Alcaraz after the US Open final, has decided to prioritize preparation for the upcoming season rather than participate in the team competition. Sinner's remarkable 2025 season included reaching all four Grand Slam finals, winning the Australian Open and Wimbledon, and claiming victory at the Six Kings Slam exhibition in Saudi Arabia. Despite being scheduled for the ATP Tour Finals in Turin from November 9-16, Sinner informed Italian captain Filippo Volandri that he would not be available for the Davis Cup matches in Bologna from November 18-23. The 24-year-old explained his decision stems from the need for adequate preparation time before the Australian Open in January, emphasizing that even one week of additional training could significantly impact his performance. Italy will now rely on Lorenzo Musetti (world number 8) and Flavio Cobolli (world number 22) as their top singles players against Austria in the quarter-finals. Sinner's absence occurs amid growing concerns about the demanding tennis calendar, highlighted by British player Jack Draper's recent comments about the need for schedule reforms following Holger Rune's season-ending injury. Volandri expressed understanding of Sinner's decision while affirming confidence in his remaining squad's ability to compete effectively.</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- CATEGORY SECTIONS -->
-        <div class="category-sections">
-            <div class="category-section">
-                <div class="category-header"><span>📰 News</span></div>
-                <ul class="article-list">
-                    <li><a href="#">Global Climate Summit Reaches Historic Agreement</a></li>
-                    <li><a href="#">New International Trade Deal Announced</a></li>
-                    <li><a href="#">Election Results Surprise Political Analysts</a></li>
-                </ul>
-            </div>
-            <div class="category-section">
-                <div class="category-header"><span>🔬 Science</span></div>
-                <ul class="article-list">
-                    <li><a href="#">Scientists Discover New Species in Amazon Rainforest</a></li>
-                    <li><a href="#">Breakthrough in Cancer Research Shows Promise</a></li>
-                    <li><a href="#">NASA Detects Potential Signs of Water on Distant Moon</a></li>
-                </ul>
-            </div>
-            <div class="category-section">
-                <div class="category-header"><span>⚽ Sports</span></div>
-                <ul class="article-list">
-                    <li><a href="#">Championship Team Celebrates Historic Victory</a></li>
-                    <li><a href="#">Young Athlete Breaks World Record</a></li>
-                    <li><a href="#">International Tournament Draws Record Viewership</a></li>
-                </ul>
-            </div>
-        </div>
-        
-        <!-- FOOTER -->
-        <div class="footer">
-            <h3>📚 News Digest</h3>
-            <p>Your daily source of educational news content tailored to your reading level.</p>
-            <p>Stay informed, stay curious, keep learning!</p>
-            
-            <div class="footer-links">
-                <a href="#">Preferences</a>
-                <a href="#">Archive</a>
-                <a href="#">Unsubscribe</a>
-                <a href="#">Contact</a>
-            </div>
-            
-            <p class="generated-time">Generated: 2025-10-22T22:29:46.759901</p>
-        </div>
-    </div>
-</body>
-</html>
+<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark">
+<div class="relative flex min-h-screen w-full flex-col">
+<header class="sticky top-0 z-10 w-full bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm border-b border-text-light/10 dark:border-text-dark/10">
+<div class="mx-auto flex max-w-5xl items-center justify-between whitespace-nowrap px-4 sm:px-6 lg:px-8 py-3">
+<a class="flex items-center gap-3 text-text-light dark:text-text-dark" href="#">
+<div class="h-6 w-6">
+<svg fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_6_330)">
+<path clip-rule="evenodd" d="M24 0.757355L47.2426 24L24 47.2426L0.757355 24L24 0.757355ZM21 35.7574V12.2426L9.24264 24L21 35.7574Z" fill-rule="evenodd"></path>
+</g>
+<defs>
+<clipPath id="clip0_6_330"><rect fill="white" height="48" width="48"></rect></clipPath>
+</defs>
+</svg>
+</div>
+<h2 class="font-display text-2xl font-bold tracking-tight">InsightFeed 🔵 Mid Level</h2>
+</a>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-sm font-medium text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">News</a>
+<a class="text-sm font-medium text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">Science</a>
+<a class="text-sm font-medium text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">Fun</a>
+</nav>
+</div>
+</header>
+<main class="flex-grow">
+<div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10 md:py-16">
+<div class="flex flex-col gap-12 md:gap-16">
+<div class="w-full @container">
+<div class="flex flex-col items-stretch justify-start rounded-xl overflow-hidden bg-white dark:bg-background-dark shadow-sm border border-text-light/10 dark:border-text-dark/10">
+<div class="w-full bg-center bg-no-repeat aspect-[16/7] bg-cover" data-alt="Trump's $250 Million White House Ballroom Expansion" style='background-image: url("http://localhost:8000/api/images/article_9_8fdf885cffc0.jpg");' ></div>
+<div class="p-6 md:p-8">
+<p class="text-sm font-medium text-primary mb-1">Technology</p>
+<h3 class="font-display text-2xl md:text-3xl font-bold tracking-tight text-text-light dark:text-text-dark">Trump's $250 Million White House Ballroom Expansion</h3>
+<div class="mt-2 flex items-center gap-x-2 text-xs text-text-muted-light dark:text-text-muted-dark">
+<span>Article #9</span>
+<span class="h-1 w-1 rounded-full bg-text-muted-light/50 dark:bg-text-muted-dark/50"></span>
+<span>Intermediate Content</span>
+</div>
+<p class="text-text-muted-light dark:text-text-muted-dark mt-3 text-base md:text-lg">
+Construction has commenced on a $250 million ballroom addition to the White House, with demolition of the East Wing facade underway. The 90,000-square-foot structure will significantly exceed the size of the main White House building, nearly doubling its footprint. President Trump asserts the project will accommodate 999 guests, addressing what he describes as inadequate entertainment space in the current White House facilities. The East Room, currently the largest entertainment space, holds approximately 200 people, leading to previous administrations hosting large events in temporary tents on the South Lawn. Funding for the project comes entirely from private sources according to the administration, including $22 million from YouTube as part of a legal settlement from a 2021 lawsuit. While the White House has committed to disclosing donor information, no comprehensive list has been released. The administration initially claimed the White House structure would remain untouched, but demolition work contradicts these earlier assurances. The East Wing traditionally serves as the social entrance for White House events and sits adjacent to the Treasury Department.
+</p>
+<div class="mt-6 flex">
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-5 bg-primary text-white text-sm font-medium leading-normal transition-transform hover:scale-105">
+<span class="truncate">Start Activity</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="w-full @container">
+<div class="flex flex-col items-stretch justify-start rounded-xl overflow-hidden bg-white dark:bg-background-dark shadow-sm border border-text-light/10 dark:border-text-dark/10">
+<div class="w-full bg-center bg-no-repeat aspect-[16/7] bg-cover" data-alt="Sinner's Strategic Absence from Italy's Davis Cup Defense" style='background-image: url("http://localhost:8000/api/images/article_8_2f93a40bbd96.jpg");' ></div>
+<div class="p-6 md:p-8">
+<p class="text-sm font-medium text-primary mb-1">Technology</p>
+<h3 class="font-display text-2xl md:text-3xl font-bold tracking-tight text-text-light dark:text-text-dark">Sinner's Strategic Absence from Italy's Davis Cup Defense</h3>
+<div class="mt-2 flex items-center gap-x-2 text-xs text-text-muted-light dark:text-text-muted-dark">
+<span>Article #8</span>
+<span class="h-1 w-1 rounded-full bg-text-muted-light/50 dark:bg-text-muted-dark/50"></span>
+<span>Intermediate Content</span>
+</div>
+<p class="text-text-muted-light dark:text-text-muted-dark mt-3 text-base md:text-lg">
+World number two tennis player Jannik Sinner has opted out of Italy's Davis Cup campaign as the team seeks a third consecutive title. The four-time Grand Slam champion, who recently lost his world number one ranking to Carlos Alcaraz after the US Open final, has decided to prioritize preparation for the upcoming season rather than participate in the team competition. Sinner's remarkable 2025 season included reaching all four Grand Slam finals, winning the Australian Open and Wimbledon, and claiming victory at the Six Kings Slam exhibition in Saudi Arabia. Despite being scheduled for the ATP Tour Finals in Turin from November 9-16, Sinner informed Italian captain Filippo Volandri that he would not be available for the Davis Cup matches in Bologna from November 18-23. The 24-year-old explained his decision stems from the need for adequate preparation time before the Australian Open in January, emphasizing that even one week of additional training could significantly impact his performance. Italy will now rely on Lorenzo Musetti (world number 8) and Flavio Cobolli (world number 22) as their top singles players against Austria in the quarter-finals. Sinner's absence occurs amid growing concerns about the demanding tennis calendar, highlighted by British player Jack Draper's recent comments about the need for schedule reforms following Holger Rune's season-ending injury. Volandri expressed understanding of Sinner's decision while affirming confidence in his remaining squad's ability to compete effectively.
+</p>
+<div class="mt-6 flex">
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-5 bg-primary text-white text-sm font-medium leading-normal transition-transform hover:scale-105">
+<span class="truncate">Start Activity</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="bg-white dark:bg-background-dark border-t border-text-light/10 dark:border-text-dark/10">
+<div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10 md:py-16">
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 text-left">
+<div>
+<h4 class="font-display text-lg font-bold text-text-light dark:text-text-dark mb-4">News</h4>
+<ul class="space-y-3">
+<li><a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors" href="#">Global Climate Summit Reaches Historic Agreement</a></li>
+<li><a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors" href="#">New International Trade Deal Announced</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-display text-lg font-bold text-text-light dark:text-text-dark mb-4">Science</h4>
+<ul class="space-y-3">
+<li><a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors" href="#">Scientists Discover New Species in Amazon Rainforest</a></li>
+<li><a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors" href="#">Breakthrough in Cancer Research Shows Promise</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-display text-lg font-bold text-text-light dark:text-text-dark mb-4">Sports</h4>
+<ul class="space-y-3">
+<li><a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors" href="#">Championship Team Celebrates Historic Victory</a></li>
+<li><a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors" href="#">Young Athlete Breaks World Record</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 pt-8 border-t border-text-light/10 dark:border-text-dark/10 flex flex-col sm:flex-row items-center justify-between gap-6">
+<div class="flex flex-wrap justify-center gap-x-6 gap-y-2">
+<a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors" href="#">About Us</a>
+<a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors" href="#">Privacy Policy</a>
+<a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors" href="#">Contact Us</a>
+</div>
+<div class="flex justify-center gap-4">
+<a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">alternate_email</span>
+</a>
+<a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">camera_alt</span>
+</a>
+<a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">group</span>
+</a>
+</div>
+<p class="text-text-muted-light dark:text-text-muted-dark text-sm order-first sm:order-last">© 2024 InsightFeed. All rights reserved.</p>
+</div>
+<div class="mt-4 text-center">
+<p class="text-text-muted-light dark:text-text-muted-dark text-xs">Generated: 2025-10-22T22:29:46.759901</p>
+</div>
+</div>
+</footer>
+</div>
+
+</body></html>
