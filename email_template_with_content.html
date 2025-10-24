@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📰 News Digest - Your Reading Level</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            padding: 20px 0;
+        }
+        
+        .email-wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        }
+        
+        /* HEADER - Responsive based on content */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+            border-bottom: 5px solid #667eea;
+        }
+        
+        .header h1 {
+            font-size: 42px;
+            margin-bottom: 15px;
+            font-weight: 800;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header .level-indicator {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            opacity: 0.98;
+        }
+        
+        .header .description {
+            font-size: 14px;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* FEATURED ARTICLE SECTION */
+        .featured-section {
+            padding: 50px 40px;
+            background: linear-gradient(to bottom, #ffffff 0%, #f9f9f9 100%);
+            border-bottom: 3px solid #f0f0f0;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+            display: inline-block;
+        }
+        
+        .article {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border-top: 4px solid #667eea;
+            display: flex;
+            flex-direction: column;
+            height: auto;
+        }
+        
+        .article:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+        
+        .article-image {
+            width: 100%;
+            height: auto;
+            max-height: 250px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .article-content {
+            padding: 25px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .article-id {
+            display: inline-block;
+            background-color: #667eea15;
+            color: #667eea;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+        
+        .article-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        
+        .article-summary {
+            font-size: 14px;
+            color: #5a6b7c;
+            line-height: 1.8;
+            text-align: justify;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            flex-grow: 1;
+        }
+        
+        /* CATEGORY SECTIONS */
+        .category-sections {
+            padding: 50px 40px;
+            background-color: #ffffff;
+        }
+        
+        .category-section {
+            margin-bottom: 35px;
+        }
+        
+        .category-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .category-header {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 15px;
+            display: inline-block;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .category-header span {
+            background-color: #667eea15;
+            color: #667eea;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 8px;
+            display: inline-block;
+        }
+        
+        .article-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .article-list li {
+            display: inline-block;
+            background-color: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        
+        .article-list li:hover {
+            background-color: #667eea10;
+            border-color: #667eea;
+        }
+        
+        .article-list li a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .article-list li a:hover {
+            color: #667eea;
+        }
+        
+        /* FOOTER */
+        .footer {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            color: white;
+            padding: 50px 40px;
+            text-align: center;
+            border-top: 5px solid #667eea;
+        }
+        
+        .footer h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .footer p {
+            margin: 10px 0;
+            font-size: 13px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        .footer-links {
+            margin: 25px 0;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .footer-links a {
+            color: #60a5fa;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        .generated-time {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 1200px) {
+            .header {
+                padding: 50px 30px;
+            }
+            
+            .header h1 {
+                font-size: 36px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px 0;
+            }
+            
+            .header {
+                padding: 40px 20px;
+            }
+            
+            .header h1 {
+                font-size: 32px;
+            }
+            
+            .featured-section,
+            .category-sections {
+                padding: 30px 20px;
+            }
+            
+            .article-image {
+                height: auto;
+                max-height: 200px;
+            }
+            
+            .article-title {
+                font-size: 18px;
+            }
+            
+            .article-summary {
+                font-size: 13px;
+            }
+        }
+        
+        /* CONDITIONALLY HIDDEN CONTENT */
+        .content-block {
+            display: none;
+        }
+        
+        .content-block.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <!-- CONDITIONAL HEADER BASED ON LEVEL -->
+        {% if subscriber.metadata.read_level == "easy" %}
+        <div class="header" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-bottom-color: #10b981;">
+            <h1>📰</h1>
+            <div class="level-indicator">🟢 Easy Level</div>
+            <div class="description">Beginner-friendly news summary - Easy to understand!</div>
+        </div>
+        {% elif subscriber.metadata.read_level == "middle" %}
+        <div class="header" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); border-bottom-color: #3b82f6;">
+            <h1>📰</h1>
+            <div class="level-indicator">🔵 Middle Level</div>
+            <div class="description">Intermediate-level analysis - More detail and context</div>
+        </div>
+        {% elif subscriber.metadata.read_level == "diff" %}
+        <div class="header" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-bottom-color: #f59e0b;">
+            <h1>📰</h1>
+            <div class="level-indicator">🟠 Hard Level</div>
+            <div class="description">Expert-level deep analysis - Detailed technical insights</div>
+        </div>
+        {% elif subscriber.metadata.read_level == "CN" %}
+        <div class="header" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); border-bottom-color: #ef4444;">
+            <h1>📰</h1>
+            <div class="level-indicator">🔴 中文版本</div>
+            <div class="description">完整的中文翻译和分析 - 深入的内容讲解</div>
+        </div>
+        {% else %}
+        <div class="header">
+            <h1>📰</h1>
+            <div class="level-indicator">📚 News Digest</div>
+            <div class="description">Your personalized news content</div>
+        </div>
+        {% endif %}
+        
+        <!-- FEATURED ARTICLE - CONDITIONAL CONTENT -->
+        <div class="featured-section">
+            <div class="section-title">Featured Article</div>
+            
+            {% if subscriber.metadata.read_level == "easy" %}
+                <div class="article">
+                    <img src="http://localhost:8000/api/images/article_9_8fdf885cffc0.jpg" alt="Big New Party Room at the White House" class="article-image" loading="lazy">
+                    <div class="article-content">
+                        <div class="article-id">Article #9</div>
+                        <div class="article-title">Big New Party Room at the White House</div>
+                        <div class="article-summary">The White House is getting a huge new ballroom where people can have parties and events. This new room will be very big - almost twice as large as the main White House building itself. It will be able to hold 999 people at once. The President says this new ballroom won't cost taxpayers any money because private donors are paying for it. Construction has already started, and workers are taking down part of the East Wing to build this new space. The President says the White House needs a bigger party space because the current largest room only holds about 200 people. Some money for the project came from YouTube as part of a legal settlement. The White House promised to share who donated money but hasn't given a full list yet. They also haven't said how much money the President himself is giving. Originally, they said the White House building wouldn't be touched, but now they are taking down part of the East Wing facade.</div>
+                    </div>
+                </div>
+            {% elif subscriber.metadata.read_level == "middle" %}
+                <div class="article">
+                    <img src="http://localhost:8000/api/images/article_9_8fdf885cffc0.jpg" alt="Trump's $250 Million White House Ballroom Expansion" class="article-image" loading="lazy">
+                    <div class="article-content">
+                        <div class="article-id">Article #9</div>
+                        <div class="article-title">Trump's $250 Million White House Ballroom Expansion</div>
+                        <div class="article-summary">Construction has commenced on a $250 million ballroom addition to the White House, with demolition of the East Wing facade underway. The 90,000-square-foot structure will significantly exceed the size of the main White House building, nearly doubling its footprint. President Trump asserts the project will accommodate 999 guests, addressing what he describes as inadequate entertainment space in the current White House facilities. The East Room, currently the largest entertainment space, holds approximately 200 people, leading to previous administrations hosting large events in temporary tents on the South Lawn. Funding for the project comes entirely from private sources according to the administration, including $22 million from YouTube as part of a legal settlement from a 2021 lawsuit. While the White House has committed to disclosing donor information, no comprehensive list has been released. The administration initially claimed the White House structure would remain untouched, but demolition work contradicts these earlier assurances. The East Wing traditionally serves as the social entrance for White House events and sits adjacent to the Treasury Department.</div>
+                    </div>
+                </div>
+            {% elif subscriber.metadata.read_level == "diff" %}
+                <div class="article">
+                    <img src="http://localhost:8000/api/images/article_9_8fdf885cffc0.jpg" alt="Architectural Expansion and Funding Mechanisms of Trump's White House Ballroom Project" class="article-image" loading="lazy">
+                    <div class="article-content">
+                        <div class="article-id">Article #9</div>
+                        <div class="article-title">Architectural Expansion and Funding Mechanisms of Trump's White House Ballroom Project</div>
+                        <div class="article-summary">The Trump administration has initiated construction of a $250 million ballroom addition to the White House complex, commencing with demolition of the East Wing facade. This 90,000-square-foot structure will substantially exceed the spatial footprint of the main Executive Residence, representing nearly double its square footage with capacity for 999 occupants. The project rationale centers on addressing perceived inadequacies in current entertainment facilities, particularly the East Room's 200-person capacity limitation that has necessitated temporary tent structures on the South Lawn for large-scale events. Funding mechanisms involve exclusively private sources, including a $22 million contribution from YouTube originating from settlement proceedings of litigation initiated by President Trump in 2021. The administration maintains that taxpayer funds will not be utilized, though comprehensive donor disclosure remains pending despite earlier transparency commitments. Methodological concerns arise from contradictory assurances regarding structural preservation—initial statements claimed the White House would remain physically untouched, yet facade demolition indicates significant architectural alteration. The East Wing's historical role as the social entrance and its proximity to the Treasury Department introduce additional considerations regarding security protocols, ceremonial functions, and historical preservation standards. The project represents a substantial intervention in federal architecture with implications for donor influence, preservation ethics, and executive discretion over nationally significant properties.</div>
+                    </div>
+                </div>
+            {% elif subscriber.metadata.read_level == "CN" %}
+                <div class="article">
+                    <img src="http://localhost:8000/api/images/article_9_8fdf885cffc0.jpg" alt="关于特朗普为白宫增建2.5亿美元舞厅需要了解的9件事" class="article-image" loading="lazy">
+                    <div class="article-content">
+                        <div class="article-id">Article #9</div>
+                        <div class="article-title">关于特朗普为白宫增建2.5亿美元舞厅需要了解的9件事</div>
+                        <div class="article-summary">美联社达琳·苏珀维尔报道 华盛顿（美联社）——本周，特朗普总统为白宫增建的2.5亿美元舞厅已开始施工，建筑工人开始拆除东翼的外立面，新舞厅将在此建造。这个9万平方英尺的舞厅将使白宫主建筑相形见绌，面积近乎翻倍，特朗普表示可容纳999人。特朗普在社交媒体上声称，舞厅不会花费纳税人一分钱，因为资金全部来自“许多慷慨的爱国者、伟大的美国公司以及本人”的私人捐款。以下是关于这一最新白宫建设项目需要了解的信息。特朗普表示白宫需要大型娱乐空间，并抱怨目前白宫内最大的东厅只能容纳约200人，空间太小。他对以往总统在南草坪帐篷内举办国宴等大型活动的做法表示不满。特朗普声称项目资金将全部来自私人捐款，不会动用公共资金。白宫承诺将公布承诺捐款或已捐款的个人和公司信息，上周还邀请部分捐款人参加了东厅晚宴，但尚未发布完整的捐款人名单和资金明细。其中2200万美元来自谷歌子公司YouTube，这是特朗普2021年起诉该公司达成和解协议的一部分。白宫也未透露特朗普本人出资多少。东翼传统上是白宫的社交区域，位于财政部对面的东行政大道旁，是游客和其他宾客参加活动的入口。总统及其首席发言人卡洛琳·莱维特今年夏季曾表示，建造舞厅期间白宫主体建筑将保持完好。特朗普说：“它会靠近但不会接触主体建筑。”莱维特补充道：“不会拆除任何建筑。”但实际情况并非如此。</div>
+                    </div>
+                </div>
+            {% else %}
+            <div style="padding: 20px; background-color: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+                <p style="color: #856404; font-weight: bold;">⚠️ Please select a reading level on our website!</p>
+                <p style="color: #856404; font-size: 14px; margin-top: 8px;">Visit our site and choose your preferred difficulty level: Easy, Middle, Hard, or Chinese.</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- CATEGORY SECTIONS -->
+        <div class="category-sections">
+            <div class="category-section">
+                <div class="category-header"><span>📰 News</span></div>
+                <ul class="article-list">
+                    <li><a href="#">Global Climate Summit Reaches Historic Agreement</a></li>
+                    <li><a href="#">New International Trade Deal Announced</a></li>
+                    <li><a href="#">Election Results Surprise Political Analysts</a></li>
+                </ul>
+            </div>
+            
+            <div class="category-section">
+                <div class="category-header"><span>🔬 Science</span></div>
+                <ul class="article-list">
+                    <li><a href="#">Scientists Discover New Species in Amazon</a></li>
+                    <li><a href="#">Breakthrough in Cancer Research Shows Promise</a></li>
+                    <li><a href="#">NASA Detects Potential Signs of Water on Distant Moon</a></li>
+                </ul>
+            </div>
+            
+            <div class="category-section">
+                <div class="category-header"><span>⚽ Sports</span></div>
+                <ul class="article-list">
+                    <li><a href="#">Championship Team Celebrates Historic Victory</a></li>
+                    <li><a href="#">Young Athlete Breaks World Record</a></li>
+                    <li><a href="#">International Tournament Draws Record Viewership</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- FOOTER -->
+        <div class="footer">
+            <h3>📚 News Digest</h3>
+            <p>Your daily source of educational news content tailored to your reading level.</p>
+            <p>Stay informed, stay curious, keep learning!</p>
+            
+            <div class="footer-links">
+                <a href="#">Preferences</a>
+                <a href="#">Archive</a>
+                <a href="#">Unsubscribe</a>
+                <a href="#">Contact</a>
+            </div>
+            
+            <p class="generated-time">Generated: {{ generation_date }}</p>
+        </div>
+    </div>
+</body>
+</html>

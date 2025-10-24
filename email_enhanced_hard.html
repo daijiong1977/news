@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🟠 Hard Level News Digest - Expert-Level Content</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            padding: 20px 0;
+        }
+        
+        .email-wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        }
+        
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, #f59e0b 0%, #f59e0bdd 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+            border-bottom: 5px solid #f59e0b;
+        }
+        
+        .header h1 {
+            font-size: 42px;
+            margin-bottom: 15px;
+            font-weight: 800;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header .level-name {
+            font-size: 28px;
+            margin-bottom: 10px;
+            opacity: 0.98;
+            font-weight: 600;
+        }
+        
+        .header .description {
+            font-size: 14px;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* FEATURED ARTICLES SECTION */
+        .featured-section {
+            padding: 50px 40px;
+            background: linear-gradient(to bottom, #ffffff 0%, #f9f9f9 100%);
+            border-bottom: 3px solid #f0f0f0;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #f59e0b;
+            display: inline-block;
+        }
+        
+        .articles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .article {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border-top: 4px solid #f59e0b;
+            display: flex;
+            flex-direction: column;
+            height: auto;
+        }
+        
+        .article:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+        
+        .article-image {
+            width: 100%;
+            height: auto;
+            max-height: 250px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .article-content {
+            padding: 25px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .article-id {
+            display: inline-block;
+            background-color: #f59e0b15;
+            color: #f59e0b;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+        
+        .article-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        
+        .article-summary {
+            font-size: 13px;
+            color: #5a6b7c;
+            line-height: 1.7;
+            text-align: justify;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            flex-grow: 1;
+        }
+        
+        /* CATEGORY SECTIONS */
+        .category-sections {
+            padding: 50px 40px;
+            background-color: #ffffff;
+        }
+        
+        .category-section {
+            margin-bottom: 35px;
+        }
+        
+        .category-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .category-header {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 15px;
+            display: inline-block;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f59e0b;
+        }
+        
+        .category-header span {
+            background-color: #f59e0b15;
+            color: #f59e0b;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 8px;
+            display: inline-block;
+        }
+        
+        .article-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .article-list li {
+            display: inline-block;
+            background-color: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        
+        .article-list li:hover {
+            background-color: #f59e0b10;
+            border-color: #f59e0b;
+        }
+        
+        .article-list li a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .article-list li a:hover {
+            color: #f59e0b;
+        }
+        
+        /* FOOTER */
+        .footer {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            color: white;
+            padding: 50px 40px;
+            text-align: center;
+            border-top: 5px solid #f59e0b;
+        }
+        
+        .footer h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .footer p {
+            margin: 10px 0;
+            font-size: 13px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        .footer-links {
+            margin: 25px 0;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .footer-links a {
+            color: #60a5fa;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        .generated-time {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 1200px) {
+            .articles-grid {
+                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .articles-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .header {
+                padding: 40px 20px;
+            }
+            
+            .header h1 {
+                font-size: 32px;
+            }
+            
+            .featured-section,
+            .category-sections {
+                padding: 30px 20px;
+            }
+            
+            .article-image {
+                height: auto;
+                max-height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>🟠 Hard Level</h1>
+            <div class="level-name">Expert-Level Content</div>
+            <div class="description">For experts and deep analysis</div>
+        </div>
+        
+        <!-- FEATURED ARTICLES -->
+        <div class="featured-section">
+            <div class="section-title">Featured Articles</div>
+            <div class="articles-grid">
+                <div class="article">
+                    <img src="http://localhost:8000/api/images/article_9_8fdf885cffc0.jpg" alt="Architectural Expansion and Funding Mechanisms of Trump's White House Ballroom Project" class="article-image" loading="lazy">
+                    <div class="article-content">
+                        <div class="article-id">Article #9</div>
+                        <div class="article-title">Architectural Expansion and Funding Mechanisms of Trump's White House Ballroom Project</div>
+                        <div class="article-summary">The Trump administration has initiated construction of a $250 million ballroom addition to the White House complex, commencing with demolition of the East Wing facade. This 90,000-square-foot structure will substantially exceed the spatial footprint of the main Executive Residence, representing nearly double its square footage with capacity for 999 occupants. The project rationale centers on addressing perceived inadequacies in current entertainment facilities, particularly the East Room's 200-person capacity limitation that has necessitated temporary tent structures on the South Lawn for large-scale events. Funding mechanisms involve exclusively private sources, including a $22 million contribution from YouTube originating from settlement proceedings of litigation initiated by President Trump in 2021. The administration maintains that taxpayer funds will not be utilized, though comprehensive donor disclosure remains pending despite earlier transparency commitments. Methodological concerns arise from contradictory assurances regarding structural preservation—initial statements claimed the White House would remain physically untouched, yet facade demolition indicates significant architectural alteration. The East Wing's historical role as the social entrance and its proximity to the Treasury Department introduce additional considerations regarding security protocols, ceremonial functions, and historical preservation standards. The project represents a substantial intervention in federal architecture with implications for donor influence, preservation ethics, and executive discretion over nationally significant properties.</div>
+                    </div>
+                </div>
+                <div class="article">
+                    <img src="http://localhost:8000/api/images/article_8_2f93a40bbd96.jpg" alt="Strategic Calendar Management: Sinner's Davis Cup Omission Amid ATP Scheduling Pressures" class="article-image" loading="lazy">
+                    <div class="article-content">
+                        <div class="article-id">Article #8</div>
+                        <div class="article-title">Strategic Calendar Management: Sinner's Davis Cup Omission Amid ATP Scheduling Pressures</div>
+                        <div class="article-summary">In a decision reflecting contemporary professional tennis's calendrical challenges, Jannik Sinner has elected to forego Italy's Davis Cup title defense, opting instead for extended preseason preparation ahead of the Australian Open. The world number two's absence from national team duties follows his exceptional 2025 season, wherein he reached all four Grand Slam finals—claiming victories at Melbourne and Wimbledon—while simultaneously contending with Carlos Alcaraz for ATP ranking supremacy. Sinner's scheduling calculus involves sequential participation in the ATP Finals (November 9-16, Turin) preceding the Davis Cup quarter-finals (November 18-23, Bologna), creating a compressed timeline that compromises optimal preparation for the forthcoming season. The player's rationale emphasizes physiological periodization principles, asserting that additional training blocks significantly enhance performance metrics and injury resilience. This decision occurs within broader discourse concerning tour scheduling density, recently highlighted by Jack Draper's commentary following Holger Rune's season-terminating injury at the Nordic Open. Italy's tactical configuration now necessitates reliance on Lorenzo Musetti (ATP #8) and Flavio Cobolli (ATP #22) as primary singles contenders against Austria, representing a substantial competitive diminution given Sinner's elite status. Captain Filippo Volandri's diplomatic response acknowledges player autonomy while affirming organizational support structures. The scenario exemplifies escalating tensions between national federation obligations, individual career optimization, and athlete welfare considerations in professional tennis's contemporary ecosystem. Methodological approaches to season planning increasingly incorporate sports science data analytics, balancing competitive appearances with physiological preservation across tennis's grueling global itinerary.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- CATEGORY SECTIONS -->
+        <div class="category-sections">
+            <div class="category-section">
+                <div class="category-header"><span>📰 News</span></div>
+                <ul class="article-list">
+                    <li><a href="#">Global Climate Summit Reaches Historic Agreement</a></li>
+                    <li><a href="#">New International Trade Deal Announced</a></li>
+                    <li><a href="#">Election Results Surprise Political Analysts</a></li>
+                </ul>
+            </div>
+            <div class="category-section">
+                <div class="category-header"><span>🔬 Science</span></div>
+                <ul class="article-list">
+                    <li><a href="#">Scientists Discover New Species in Amazon Rainforest</a></li>
+                    <li><a href="#">Breakthrough in Cancer Research Shows Promise</a></li>
+                    <li><a href="#">NASA Detects Potential Signs of Water on Distant Moon</a></li>
+                </ul>
+            </div>
+            <div class="category-section">
+                <div class="category-header"><span>⚽ Sports</span></div>
+                <ul class="article-list">
+                    <li><a href="#">Championship Team Celebrates Historic Victory</a></li>
+                    <li><a href="#">Young Athlete Breaks World Record</a></li>
+                    <li><a href="#">International Tournament Draws Record Viewership</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- FOOTER -->
+        <div class="footer">
+            <h3>📚 News Digest</h3>
+            <p>Your daily source of educational news content tailored to your reading level.</p>
+            <p>Stay informed, stay curious, keep learning!</p>
+            
+            <div class="footer-links">
+                <a href="#">Preferences</a>
+                <a href="#">Archive</a>
+                <a href="#">Unsubscribe</a>
+                <a href="#">Contact</a>
+            </div>
+            
+            <p class="generated-time">Generated: 2025-10-22T22:29:46.759901</p>
+        </div>
+    </div>
+</body>
+</html>

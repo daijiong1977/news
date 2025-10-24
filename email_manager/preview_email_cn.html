@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News for Kids - Daily Digest</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+        .email-container { 
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .greeting {
+            font-size: 16px;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+        
+        /* FEATURE CARD */
+        .feature-card {
+            border-bottom: 1px solid #eee;
+            padding: 0;
+            overflow: hidden;
+        }
+        .feature-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            display: block;
+        }
+        .feature-content {
+            padding: 30px;
+        }
+        .feature-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            color: #666;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .level-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .level-easy { background: #d4edda; color: #155724; }
+        .level-mid { background: #fff3cd; color: #856404; }
+        .level-hard { background: #f8d7da; color: #721c24; }
+        .level-cn { background: #cfe2ff; color: #084298; }
+        
+        .category {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase;
+            background: #f0f0f0;
+            padding: 4px 12px;
+            border-radius: 4px;
+        }
+        
+        .feature-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin: 15px 0;
+            line-height: 1.3;
+        }
+        .feature-summary {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.7;
+            margin: 15px 0;
+        }
+        
+        .keywords {
+            margin: 15px 0;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+        .keywords-title {
+            font-size: 12px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+        .keyword-item {
+            display: inline-block;
+            background: white;
+            padding: 4px 10px;
+            margin: 4px 4px 4px 0;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #555;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .cta-button {
+            flex: 1;
+            display: inline-block;
+            padding: 12px 16px;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+        .cta-quiz {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .cta-read {
+            background: #f0f0f0;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        /* NAVIGATION */
+        .nav-section {
+            padding: 30px;
+            background: #f9f9f9;
+        }
+        .nav-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .nav-list {
+            list-style: none;
+        }
+        .nav-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .nav-item:last-child {
+            border-bottom: none;
+        }
+        .nav-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+        .nav-category {
+            color: #999;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        
+        /* FOOTER */
+        .footer {
+            background: #f5f5f5;
+            padding: 20px 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid #eee;
+        }
+        .footer-links {
+            margin-bottom: 15px;
+        }
+        .footer-links a {
+            color: #667eea;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>📚 News for Kids</h1>
+            <p>Your personalized daily news digest</p>
+            <p class="greeting">Hello Friend! Here's today's top stories in CN level...</p>
+        </div>
+        
+        <!-- FEATURE 1 -->
+        <div class="feature-card">
+            <img src="https://via.placeholder.com/600x400?text=Article+12" alt="WTA挑战赛雷克瑟姆站：二号种子罗萨泰洛首轮爆冷出局的技术分析与赛事影响" class="feature-image">
+            <div class="feature-content">
+                <div class="feature-meta">
+                    <span class="level-badge level-hard" style="background: #cfe2ff; color: #084298;">CN</span>
+                    <span class="category">Technology</span>
+                </div>
+                
+                <h2 class="feature-title">WTA挑战赛雷克瑟姆站：二号种子罗萨泰洛首轮爆冷出局的技术分析与赛事影响</h2>
+                
+                <p class="feature-summary">在雷克瑟姆网球和板式网球中心举行的WTA挑战赛雷克瑟姆公开赛首日比赛中，赛事第二种子、意大利选手卡米拉·罗萨泰洛遭遇了令人震惊的首轮出局，败给了斯洛伐克的卡塔琳娜·库兹莫娃。这场历时近三小时的激烈对决充分展现了职业网球比赛的不确定性和竞争强度。罗萨泰洛作为拥有两个WTA挑战赛双打头衔的经验丰富选手，在比赛开局阶段表现挣扎，首盘比赛中尽管与对手缠斗至抢七，但最终以4-7的小分失利。进入第二盘，意大利选手展现出顽强的斗志，通过提升发球质量和底线稳定性，成功将比赛再次拖入抢七，并以7-4的小分扳回一城。然而，决胜盘成为比赛的转折点，罗萨泰洛在关键的发球局中早早遭遇破发，这一致命失误彻底改变了比赛态势。尽管她在后续比赛中努力寻求回破机会，但库兹莫娃凭借稳健的发挥和关键时刻的得分能力，最终以6-4锁定胜局。这场失利对罗萨泰洛的排名积分和赛季目标都将产生显著影响，同时也凸显了职业网球中种子选手面临的压力和挑战。与此同时，赛事其他高排位选手的表现相对稳定。列支敦士登的第四种子卡廷卡·冯·戴希曼和塞浦路斯的第五种子拉卢卡·乔治亚娜·瑟班都顺利晋级，其中瑟班的比赛过程尤为引人注目。她在对阵英国选手拉娜·阿库阿·斯托伊伯时遭遇强劲挑战，首盘以1-6的悬殊比分落败。但这位28岁的塞浦路斯选手展现出卓越的心理调整能力，在第二盘以6-0的完美表现强势反弹，并在决胜盘抢七中以7-5险胜，完成了一场经典的比赛逆转。其他首轮女子单打比赛中，多位选手展现出良好的竞技状态。贾娜·奥茨普卡、埃琳娜·马利吉娜、露西·哈夫利奇科娃均直落两盘获胜，而世界排名第295位的英国选手阿玛尼·班克斯则以6-4、6-0击败芬兰的劳拉·希塔兰塔，这场胜利对她提升排名具有重要意义。赛事还见证了当地观众对18岁威尔士新星咪咪·徐的支持，这位年轻选手曾在今年温网首轮对阵艾玛·拉杜卡努，如今在主场观众的助威下参加女子双打比赛。整日赛事结果反映了现代职业网球竞争的深度和广度，即使是挑战赛级别的赛事也汇聚了来自世界各地的优秀选手，每场比赛都充满变数和戏剧性。</p>
+
+                <div class="keywords">
+                    <div class="keywords-title">📖 Key Words:</div>
+                    <span class="keyword-item">WTA挑战赛体系</span>
+                    <span class="keyword-item">种子保护机制</span>
+                    <span class="keyword-item">抢七局战术</span>
+                    <span class="keyword-item">破发时机分析</span>
+                    <span class="keyword-item">三盘比赛动力学</span>
+
+                </div>
+
+                <div class="cta-buttons">
+                    <a href="https://news.6ray.com/articles/12/hard.html" class="cta-button cta-quiz">
+                        🧠 Test Knowledge
+                    </a>
+                    <a href="https://news.6ray.com/articles/12/hard.html" class="cta-button cta-read">
+                        📖 Read Full
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FEATURE 2 -->
+        <div class="feature-card">
+            <img src="https://via.placeholder.com/600x400?text=Article+2" alt="联邦法院对NSO的永久禁令为数字监控中的企业责任确立先例" class="feature-image">
+            <div class="feature-content">
+                <div class="feature-meta">
+                    <span class="level-badge level-hard" style="background: #cfe2ff; color: #084298;">CN</span>
+                    <span class="category">Technology</span>
+                </div>
+                
+                <h2 class="feature-title">联邦法院对NSO的永久禁令为数字监控中的企业责任确立先例</h2>
+                
+                <p class="feature-summary">在一项对监控技术行业具有深远影响的里程碑式裁决中，美国地区法官Phyllis J. Hamilton发布了永久禁令，禁止NSO集团使用其飞马间谍软件针对WhatsApp用户或破坏Meta的基础设施。这一裁决结束了始于2019年的四年法律斗争，当时Meta发现NSO开展了一项复杂的攻击活动，试图感染约1,400台移动设备，这些设备属于记者、人权活动人士、政治异见者、外交官和外国政府高级官员。法院认定NSO采用了先进技术，包括创建假冒WhatsApp账户和直接攻击Meta的基础设施，以绕过该平台使用开源Signal协议的端到端加密。Hamilton法官的全面命令要求NSO永久停止所有针对WhatsApp用户的尝试、感染其设备、拦截加密通信的行为，并要求立即删除通过这些非法手段获取的任何数据。关键的是，法院驳回了NSO关于此类限制将有效摧毁其商业模式的论点，认定对Meta基于加密的服务和用户信任造成的实质性损害超过了任何商业考量。这一裁决在数字监控领域确立了关于企业责任的重要法律先例，可能影响未来涉及监控技术公司及其尊重平台安全和用户隐私义务的案件。该决定还强化了科技公司保护其加密基础设施免受外部破坏的法律地位，为快速发展的监控技术市场设定了重要边界。此案凸显了商业监控技术与数字隐私权之间的持续紧张关系，同时提出了关于在数字时代平衡安全利益与执法合法需求的重要问题。裁决的影响可能超越本案，为全球范围内类似的法律挑战提供参考框架，并可能促使其他科技公司采取更积极的法律行动来保护其平台完整性。</p>
+
+                <div class="keywords">
+                    <div class="keywords-title">📖 Key Words:</div>
+                    <span class="keyword-item">Permanent injunction</span>
+                    <span class="keyword-item">Signal Protocol</span>
+                    <span class="keyword-item">Judicial precedent</span>
+                    <span class="keyword-item">Corporate accountability</span>
+                    <span class="keyword-item">Encryption infrastructure</span>
+
+                </div>
+
+                <div class="cta-buttons">
+                    <a href="https://news.6ray.com/articles/2/hard.html" class="cta-button cta-quiz">
+                        🧠 Test Knowledge
+                    </a>
+                    <a href="https://news.6ray.com/articles/2/hard.html" class="cta-button cta-read">
+                        📖 Read Full
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- NAVIGATION -->
+        <div class="nav-section">
+            <div class="nav-title">📰 More Today's Stories</div>
+            <ul class="nav-list">
+
+                <li class="nav-item">
+                    <a href="https://news.6ray.com/articles/45/hard.html" class="nav-link">
+                        Botswana snatch gold from USA in dramatic 4x400m finish
+                    </a>
+                    <span class="nav-category">• Technology</span>
+                </li>
+
+                <li class="nav-item">
+                    <a href="https://news.6ray.com/articles/44/hard.html" class="nav-link">
+                        I asked Gemini to predict what the Apple M5 Ultra will look like - and the answer blew my mind away
+                    </a>
+                    <span class="nav-category">• Technology</span>
+                </li>
+
+                <li class="nav-item">
+                    <a href="https://news.6ray.com/articles/43/hard.html" class="nav-link">
+                        A new update proves that Control and the PS5 Pro are a match made in heaven, and it's now a sure-fire replay and re-platinum for me this holiday
+                    </a>
+                    <span class="nav-category">• Technology</span>
+                </li>
+
+                <li class="nav-item">
+                    <a href="https://news.6ray.com/articles/42/hard.html" class="nav-link">
+                        OpenAI launched a ChatGPT Atlas Browser – here are the 5 things you need to know
+                    </a>
+                    <span class="nav-category">• Technology</span>
+                </li>
+
+                <li class="nav-item">
+                    <a href="https://news.6ray.com/articles/41/hard.html" class="nav-link">
+                        This tiny laser could transform how we see and sense the world
+                    </a>
+                    <span class="nav-category">• Technology</span>
+                </li>
+
+                <li class="nav-item">
+                    <a href="https://news.6ray.com/articles/40/hard.html" class="nav-link">
+                        A clue to ancient life? What scientists found inside Mars’ frozen vortex
+                    </a>
+                    <span class="nav-category">• Technology</span>
+                </li>
+
+            </ul>
+        </div>
+        
+        <!-- FOOTER -->
+        <div class="footer">
+            <div class="footer-links">
+                <a href="https://news.6ray.com/preferences">Update Preferences</a>
+                <a href="https://news.6ray.com/unsubscribe">Unsubscribe</a>
+            </div>
+            <p>© 2025 News for Kids. All rights reserved.</p>
+            <p style="margin-top: 10px; font-size: 11px; color: #999;">
+                You're receiving this because you subscribed to our newsletter.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

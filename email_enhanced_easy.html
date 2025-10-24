@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🟢 Easy Level News Digest - Beginner-Friendly Content</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            padding: 20px 0;
+        }
+        
+        .email-wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        }
+        
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, #10b981 0%, #10b981dd 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+            border-bottom: 5px solid #10b981;
+        }
+        
+        .header h1 {
+            font-size: 42px;
+            margin-bottom: 15px;
+            font-weight: 800;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header .level-name {
+            font-size: 28px;
+            margin-bottom: 10px;
+            opacity: 0.98;
+            font-weight: 600;
+        }
+        
+        .header .description {
+            font-size: 14px;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* FEATURED ARTICLES SECTION */
+        .featured-section {
+            padding: 50px 40px;
+            background: linear-gradient(to bottom, #ffffff 0%, #f9f9f9 100%);
+            border-bottom: 3px solid #f0f0f0;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #10b981;
+            display: inline-block;
+        }
+        
+        .articles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .article {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border-top: 4px solid #10b981;
+            display: flex;
+            flex-direction: column;
+            height: auto;
+        }
+        
+        .article:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+        
+        .article-image {
+            width: 100%;
+            height: auto;
+            max-height: 250px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .article-content {
+            padding: 25px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .article-id {
+            display: inline-block;
+            background-color: #10b98115;
+            color: #10b981;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+        
+        .article-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        
+        .article-summary {
+            font-size: 13px;
+            color: #5a6b7c;
+            line-height: 1.7;
+            text-align: justify;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            flex-grow: 1;
+        }
+        
+        /* CATEGORY SECTIONS */
+        .category-sections {
+            padding: 50px 40px;
+            background-color: #ffffff;
+        }
+        
+        .category-section {
+            margin-bottom: 35px;
+        }
+        
+        .category-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .category-header {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 15px;
+            display: inline-block;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #10b981;
+        }
+        
+        .category-header span {
+            background-color: #10b98115;
+            color: #10b981;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 8px;
+            display: inline-block;
+        }
+        
+        .article-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .article-list li {
+            display: inline-block;
+            background-color: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        
+        .article-list li:hover {
+            background-color: #10b98110;
+            border-color: #10b981;
+        }
+        
+        .article-list li a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .article-list li a:hover {
+            color: #10b981;
+        }
+        
+        /* FOOTER */
+        .footer {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            color: white;
+            padding: 50px 40px;
+            text-align: center;
+            border-top: 5px solid #10b981;
+        }
+        
+        .footer h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .footer p {
+            margin: 10px 0;
+            font-size: 13px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        .footer-links {
+            margin: 25px 0;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .footer-links a {
+            color: #60a5fa;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        .generated-time {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 1200px) {
+            .articles-grid {
+                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .articles-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .header {
+                padding: 40px 20px;
+            }
+            
+            .header h1 {
+                font-size: 32px;
+            }
+            
+            .featured-section,
+            .category-sections {
+                padding: 30px 20px;
+            }
+            
+            .article-image {
+                height: auto;
+                max-height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>🟢 Easy Level</h1>
+            <div class="level-name">Beginner-Friendly Content</div>
+            <div class="description">For beginners and those learning the topic</div>
+        </div>
+        
+        <!-- FEATURED ARTICLES -->
+        <div class="featured-section">
+            <div class="section-title">Featured Articles</div>
+            <div class="articles-grid">
+                <div class="article">
+                    <img src="http://localhost:8000/api/images/article_9_8fdf885cffc0.jpg" alt="Big New Party Room at the White House" class="article-image" loading="lazy">
+                    <div class="article-content">
+                        <div class="article-id">Article #9</div>
+                        <div class="article-title">Big New Party Room at the White House</div>
+                        <div class="article-summary">The White House is getting a huge new ballroom where people can have parties and events. This new room will be very big - almost twice as large as the main White House building itself. It will be able to hold 999 people at once. The President says this new ballroom won't cost taxpayers any money because private donors are paying for it. Construction has already started, and workers are taking down part of the East Wing to build this new space. The President says the White House needs a bigger party space because the current largest room only holds about 200 people. Some money for the project came from YouTube as part of a legal settlement. The White House promised to share who donated money but hasn't given a full list yet. They also haven't said how much money the President himself is giving. Originally, they said the White House building wouldn't be touched, but now they are taking down part of the East Wing facade.</div>
+                    </div>
+                </div>
+                <div class="article">
+                    <img src="http://localhost:8000/api/images/article_8_2f93a40bbd96.jpg" alt="Tennis Star Sinner Skips Team Italy's Big Match" class="article-image" loading="lazy">
+                    <div class="article-content">
+                        <div class="article-id">Article #8</div>
+                        <div class="article-title">Tennis Star Sinner Skips Team Italy's Big Match</div>
+                        <div class="article-summary">Jannik Sinner, a famous tennis player from Italy, has decided not to play for his country's team in an important tournament called the Davis Cup. This is like when your favorite player on a school team misses the championship game. Sinner is one of the best tennis players in the world - he was ranked number one until he lost a big match to Carlos Alcaraz in September. He has won four major tournaments called Grand Slams, including the Australian Open and Wimbledon this year. Sinner says he needs extra time to prepare for next season, especially for the Australian Open in January. He explained that just one week of extra practice can make a big difference in how well he plays. Italy has won the Davis Cup for the last two years, and now they'll have to try for a third win without their best player. Other players like Lorenzo Musetti and Flavio Cobolli will play instead. Some people are worried that tennis players have too many matches and tournaments, which can make them tired or injured. This situation shows how athletes sometimes have to choose between playing for their country and taking care of their own career.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- CATEGORY SECTIONS -->
+        <div class="category-sections">
+            <div class="category-section">
+                <div class="category-header"><span>📰 News</span></div>
+                <ul class="article-list">
+                    <li><a href="#">Global Climate Summit Reaches Historic Agreement</a></li>
+                    <li><a href="#">New International Trade Deal Announced</a></li>
+                    <li><a href="#">Election Results Surprise Political Analysts</a></li>
+                </ul>
+            </div>
+            <div class="category-section">
+                <div class="category-header"><span>🔬 Science</span></div>
+                <ul class="article-list">
+                    <li><a href="#">Scientists Discover New Species in Amazon Rainforest</a></li>
+                    <li><a href="#">Breakthrough in Cancer Research Shows Promise</a></li>
+                    <li><a href="#">NASA Detects Potential Signs of Water on Distant Moon</a></li>
+                </ul>
+            </div>
+            <div class="category-section">
+                <div class="category-header"><span>⚽ Sports</span></div>
+                <ul class="article-list">
+                    <li><a href="#">Championship Team Celebrates Historic Victory</a></li>
+                    <li><a href="#">Young Athlete Breaks World Record</a></li>
+                    <li><a href="#">International Tournament Draws Record Viewership</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- FOOTER -->
+        <div class="footer">
+            <h3>📚 News Digest</h3>
+            <p>Your daily source of educational news content tailored to your reading level.</p>
+            <p>Stay informed, stay curious, keep learning!</p>
+            
+            <div class="footer-links">
+                <a href="#">Preferences</a>
+                <a href="#">Archive</a>
+                <a href="#">Unsubscribe</a>
+                <a href="#">Contact</a>
+            </div>
+            
+            <p class="generated-time">Generated: 2025-10-22T22:29:46.759901</p>
+        </div>
+    </div>
+</body>
+</html>

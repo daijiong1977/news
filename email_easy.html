@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🟢 Easy Level News Digest - Beginner-Friendly Content</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        
+        .email-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #10b981 0%, #10b981dd 100%);
+            color: white;
+            padding: 50px 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.95;
+            margin-bottom: 5px;
+        }
+        
+        .header .subtitle {
+            font-size: 13px;
+            opacity: 0.85;
+        }
+        
+        .content {
+            padding: 40px 20px;
+        }
+        
+        .article {
+            margin-bottom: 40px;
+            padding: 25px;
+            background-color: #fafafa;
+            border-radius: 10px;
+            border-left: 5px solid #10b981;
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .article:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .article-header {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .article-image {
+            flex-shrink: 0;
+        }
+        
+        .article-image img {
+            width: 180px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+        }
+        
+        .article-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .article-id {
+            display: inline-block;
+            background-color: #10b981;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            width: fit-content;
+        }
+        
+        .article-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        
+        .article-summary {
+            color: #4b5563;
+            font-size: 14px;
+            line-height: 1.7;
+            text-align: justify;
+        }
+        
+        .footer {
+            background-color: #f3f4f6;
+            padding: 30px 20px;
+            text-align: center;
+            border-top: 2px solid #e5e7eb;
+        }
+        
+        .footer h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #1f2937;
+        }
+        
+        .footer p {
+            margin: 8px 0;
+            font-size: 13px;
+            color: #6b7280;
+        }
+        
+        .generated-time {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #d1d5db;
+        }
+        
+        .no-image .article-header {
+            flex-direction: column;
+        }
+        
+        .level-badge {
+            display: inline-block;
+            background-color: #10b98120;
+            color: #10b981;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .article-header {
+                flex-direction: column;
+            }
+            
+            .article-image img {
+                width: 100%;
+                height: auto;
+                max-width: 300px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .content {
+                padding: 20px 15px;
+            }
+            
+            .article {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>🟢 Easy Level</h1>
+            <p>Beginner-Friendly Content</p>
+            <p class="subtitle">For beginners and those learning the topic</p>
+        </div>
+        
+        <div class="content">
+            <div class="level-badge">🟢 Easy Level Beginner-Friendly Content</div>
+            <div class="article">
+                <div class="article-id">Article #9</div>
+                <div class="article-header">
+                    <div class="article-image">
+                        <img src="http://localhost:8000/api/images/article_9_8fdf885cffc0.jpg" alt="Big New Party Room at the White House" loading="lazy">
+                    </div>
+                    <div class="article-content">
+                        <div class="article-title">Big New Party Room at the White House</div>
+                        <div class="article-summary">The White House is getting a huge new ballroom where people can have parties and events. This new room will be very big - almost twice as large as the main White House building itself. It will be able to hold 999 people at once. The President says this new ballroom won't cost taxpayers any money because private donors are paying for it. Construction has already started, and workers are taking down part of the East Wing to build this new space. The President says the White House needs a bigger party space because the current largest room only holds about 200 people. Some money for the project came from YouTube as part of a legal settlement. The White House promised to share who donated money but hasn't given a full list yet. They also haven't said how much money the President himself is giving. Originally, they said the White House building wouldn't be touched, but now they are taking down part of the East Wing facade.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="article">
+                <div class="article-id">Article #8</div>
+                <div class="article-header">
+                    <div class="article-image">
+                        <img src="http://localhost:8000/api/images/article_8_2f93a40bbd96.jpg" alt="Tennis Star Sinner Skips Team Italy's Big Match" loading="lazy">
+                    </div>
+                    <div class="article-content">
+                        <div class="article-title">Tennis Star Sinner Skips Team Italy's Big Match</div>
+                        <div class="article-summary">Jannik Sinner, a famous tennis player from Italy, has decided not to play for his country's team in an important tournament called the Davis Cup. This is like when your favorite player on a school team misses the championship game. Sinner is one of the best tennis players in the world - he was ranked number one until he lost a big match to Carlos Alcaraz in September. He has won four major tournaments called Grand Slams, including the Australian Open and Wimbledon this year. Sinner says he needs extra time to prepare for next season, especially for the Australian Open in January. He explained that just one week of extra practice can make a big difference in how well he plays. Italy has won the Davis Cup for the last two years, and now they'll have to try for a third win without their best player. Other players like Lorenzo Musetti and Flavio Cobolli will play instead. Some people are worried that tennis players have too many matches and tournaments, which can make them tired or injured. This situation shows how athletes sometimes have to choose between playing for their country and taking care of their own career.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <h3>📚 News Digest - Beginner-Friendly Content</h3>
+            <p>This email contains news articles at the beginner-friendly content difficulty level.</p>
+            <p>Select this level based on your reading preference and language skills.</p>
+            <p class="generated-time">Generated: 2025-10-22T22:29:46.759901</p>
+        </div>
+    </div>
+</body>
+</html>

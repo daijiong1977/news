@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>InsightFeed - Engaging News for High Schoolers</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz@6..72&amp;family=Noto+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#13a4ec",
+              "background-light": "#f6f7f8",
+              "background-dark": "#101c22",
+              "text-light": "#111618",
+              "text-dark": "#f0f3f4",
+              "text-muted-light": "#617c89",
+              "text-muted-dark": "#9cb3bf",
+            },
+            fontFamily: {
+              "display": ["Newsreader", "serif"],
+              "sans": ["Noto Sans", "sans-serif"],
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Noto Sans', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark">
+<div class="relative flex min-h-screen w-full flex-col">
+<header class="sticky top-0 z-10 w-full bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm border-b border-text-light/10 dark:border-text-dark/10">
+<div class="mx-auto flex max-w-5xl items-center justify-between whitespace-nowrap px-4 sm:px-6 lg:px-8 py-3">
+<a class="flex items-center gap-3 text-text-light dark:text-text-dark" href="#">
+<div class="h-6 w-6">
+<svg fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_6_330)">
+<path clip-rule="evenodd" d="M24 0.757355L47.2426 24L24 47.2426L0.757355 24L24 0.757355ZM21 35.7574V12.2426L9.24264 24L21 35.7574Z" fill-rule="evenodd"></path>
+</g>
+<defs>
+<clipPath id="clip0_6_330"><rect fill="white" height="48" width="48"></rect></clipPath>
+</defs>
+</svg>
+</div>
+<h2 class="font-display text-2xl font-bold tracking-tight">InsightFeed</h2>
+</a>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-sm font-medium text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">News</a>
+<a class="text-sm font-medium text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">Science</a>
+<a class="text-sm font-medium text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">Fun</a>
+</nav>
+</div>
+</header>
+<main class="flex-grow">
+<div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10 md:py-16">
+<div class="flex flex-col gap-12 md:gap-16">
+<div class="w-full @container">
+<div class="flex flex-col items-stretch justify-start rounded-xl overflow-hidden bg-white dark:bg-background-dark shadow-sm border border-text-light/10 dark:border-text-dark/10">
+<div class="w-full bg-center bg-no-repeat aspect-[16/7] bg-cover" data-alt="Abstract digital art representing artificial intelligence and creativity" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAFbLSO6RVtWkXKKh0did-R7oDq75_Zov9uRclBjoBTuUF32KoBM3HzBDRNzGaM0ZUuQzlfEfVB8zb_wAftgjbwdk6oZD3UwpUVyHCAb__t9fYWFi4yFcqVfEArI1tzesvbOoKU2pqDHVNiYqvCl58ehvyrk2JlH5y2nYE-7pTS20KUNZyDDTxT1YzwIRKCm2P3GGDTV45sxQV3SsUh7s4tUnj7ATjyyJ3lueEwXeVG80mdofrBn3epMwqaFUgB1g8OJjOmFHMXE7Sc");'></div>
+<div class="p-6 md:p-8">
+<p class="text-sm font-medium text-primary mb-1">Technology</p>
+<h3 class="font-display text-2xl md:text-3xl font-bold tracking-tight text-text-light dark:text-text-dark">The Future of AI in Creative Arts</h3>
+<div class="mt-2 flex items-center gap-x-2 text-xs text-text-muted-light dark:text-text-muted-dark">
+<span>Oct 26, 2023</span>
+<span class="h-1 w-1 rounded-full bg-text-muted-light/50 dark:bg-text-muted-dark/50"></span>
+<span>Tech Journal</span>
+</div>
+<p class="text-text-muted-light dark:text-text-muted-dark mt-3 text-base md:text-lg">
+                                    Explore how artificial intelligence is transforming the landscape of art, music, and literature, and what it means for human creativity.
+                                </p>
+<div class="mt-6 flex">
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-5 bg-primary text-white text-sm font-medium leading-normal transition-transform hover:scale-105">
+<span class="truncate">Start Activity</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="w-full @container">
+<div class="flex flex-col items-stretch justify-start rounded-xl overflow-hidden bg-white dark:bg-background-dark shadow-sm border border-text-light/10 dark:border-text-dark/10">
+<div class="w-full bg-center bg-no-repeat aspect-[16/7] bg-cover" data-alt="A melting glacier representing the effects of climate change" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCTPx9qW8HX0oAbKXHPiH6pj-3huO1nEgzmeB_9RiDYmi7TpWdoGYSTWMC7Emiq2tj6oehOGfFdGj8gILVKeGa-2lB82GDPHB4-4X8xAYj5-Edxk8rlG5D2WSNjWdSE0OMyqDIgFSoYZDnGr0W6srPM--yPLXGfHTcd5j-bYv2eZFDPoqGDS76oyBFQu2CrVwev_8D2wlbFmNiAkBjHn5pdTphK7pPm0weeHDMOR8FHz_be2o7BpQauyutgl5e3xkdqtccBjP9fPIjG");'></div>
+<div class="p-6 md:p-8">
+<p class="text-sm font-medium text-primary mb-1">Environment</p>
+<h3 class="font-display text-2xl md:text-3xl font-bold tracking-tight text-text-light dark:text-text-dark">Unpacking the Latest Climate Change Report</h3>
+<div class="mt-2 flex items-center gap-x-2 text-xs text-text-muted-light dark:text-text-muted-dark">
+<span>Oct 25, 2023</span>
+<span class="h-1 w-1 rounded-full bg-text-muted-light/50 dark:bg-text-muted-dark/50"></span>
+<span>Global Science Today</span>
+</div>
+<p class="text-text-muted-light dark:text-text-muted-dark mt-3 text-base md:text-lg">
+                                    Dive into the key findings of the most recent global climate assessment and understand its implications for our planet's future.
+                                </p>
+<div class="mt-6 flex">
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-5 bg-primary text-white text-sm font-medium leading-normal transition-transform hover:scale-105">
+<span class="truncate">Read &amp; Analyze</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="bg-white dark:bg-background-dark border-t border-text-light/10 dark:border-text-dark/10">
+<div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10 md:py-16">
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 text-left">
+<div>
+<h4 class="font-display text-lg font-bold text-text-light dark:text-text-dark mb-4">News</h4>
+<ul class="space-y-3">
+<li><a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors" href="#">Global Economic Shifts</a></li>
+<li><a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors" href="#">Political Roundup</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-display text-lg font-bold text-text-light dark:text-text-dark mb-4">Science</h4>
+<ul class="space-y-3">
+<li><a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors" href="#">Mars Rover's New Discovery</a></li>
+<li><a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors" href="#">CRISPR Breakthroughs</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-display text-lg font-bold text-text-light dark:text-text-dark mb-4">Fun</h4>
+<ul class="space-y-3">
+<li><a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors" href="#">Top Indie Games of the Year</a></li>
+<li><a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors" href="#">The Science of a Perfect Cookie</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 pt-8 border-t border-text-light/10 dark:border-text-dark/10 flex flex-col sm:flex-row items-center justify-between gap-6">
+<div class="flex flex-wrap justify-center gap-x-6 gap-y-2">
+<a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors" href="#">About Us</a>
+<a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors" href="#">Privacy Policy</a>
+<a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary text-sm transition-colors" href="#">Contact Us</a>
+</div>
+<div class="flex justify-center gap-4">
+<a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">alternate_email</span>
+</a>
+<a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">camera_alt</span>
+</a>
+<a class="text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">group</span>
+</a>
+</div>
+<p class="text-text-muted-light dark:text-text-muted-dark text-sm order-first sm:order-last">© 2024 InsightFeed. All rights reserved.</p>
+</div>
+</div>
+</footer>
+</div>
+
+</body></html>

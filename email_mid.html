@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔵 Mid Level News Digest - Intermediate Content</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        
+        .email-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #3b82f6 0%, #3b82f6dd 100%);
+            color: white;
+            padding: 50px 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.95;
+            margin-bottom: 5px;
+        }
+        
+        .header .subtitle {
+            font-size: 13px;
+            opacity: 0.85;
+        }
+        
+        .content {
+            padding: 40px 20px;
+        }
+        
+        .article {
+            margin-bottom: 40px;
+            padding: 25px;
+            background-color: #fafafa;
+            border-radius: 10px;
+            border-left: 5px solid #3b82f6;
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .article:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .article-header {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .article-image {
+            flex-shrink: 0;
+        }
+        
+        .article-image img {
+            width: 180px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+        }
+        
+        .article-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .article-id {
+            display: inline-block;
+            background-color: #3b82f6;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            width: fit-content;
+        }
+        
+        .article-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        
+        .article-summary {
+            color: #4b5563;
+            font-size: 14px;
+            line-height: 1.7;
+            text-align: justify;
+        }
+        
+        .footer {
+            background-color: #f3f4f6;
+            padding: 30px 20px;
+            text-align: center;
+            border-top: 2px solid #e5e7eb;
+        }
+        
+        .footer h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #1f2937;
+        }
+        
+        .footer p {
+            margin: 8px 0;
+            font-size: 13px;
+            color: #6b7280;
+        }
+        
+        .generated-time {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #d1d5db;
+        }
+        
+        .no-image .article-header {
+            flex-direction: column;
+        }
+        
+        .level-badge {
+            display: inline-block;
+            background-color: #3b82f620;
+            color: #3b82f6;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .article-header {
+                flex-direction: column;
+            }
+            
+            .article-image img {
+                width: 100%;
+                height: auto;
+                max-width: 300px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .content {
+                padding: 20px 15px;
+            }
+            
+            .article {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>🔵 Mid Level</h1>
+            <p>Intermediate Content</p>
+            <p class="subtitle">For readers with moderate knowledge</p>
+        </div>
+        
+        <div class="content">
+            <div class="level-badge">🔵 Mid Level Intermediate Content</div>
+            <div class="article">
+                <div class="article-id">Article #9</div>
+                <div class="article-header">
+                    <div class="article-image">
+                        <img src="http://localhost:8000/api/images/article_9_8fdf885cffc0.jpg" alt="Trump's $250 Million White House Ballroom Expansion" loading="lazy">
+                    </div>
+                    <div class="article-content">
+                        <div class="article-title">Trump's $250 Million White House Ballroom Expansion</div>
+                        <div class="article-summary">Construction has commenced on a $250 million ballroom addition to the White House, with demolition of the East Wing facade underway. The 90,000-square-foot structure will significantly exceed the size of the main White House building, nearly doubling its footprint. President Trump asserts the project will accommodate 999 guests, addressing what he describes as inadequate entertainment space in the current White House facilities. The East Room, currently the largest entertainment space, holds approximately 200 people, leading to previous administrations hosting large events in temporary tents on the South Lawn. Funding for the project comes entirely from private sources according to the administration, including $22 million from YouTube as part of a legal settlement from a 2021 lawsuit. While the White House has committed to disclosing donor information, no comprehensive list has been released. The administration initially claimed the White House structure would remain untouched, but demolition work contradicts these earlier assurances. The East Wing traditionally serves as the social entrance for White House events and sits adjacent to the Treasury Department.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="article">
+                <div class="article-id">Article #8</div>
+                <div class="article-header">
+                    <div class="article-image">
+                        <img src="http://localhost:8000/api/images/article_8_2f93a40bbd96.jpg" alt="Sinner's Strategic Absence from Italy's Davis Cup Defense" loading="lazy">
+                    </div>
+                    <div class="article-content">
+                        <div class="article-title">Sinner's Strategic Absence from Italy's Davis Cup Defense</div>
+                        <div class="article-summary">World number two tennis player Jannik Sinner has opted out of Italy's Davis Cup campaign as the team seeks a third consecutive title. The four-time Grand Slam champion, who recently lost his world number one ranking to Carlos Alcaraz after the US Open final, has decided to prioritize preparation for the upcoming season rather than participate in the team competition. Sinner's remarkable 2025 season included reaching all four Grand Slam finals, winning the Australian Open and Wimbledon, and claiming victory at the Six Kings Slam exhibition in Saudi Arabia. Despite being scheduled for the ATP Tour Finals in Turin from November 9-16, Sinner informed Italian captain Filippo Volandri that he would not be available for the Davis Cup matches in Bologna from November 18-23. The 24-year-old explained his decision stems from the need for adequate preparation time before the Australian Open in January, emphasizing that even one week of additional training could significantly impact his performance. Italy will now rely on Lorenzo Musetti (world number 8) and Flavio Cobolli (world number 22) as their top singles players against Austria in the quarter-finals. Sinner's absence occurs amid growing concerns about the demanding tennis calendar, highlighted by British player Jack Draper's recent comments about the need for schedule reforms following Holger Rune's season-ending injury. Volandri expressed understanding of Sinner's decision while affirming confidence in his remaining squad's ability to compete effectively.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <h3>📚 News Digest - Intermediate Content</h3>
+            <p>This email contains news articles at the intermediate content difficulty level.</p>
+            <p>Select this level based on your reading preference and language skills.</p>
+            <p class="generated-time">Generated: 2025-10-22T22:29:46.759901</p>
+        </div>
+    </div>
+</body>
+</html>

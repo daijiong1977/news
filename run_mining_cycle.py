@@ -94,6 +94,8 @@ def fetch_article_row(conn, article_id):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--apply', action='store_true', help='Call API and run inserter after preview')
+    parser.add_argument('--force', action='store_true', help='Force reprocess of selected article IDs (ignores deepseek_processed)')
+    parser.add_argument('--article-ids', type=str, help='Comma-separated list of article IDs to process (overrides sampling)')
     args = parser.parse_args()
 
     thresholds = load_thresholds()
@@ -121,17 +123,27 @@ def main():
     conn = sqlite3.connect(DB_PATH)
     try:
         ensure_article_columns(conn)
-        by_source = get_unprocessed_by_source(conn)
-        print(f"Found {len(by_source)} sources with unprocessed articles")
+        # Determine articles to process. If explicit IDs are provided, use them.
+        if args.article_ids:
+            try:
+                ids = [int(x.strip()) for x in args.article_ids.split(',') if x.strip()]
+            except Exception:
+                print('Invalid --article-ids value; must be comma-separated integers')
+                ids = []
+            to_process = ids
+            print(f"Explicit article IDs provided: {to_process}")
+        else:
+            by_source = get_unprocessed_by_source(conn)
+            print(f"Found {len(by_source)} sources with unprocessed articles")
 
-        to_process = []
-        for src, aids in by_source.items():
-            selected = [aid for aid in aids if random.randrange(sample_rate) == 0]
-            if selected:
-                print(f"Source '{src}': selected {len(selected)} of {len(aids)} articles")
-                to_process.extend(selected)
+            to_process = []
+            for src, aids in by_source.items():
+                selected = [aid for aid in aids if random.randrange(sample_rate) == 0]
+                if selected:
+                    print(f"Source '{src}': selected {len(selected)} of {len(aids)} articles")
+                    to_process.extend(selected)
 
-        print(f"Total selected: {len(to_process)}")
+            print(f"Total selected: {len(to_process)}")
 
         # Import process_one_article only when we will call the API
         if args.apply:
@@ -142,6 +154,16 @@ def main():
 
         for aid in to_process:
             print(f"\n--- Article {aid} ---")
+            # If force reprocess requested, clear processed/failure flags to allow reprocessing
+            if args.force:
+                try:
+                    cur = conn.cursor()
+                    cur.execute("UPDATE articles SET deepseek_processed = 0, deepseek_failed = 0 WHERE id = ?", (aid,))
+                    conn.commit()
+                    print(f"Force: reset deepseek flags for {aid}")
+                except Exception as e:
+                    print(f"Force reset failed for {aid}: {e}")
+
             if not claim_article(conn, aid):
                 print(f"Could not claim {aid}; skipping")
                 continue

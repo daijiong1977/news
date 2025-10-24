@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buttondown Metadata Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .controls label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .controls input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #667eea;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .controls button {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        .controls button:hover {
+            background: #764ba2;
+        }
+        
+        .controls button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 18px;
+            margin: 20px 0;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .user-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border-left: 5px solid #667eea;
+        }
+        
+        .user-card.easy {
+            border-left-color: #4caf50;
+        }
+        
+        .user-card.mid {
+            border-left-color: #ff9800;
+        }
+        
+        .user-card.hard {
+            border-left-color: #f44336;
+        }
+        
+        .user-card.diff {
+            border-left-color: #f44336;
+        }
+        
+        .user-email {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            word-break: break-all;
+        }
+        
+        .user-metadata {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #666;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        
+        .metadata-label {
+            display: block;
+            margin-top: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .difficulty-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+            color: white;
+        }
+        
+        .difficulty-badge.easy {
+            background: #4caf50;
+        }
+        
+        .difficulty-badge.mid {
+            background: #ff9800;
+        }
+        
+        .difficulty-badge.hard {
+            background: #f44336;
+        }
+        
+        .difficulty-badge.diff {
+            background: #f44336;
+        }
+        
+        .error {
+            background: #f44336;
+            color: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+        
+        .summary {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .summary h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .stat {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Buttondown Metadata Viewer</h1>
+        
+        <div class="controls">
+            <label for="apiKey">Buttondown API Key:</label>
+            <input type="password" id="apiKey" placeholder="Paste your Buttondown API key here">
+            <button onclick="fetchSubscribers()">Load Subscribers</button>
+        </div>
+        
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            Fetching subscribers from Buttondown...
+        </div>
+        
+        <div id="error" class="error" style="display: none;"></div>
+        
+        <div id="content"></div>
+    </div>
+
+    <script>
+        async function fetchSubscribers() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            
+            if (!apiKey) {
+                showError('Please enter your Buttondown API key');
+                return;
+            }
+            
+            const loading = document.getElementById('loading');
+            const content = document.getElementById('content');
+            const error = document.getElementById('error');
+            
+            loading.style.display = 'block';
+            error.style.display = 'none';
+            content.innerHTML = '';
+            
+            try {
+                const response = await fetch('https://api.buttondown.email/v1/subscribers', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Token ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                const subscribers = data.results || [];
+                
+                loading.style.display = 'none';
+                
+                if (subscribers.length === 0) {
+                    showError('No subscribers found');
+                    return;
+                }
+                
+                displaySubscribers(subscribers);
+                
+            } catch (err) {
+                loading.style.display = 'none';
+                showError(`Error: ${err.message}`);
+                console.error(err);
+            }
+        }
+        
+        function displaySubscribers(subscribers) {
+            const content = document.getElementById('content');
+            
+            // Group by difficulty
+            const byDifficulty = {
+                easy: [],
+                mid: [],
+                hard: [],
+                diff: [],
+                unknown: []
+            };
+            
+            subscribers.forEach(sub => {
+                const metadata = sub.metadata || {};
+                const difficulty = (metadata.read_level || 'unknown').toLowerCase();
+                
+                if (difficulty in byDifficulty) {
+                    byDifficulty[difficulty].push(sub);
+                } else {
+                    byDifficulty.unknown.push(sub);
+                }
+            });
+            
+            // Summary stats
+            const summary = document.createElement('div');
+            summary.className = 'summary';
+            summary.innerHTML = `
+                <h3>📈 Summary</h3>
+                <div class="summary-stats">
+                    <div class="stat">
+                        <div class="stat-value">${subscribers.length}</div>
+                        <div class="stat-label">Total Subscribers</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">${byDifficulty.easy.length}</div>
+                        <div class="stat-label">Easy Level</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">${byDifficulty.mid.length}</div>
+                        <div class="stat-label">Mid Level</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">${byDifficulty.hard.length + byDifficulty.diff.length}</div>
+                        <div class="stat-label">Hard/Diff Level</div>
+                    </div>
+                </div>
+            `;
+            content.appendChild(summary);
+            
+            // Display each group
+            Object.entries(byDifficulty).forEach(([difficulty, subs]) => {
+                if (subs.length === 0) return;
+                
+                const section = document.createElement('div');
+                section.style.marginTop = '30px';
+                
+                const title = document.createElement('h2');
+                title.style.color = 'white';
+                title.style.marginBottom = '15px';
+                title.innerHTML = `${difficulty.toUpperCase()} Level (${subs.length})`;
+                section.appendChild(title);
+                
+                const grid = document.createElement('div');
+                grid.className = 'users-grid';
+                
+                subs.forEach(sub => {
+                    const card = createUserCard(sub);
+                    grid.appendChild(card);
+                });
+                
+                section.appendChild(grid);
+                content.appendChild(section);
+            });
+        }
+        
+        function createUserCard(subscriber) {
+            const card = document.createElement('div');
+            const metadata = subscriber.metadata || {};
+            const difficulty = (metadata.read_level || 'unknown').toLowerCase();
+            
+            card.className = `user-card ${difficulty}`;
+            
+            let metadataHtml = '<span class="metadata-label">Metadata:</span><div class="user-metadata">';
+            if (Object.keys(metadata).length === 0) {
+                metadataHtml += '(empty)';
+            } else {
+                Object.entries(metadata).forEach(([key, value]) => {
+                    metadataHtml += `${key}: ${JSON.stringify(value)}<br>`;
+                });
+            }
+            metadataHtml += '</div>';
+            
+            card.innerHTML = `
+                <div class="user-email">✉️ ${subscriber.email}</div>
+                <div style="margin-top: 10px;">
+                    <strong>Name:</strong> ${subscriber.name || '(not set)'}
+                </div>
+                ${metadataHtml}
+                <span class="difficulty-badge ${difficulty}">${difficulty.toUpperCase()}</span>
+            `;
+            
+            return card;
+        }
+        
+        function showError(message) {
+            const error = document.getElementById('error');
+            error.textContent = message;
+            error.style.display = 'block';
+        }
+        
+        // Allow Enter key to trigger fetch
+        document.getElementById('apiKey').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                fetchSubscribers();
+            }
+        });
+    </script>
+</body>
+</html>

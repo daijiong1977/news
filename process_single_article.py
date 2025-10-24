@@ -59,73 +59,110 @@ def process_article(article_id: int):
     print(f"   Source: {article['source']}")
     print(f"   URL: {article['url']}")
     
-    # Create prompt
-    prompt = f"""You are an expert editorial analyst and educator. Process this article with comprehensive analysis.
+    # Create prompt using new structure
+    prompt = f"""You are an expert educational content creator specializing in making complex articles accessible at multiple reading levels.
 
 Article Details:
 - Title: {article['title']}
 - Source: {article['source']}
+- URL: {article['url']}
 - Description: {article['description']}
 
 Article Content:
 {article['content']}
 
-Provide a JSON response with the following structure:
+Analyze this article and create comprehensive educational content at four different levels: Easy, Mid, Hard, and Chinese (CN).
+
+⚠️ CRITICAL LANGUAGE REQUIREMENT:
+- Easy level: ENGLISH ONLY
+- Mid level: ENGLISH ONLY
+- Hard level: ENGLISH ONLY
+- CN level: CHINESE ONLY (this is the ONLY place Chinese appears)
+- NO Chinese text should appear in easy, mid, or hard levels
+- NO English text should appear in CN level
+
+Return ONLY a valid JSON response (no additional text) with this exact structure:
 
 {{
-    "article_id": {article['id']},
-    "rewritten_title": "<rewrite the title to be more engaging and clear, 8-12 words>",
-    "rewritten_title_zh": "<Chinese translation of the rewritten title>",
-    "summary_en": "<500-700 word summary in English>",
-    "summary_zh": "<Chinese translation of the English summary, 500-700 words>",
-    "key_words": [
-        {{
-            "word": "<keyword>",
-            "frequency": <count>,
-            "explanation": "<50-100 word explanation of this key term in context>",
-            "easy_explanation": "<simple 30-50 word explanation suitable for beginners>",
-            "medium_explanation": "<intermediate 50-80 word explanation with moderate detail>",
-            "hard_explanation": "<advanced 80-120 word explanation with technical depth and nuances>"
-        }},
-        ... (top 10 keywords: ONLY include words with frequency >= 3)
-    ],
-    "background_reading": "<200-300 word background on the topic>",
-    "multiple_choice_questions": [
-        {{
-            "question": "<question text>",
-            "options": ["<A>", "<B>", "<C>", "<D>"],
-            "correct_answer": "<A/B/C/D>",
-            "explanation": "<why this is correct>",
-            "type": "<what_questions/how_questions/why_questions>",
-            "word_type": "<what/how/why>"
-        }},
-        ... (10 questions total: 3-4 "what", 3-4 "how", 3-4 "why")
-    ],
-    "discussion_both_sides": {{
-        "perspective_1": {{
-            "title": "<perspective name>",
-            "arguments": ["<1-2 arguments supporting this view>"]
-        }},
-        "perspective_2": {{
-            "title": "<alternative perspective>",
-            "arguments": ["<1-2 arguments supporting this view>"]
-        }},
-        "synthesis": "<200 word synthesis>"
+  "article_analysis": {{
+    "levels": {{
+      "easy": {{
+        "title": "<Simple, engaging title for beginners - 5-10 words - ENGLISH ONLY>",
+        "summary": "<Beginner-friendly explanation using simple vocabulary and short sentences. ENGLISH ONLY. 200-300 words. Use analogies and everyday examples. Avoid jargon. NO CHINESE TEXT.>",
+        "keywords": [
+          {{"term": "<keyword>", "explanation": "<2-3 sentence simple explanation suitable for a child - ENGLISH ONLY - NO CHINESE>"}},
+          (10 keywords total)
+        ],
+        "questions": [
+          {{"question": "<Simple question>", "options": ["<opt1>", "<opt2>", "<opt3>", "<opt4>"], "correct_answer": "<match one option exactly>"}},
+          (5 questions total)
+        ],
+        "background_reading": "<2-3 paragraphs in simple terms. Include 'why this matters' section.>",
+        "perspectives": [
+          {{"perspective": "<Positive viewpoint - 1-2 sentences>", "attitude": "positive"}},
+          {{"perspective": "<Negative viewpoint - 1-2 sentences>", "attitude": "negative"}},
+          {{"perspective": "<Neutral viewpoint - 1-2 sentences>", "attitude": "neutral"}}
+        ]
+      }},
+      "mid": {{
+        "title": "<Intermediate title - 6-12 words, more specific - ENGLISH ONLY>",
+        "summary": "<Intermediate explanation for high school/adults. ENGLISH ONLY. Include more technical details, cause-and-effect. Use standard vocabulary. 300-400 words. NO CHINESE TEXT.>",
+        "keywords": [
+          {{"term": "<keyword>", "explanation": "<3-4 sentence explanation with some technical terms and context - ENGLISH ONLY - NO CHINESE>"}},
+          (10 keywords total)
+        ],
+        "questions": [
+          {{"question": "<Question requiring understanding of concepts and relationships>", "options": ["<opt1>", "<opt2>", "<opt3>", "<opt4>"], "correct_answer": "<match one option exactly>"}},
+          (8-10 questions total)
+        ],
+        "background_reading": "<3-4 paragraphs of intermediate context. Include historical background, relevant research, and broader implications.>",
+        "perspectives": [
+          {{"perspective": "<Positive viewpoint with supporting arguments - 2-3 sentences>", "attitude": "positive"}},
+          {{"perspective": "<Negative viewpoint with supporting arguments - 2-3 sentences>", "attitude": "negative"}},
+          {{"perspective": "<Balanced viewpoint acknowledging complexity - 2-3 sentences>", "attitude": "neutral"}}
+        ]
+      }},
+      "hard": {{
+        "title": "<Advanced title - highly specific and precise, 7-15 words - ENGLISH ONLY>",
+        "summary": "<Expert-level explanation for professionals. ENGLISH ONLY. Use technical terminology appropriately. Include methodology, nuances, limitations, implications. 400-500 words. NO CHINESE TEXT.>",
+        "keywords": [
+          {{"term": "<technical keyword>", "explanation": "<5-6 sentence detailed explanation with technical terminology, context, and relevance - ENGLISH ONLY - NO CHINESE>"}},
+          (10 keywords total)
+        ],
+        "questions": [
+          {{"question": "<Advanced question requiring critical thinking and synthesis>", "options": ["<opt1>", "<opt2>", "<opt3>", "<opt4>"], "correct_answer": "<match one option exactly>"}},
+          (10-12 questions total)
+        ],
+        "background_reading": "<4-5 paragraphs of advanced context. Include research methodology, historical evolution, scientific principles, policy implications.>",
+        "analysis": "<Detailed analytical commentary - 3-4 paragraphs analyzing article's strengths, potential biases, methodological considerations, field implications, and gaps in coverage.>",
+        "perspectives": [
+          {{"perspective": "<Sophisticated positive viewpoint with nuanced arguments - 2-3 sentences>", "attitude": "positive"}},
+          {{"perspective": "<Sophisticated negative viewpoint with nuanced arguments - 2-3 sentences>", "attitude": "negative"}},
+          {{"perspective": "<Nuanced neutral viewpoint acknowledging trade-offs and complexity - 2-3 sentences>", "attitude": "neutral"}}
+        ]
+      }},
+      "CN": {{
+        "title": "<Complete Chinese translation of the article's main title - CHINESE ONLY>",
+        "summary": "<Comprehensive Chinese translation of the entire article content, approximately 500 words. CHINESE ONLY - DO NOT mix English. Maintain original meaning, tone, and key information. Use standard Simplified Chinese.>"
+      }}
     }}
+  }}
 }}
 
-IMPORTANT:
-1. TITLE REWRITING: Rewrite to be more engaging/clear (8-12 words) and translate to Chinese
-2. Summaries MUST be exactly 500-700 words
-3. Chinese should be natural, not literal translation
-4. Keywords must appear 3+ times in the article
-5. Provide 3 difficulty-level explanations for each keyword
-6. Background reading for someone with no prior knowledge
-7. 10 multiple choice questions (3-4 of each type: what/how/why)
-8. Two contrasting perspectives on the topic
-9. Return ONLY valid JSON
+CRITICAL REQUIREMENTS:
+1. Return ONLY valid JSON - no markdown, no code fences, no explanations
+2. Easy level: ENGLISH ONLY - 200-300 word summary, 5 questions, simple vocabulary
+3. Mid level: ENGLISH ONLY - 300-400 word summary, 8-10 questions, intermediate terminology  
+4. Hard level: ENGLISH ONLY - 400-500 word summary, 10-12 questions, technical terminology, includes analysis
+5. CN level: CHINESE ONLY - 500-word complete Chinese translation of entire article
+6. ⚠️ NO CHINESE TEXT IN EASY/MID/HARD LEVELS - Chinese content belongs ONLY in CN level
+7. ⚠️ NO ENGLISH TEXT IN CN LEVEL - All CN level content must be in Chinese
+8. All levels: Exactly 10 keywords, 3 perspectives (positive/negative/neutral)
+9. All correct_answer values MUST match one of the options exactly
+10. Randomize option positions - don't always put correct answer in same spot
+11. Keywords should be central to understanding the article
 
-Generate the analysis now. Return ONLY the JSON response."""
+Generate the complete analysis now."""
 
     headers = {
         "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
@@ -137,7 +174,7 @@ Generate the analysis now. Return ONLY the JSON response."""
         "messages": [
             {
                 "role": "system",
-                "content": "You are an expert editorial analyst, educator, and content processor. Return responses only in valid JSON format."
+                "content": "You are an expert educational content creator and analyst. Return responses ONLY as valid JSON with no additional text."
             },
             {
                 "role": "user",
@@ -145,7 +182,7 @@ Generate the analysis now. Return ONLY the JSON response."""
             }
         ],
         "temperature": 0.7,
-        "max_tokens": 6000
+        "max_tokens": 8000
     }
     
     print("\n📤 Sending to DeepSeek API...")
@@ -167,47 +204,28 @@ Generate the analysis now. Return ONLY the JSON response."""
             
             print("✓ Received response from DeepSeek")
             
-            # Parse and store in normalized tables using the inserter
+            # Parse and save response
             try:
                 feedback = json.loads(content)
-
-                # Update articles table with rewritten title and Chinese title if present
-                try:
-                    if 'rewritten_title' in feedback and feedback['rewritten_title']:
-                        conn = sqlite3.connect(DB_FILE)
-                        cursor = conn.cursor()
-                        cursor.execute("""
-                            UPDATE articles 
-                            SET title = ?, zh_title = ?
-                            WHERE id = ?
-                        """, (
-                            feedback.get('rewritten_title', ''),
-                            feedback.get('rewritten_title_zh', ''),
-                            article_id
-                        ))
-                        conn.commit()
-                        conn.close()
-                        print(f"✓ Updated title: {feedback.get('rewritten_title')}")
-                        print(f"✓ Updated zh_title: {feedback.get('rewritten_title_zh')}")
-                except Exception as e:
-                    print(f"✗ Failed to update title: {e}")
-
-                # Use inserter to populate normalized tables
-                try:
-                    from insert_from_response import insert_data_into_db
-                    ok = insert_data_into_db(article_id, feedback)
-                    if ok:
-                        print(f"✓ Inserted processed data for article {article_id}")
-                    else:
-                        print(f"✗ Inserter reported failure for article {article_id}")
-                except Exception as e:
-                    print(f"✗ Could not insert processed data: {e}")
+                
+                # Save response to file with timestamp
+                import datetime
+                timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                response_file = pathlib.Path(f"responses/response_article_{article_id}_{timestamp}.json")
+                response_file.parent.mkdir(parents=True, exist_ok=True)
+                
+                with open(response_file, 'w', encoding='utf-8') as f:
+                    json.dump(feedback, f, ensure_ascii=False, indent=2)
+                
+                print(f"✓ Saved response to: {response_file}")
+                print(f"✓ Response contains levels: {list(feedback.get('article_analysis', {}).get('levels', {}).keys())}")
                 
             except json.JSONDecodeError as e:
                 print(f"✗ Failed to parse JSON response: {e}")
-                print(f"Response: {content[:500]}")
+                print(f"Response content (first 500 chars): {content[:500]}")
         else:
             print(f"✗ Unexpected response format from DeepSeek")
+            print(f"Response: {result}")
             
     except requests.exceptions.RequestException as e:
         print(f"✗ API request failed: {e}")

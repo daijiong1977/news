@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Digest - Multi-Level Educational Content</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        
+        .email-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .level-section {
+            padding: 30px 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .level-section:last-child {
+            border-bottom: none;
+        }
+        
+        .level-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            font-size: 22px;
+            font-weight: bold;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 0 0 25px 0;
+        }
+        
+        .level-easy .level-title {
+            background-color: #10b981;
+        }
+        
+        .level-mid .level-title {
+            background-color: #3b82f6;
+        }
+        
+        .level-hard .level-title {
+            background-color: #f59e0b;
+        }
+        
+        .level-cn .level-title {
+            background-color: #ef4444;
+        }
+        
+        .article {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .article-header {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .article-image {
+            flex-shrink: 0;
+        }
+        
+        .article-image img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .article-content {
+            flex: 1;
+        }
+        
+        .article-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .article-id {
+            display: inline-block;
+            background-color: #e5e7eb;
+            color: #4b5563;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+        
+        .article-summary {
+            color: #4b5563;
+            font-size: 14px;
+            line-height: 1.6;
+            text-align: justify;
+        }
+        
+        .footer {
+            background-color: #f3f4f6;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #6b7280;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .footer p {
+            margin: 5px 0;
+        }
+        
+        .generated-time {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+        
+        @media (max-width: 600px) {
+            .article-header {
+                flex-direction: column;
+            }
+            
+            .article-image img {
+                width: 100%;
+                height: auto;
+            }
+            
+            .level-section {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>📚 News Digest</h1>
+            <p>Multi-Level Educational Content</p>
+        </div>
+        <div class="level-section level-easy">
+            <div class="level-title">🟢 Easy Level</div>
+            <p style="color: #6b7280; margin-bottom: 20px; font-size: 14px;">Beginner-Friendly Content</p>
+            <div class="article">
+                <div class="article-id">Article #9</div>
+                <div class="article-header">
+                    <div class="article-image">
+                        <img src="http://localhost:8000/api/images/article_9_8fdf885cffc0.jpg" alt="Big New Party Room at the White House" loading="lazy">
+                    </div>
+                    <div class="article-content">
+                        <div class="article-title">Big New Party Room at the White House</div>
+                        <div class="article-summary">The White House is getting a huge new ballroom where people can have parties and events. This new room will be very big - almost twice as large as the main White House building itself. It will be able to hold 999 people at once. The President says this new ballroom won't cost taxpayers any money bec...</div>
+                    </div>
+                </div>
+            </div>
+            <div class="article">
+                <div class="article-id">Article #8</div>
+                <div class="article-header">
+                    <div class="article-image">
+                        <img src="http://localhost:8000/api/images/article_8_2f93a40bbd96.jpg" alt="Tennis Star Sinner Skips Team Italy's Big Match" loading="lazy">
+                    </div>
+                    <div class="article-content">
+                        <div class="article-title">Tennis Star Sinner Skips Team Italy's Big Match</div>
+                        <div class="article-summary">Jannik Sinner, a famous tennis player from Italy, has decided not to play for his country's team in an important tournament called the Davis Cup. This is like when your favorite player on a school team misses the championship game. Sinner is one of the best tennis players in the world - he was ranke...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="level-section level-mid">
+            <div class="level-title">🔵 Mid Level</div>
+            <p style="color: #6b7280; margin-bottom: 20px; font-size: 14px;">Intermediate Content</p>
+            <div class="article">
+                <div class="article-id">Article #9</div>
+                <div class="article-header">
+                    <div class="article-image">
+                        <img src="http://localhost:8000/api/images/article_9_8fdf885cffc0.jpg" alt="Trump's $250 Million White House Ballroom Expansion" loading="lazy">
+                    </div>
+                    <div class="article-content">
+                        <div class="article-title">Trump's $250 Million White House Ballroom Expansion</div>
+                        <div class="article-summary">Construction has commenced on a $250 million ballroom addition to the White House, with demolition of the East Wing facade underway. The 90,000-square-foot structure will significantly exceed the size of the main White House building, nearly doubling its footprint. President Trump asserts the projec...</div>
+                    </div>
+                </div>
+            </div>
+            <div class="article">
+                <div class="article-id">Article #8</div>
+                <div class="article-header">
+                    <div class="article-image">
+                        <img src="http://localhost:8000/api/images/article_8_2f93a40bbd96.jpg" alt="Sinner's Strategic Absence from Italy's Davis Cup Defense" loading="lazy">
+                    </div>
+                    <div class="article-content">
+                        <div class="article-title">Sinner's Strategic Absence from Italy's Davis Cup Defense</div>
+                        <div class="article-summary">World number two tennis player Jannik Sinner has opted out of Italy's Davis Cup campaign as the team seeks a third consecutive title. The four-time Grand Slam champion, who recently lost his world number one ranking to Carlos Alcaraz after the US Open final, has decided to prioritize preparation for...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="level-section level-hard">
+            <div class="level-title">🟠 Hard Level</div>
+            <p style="color: #6b7280; margin-bottom: 20px; font-size: 14px;">Expert-Level Content</p>
+            <div class="article">
+                <div class="article-id">Article #9</div>
+                <div class="article-header">
+                    <div class="article-image">
+                        <img src="http://localhost:8000/api/images/article_9_8fdf885cffc0.jpg" alt="Architectural Expansion and Funding Mechanisms of Trump's White House Ballroom Project" loading="lazy">
+                    </div>
+                    <div class="article-content">
+                        <div class="article-title">Architectural Expansion and Funding Mechanisms of Trump's White House Ballroom Project</div>
+                        <div class="article-summary">The Trump administration has initiated construction of a $250 million ballroom addition to the White House complex, commencing with demolition of the East Wing facade. This 90,000-square-foot structure will substantially exceed the spatial footprint of the main Executive Residence, representing near...</div>
+                    </div>
+                </div>
+            </div>
+            <div class="article">
+                <div class="article-id">Article #8</div>
+                <div class="article-header">
+                    <div class="article-image">
+                        <img src="http://localhost:8000/api/images/article_8_2f93a40bbd96.jpg" alt="Strategic Calendar Management: Sinner's Davis Cup Omission Amid ATP Scheduling Pressures" loading="lazy">
+                    </div>
+                    <div class="article-content">
+                        <div class="article-title">Strategic Calendar Management: Sinner's Davis Cup Omission Amid ATP Scheduling Pressures</div>
+                        <div class="article-summary">In a decision reflecting contemporary professional tennis's calendrical challenges, Jannik Sinner has elected to forego Italy's Davis Cup title defense, opting instead for extended preseason preparation ahead of the Australian Open. The world number two's absence from national team duties follows hi...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="level-section level-cn">
+            <div class="level-title">🔴 中文版本</div>
+            <p style="color: #6b7280; margin-bottom: 20px; font-size: 14px;">Chinese Translation</p>
+            <div class="article">
+                <div class="article-id">Article #9</div>
+                <div class="article-header">
+                    <div class="article-image">
+                        <img src="http://localhost:8000/api/images/article_9_8fdf885cffc0.jpg" alt="关于特朗普为白宫增建2.5亿美元舞厅需要了解的9件事" loading="lazy">
+                    </div>
+                    <div class="article-content">
+                        <div class="article-title">关于特朗普为白宫增建2.5亿美元舞厅需要了解的9件事</div>
+                        <div class="article-summary">美联社达琳·苏珀维尔报道 华盛顿（美联社）——本周，特朗普总统为白宫增建的2.5亿美元舞厅已开始施工，建筑工人开始拆除东翼的外立面，新舞厅将在此建造。这个9万平方英尺的舞厅将使白宫主建筑相形见绌，面积近乎翻倍，特朗普表示可容纳999人。特朗普在社交媒体上声称，舞厅不会花费纳税人一分钱，因为资金全部来自“许多慷慨的爱国者、伟大的美国公司以及本人”的私人捐款。以下是关于这一最新白宫建设项目需要了解的信息。特朗普表示白宫需要大型娱乐空间，并抱怨目前白宫内最大的东厅只能容纳约200人，空间太小。他对以往总统在南草坪帐篷内举办国宴等大型活动的做法表示不满。特朗普声称项目资金将全部来自私人捐款，不会动用公...</div>
+                    </div>
+                </div>
+            </div>
+            <div class="article">
+                <div class="article-id">Article #8</div>
+                <div class="article-header">
+                    <div class="article-image">
+                        <img src="http://localhost:8000/api/images/article_8_2f93a40bbd96.jpg" alt="辛纳将缺席意大利戴维斯杯卫冕战" loading="lazy">
+                    </div>
+                    <div class="article-content">
+                        <div class="article-title">辛纳将缺席意大利戴维斯杯卫冕战</div>
+                        <div class="article-summary">四届大满贯冠军得主辛纳将不会参加意大利队下个月争取第三次连续戴维斯杯冠军的比赛。这位24岁的选手在2025年进入了全部四项大满贯单打决赛，赢得了澳大利亚公开赛和温布尔登锦标赛，并于周六在沙特阿拉伯赢得了六王表演赛的冠军。
+
+辛纳目前世界排名第二，在九月份美国公开赛决赛中输给阿尔卡拉斯后失去了世界第一的宝座。他计划参加11月9日至16日在都灵举行的ATP总决赛，但意大利队长沃兰德里表示，这位世界第二的选手"尚未确认可用性"参加11月18日至23日在博洛尼亚举行的戴维斯杯比赛。
+
+世界排名第一的阿尔卡拉斯已被列入西班牙队阵容。
+
+辛纳表示，他决定缺席戴维斯杯是为了为下个赛季的开始获得额外的准备时间...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <p><strong>📧 News Digest - Multi-Level Content</strong></p>
+            <p>This email contains articles at different complexity levels (Easy, Mid, Hard) and Chinese translation.</p>
+            <p>Use the level that matches your reading preference or language.</p>
+            <p class="generated-time">Generated: 2025-10-22T22:29:46.759901</p>
+        </div>
+    </div>
+</body>
+</html>

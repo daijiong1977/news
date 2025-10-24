@@ -1,0 +1,500 @@
+{
+  "article_analysis": {
+    "zh_title": "特朗普表示不愿举行'浪费的会议'，与普京会谈计划被搁置",
+    "levels": {
+      "easy": {
+        "title": "Trump Cancels Meeting with Putin Over Ukraine War",
+        "summary": "President Trump decided not to meet with Russian President Putin because they couldn't agree on how to end the fighting in Ukraine. Trump said he didn't want a \"wasted meeting\" where nothing gets accomplished. The main problem is that Russia doesn't want to stop fighting where the battle lines are currently drawn. Trump wants both sides to stop fighting immediately and keep the current front lines. This would be similar to a ceasefire that Ukraine and European leaders support. The two leaders last met in Alaska in August, but that meeting didn't produce any real results. The White House decided it was better to cancel this new meeting rather than have another unsuccessful summit. Both countries had different ideas about how to make peace, making it clear they couldn't reach an agreement.",
+        "keywords": [
+          {
+            "term": "Meeting",
+            "explanation": "A planned discussion between leaders"
+          },
+          {
+            "term": "Ukraine War",
+            "explanation": "The fighting between Russia and Ukraine"
+          },
+          {
+            "term": "Ceasefire",
+            "explanation": "When fighting stops temporarily"
+          },
+          {
+            "term": "Front Line",
+            "explanation": "Where the fighting is happening now"
+          },
+          {
+            "term": "Peace Talks",
+            "explanation": "Discussions to end a war"
+          },
+          {
+            "term": "White House",
+            "explanation": "Where the US president works"
+          },
+          {
+            "term": "Russia",
+            "explanation": "The country fighting Ukraine"
+          },
+          {
+            "term": "Agreement",
+            "explanation": "When two sides decide on something"
+          },
+          {
+            "term": "Diplomat",
+            "explanation": "A person who represents their country"
+          },
+          {
+            "term": "Summit",
+            "explanation": "An important meeting between leaders"
+          }
+        ],
+        "questions": [
+          {
+            "question": "Why did Trump cancel the meeting with Putin?",
+            "options": [
+              "They couldn't agree on Ukraine",
+              "Putin was too busy",
+              "The weather was bad",
+              "Trump was sick"
+            ],
+            "correct_answer": "They couldn't agree on Ukraine"
+          },
+          {
+            "question": "What did Trump call the meeting he didn't want?",
+            "options": [
+              "Wasted meeting",
+              "Boring meeting",
+              "Important meeting",
+              "Secret meeting"
+            ],
+            "correct_answer": "Wasted meeting"
+          },
+          {
+            "question": "Where do Trump and Putin want the fighting to stop?",
+            "options": [
+              "Current front lines",
+              "Russian border",
+              "Ukrainian capital",
+              "Europe"
+            ],
+            "correct_answer": "Current front lines"
+          },
+          {
+            "question": "When was the last time Trump and Putin met?",
+            "options": [
+              "August in Alaska",
+              "Last week",
+              "Last year",
+              "Never met before"
+            ],
+            "correct_answer": "August in Alaska"
+          },
+          {
+            "question": "Who supports the ceasefire plan Trump mentioned?",
+            "options": [
+              "Ukraine and European leaders",
+              "Only Russia",
+              "Only the US",
+              "No one supports it"
+            ],
+            "correct_answer": "Ukraine and European leaders"
+          },
+          {
+            "question": "What is the main disagreement between US and Russia?",
+            "options": [
+              "Where to stop fighting",
+              "What to eat",
+              "When to meet",
+              "How to travel"
+            ],
+            "correct_answer": "Where to stop fighting"
+          },
+          {
+            "question": "Where does the US president work?",
+            "options": [
+              "White House",
+              "Kremlin",
+              "Congress",
+              "Pentagon"
+            ],
+            "correct_answer": "White House"
+          },
+          {
+            "question": "What is a ceasefire?",
+            "options": [
+              "Stopping fighting temporarily",
+              "Starting a war",
+              "Moving armies",
+              "Building weapons"
+            ],
+            "correct_answer": "Stopping fighting temporarily"
+          }
+        ],
+        "background_reading": "The conflict between Russia and Ukraine began in 2014 when Russia took control of Crimea. Since then, fighting has continued in eastern Ukraine between Ukrainian forces and Russian-backed separatists. The United States and European countries have supported Ukraine, while Russia denies direct involvement. Peace talks have happened many times, but no lasting agreement has been reached. World leaders often meet to discuss ending the conflict, but these meetings don't always succeed. The situation affects many countries and has caused thousands of deaths and displacement of people from their homes.",
+        "perspectives": [
+          {
+            "perspective": "Trump is being practical by not having a meeting that won't achieve anything, saving time and resources",
+            "attitude": "positive"
+          },
+          {
+            "perspective": "Canceling the meeting shows that diplomacy is failing and the conflict may continue longer",
+            "attitude": "negative"
+          },
+          {
+            "perspective": "Both leaders have different positions on the conflict, making agreement difficult at this time",
+            "attitude": "neutral"
+          }
+        ]
+      },
+      "mid": {
+        "title": "Trump-Putin Summit Canceled Over Ukraine Peace Plan Disagreements",
+        "summary": "President Trump announced the cancellation of planned talks with Russian President Vladimir Putin, citing concerns about a \"wasted meeting\" given the fundamental disagreements over resolving the Ukraine conflict. The key sticking point emerged as Russia's refusal to accept a ceasefire along current battle lines, which Trump has endorsed along with Ukrainian and European leaders. This development follows a previous Trump-Putin summit in Alaska last August that failed to produce substantive results, leading the White House to avoid repeating that scenario. Preparatory discussions between US Secretary of State Marco Rubio and Russian Foreign Minister Sergei Lavrov were deemed sufficient, with the White House characterizing their communication as \"productive\" and making a face-to-face meeting unnecessary. Trump explicitly stated his position: \"Let it be cut the way it is. I said: cut and stop at the battle line. Go home. Stop fighting, stop killing people.\" However, Moscow has consistently rejected freezing the conflict along current front lines, creating an irreconcilable difference in negotiating positions. A senior European diplomat suggested that Russian demands exceeded what the US was willing to concede, making any potential agreement in Budapest unfeasible. The cancellation reflects the deepening divide between American and Russian approaches to conflict resolution in Ukraine, with neither side showing willingness to compromise on core positions.",
+        "keywords": [
+          {
+            "term": "Diplomatic Summit",
+            "explanation": "High-level meeting between national leaders to discuss important issues"
+          },
+          {
+            "term": "Ceasefire Proposal",
+            "explanation": "Formal suggestion to temporarily halt military operations"
+          },
+          {
+            "term": "Front Line Stabilization",
+            "explanation": "Freezing military positions along current battle boundaries"
+          },
+          {
+            "term": "Bilateral Relations",
+            "explanation": "The political and economic connections between two countries"
+          },
+          {
+            "term": "Conflict Resolution",
+            "explanation": "Process of ending disputes through negotiation and compromise"
+          },
+          {
+            "term": "Preparatory Meetings",
+            "explanation": "Discussions held in advance to prepare for main negotiations"
+          },
+          {
+            "term": "Geopolitical Stalemate",
+            "explanation": "Situation where opposing powers cannot reach agreement"
+          },
+          {
+            "term": "Foreign Policy",
+            "explanation": "A government's strategy in dealing with other nations"
+          },
+          {
+            "term": "Negotiating Positions",
+            "explanation": "The stated demands and conditions each side brings to talks"
+          },
+          {
+            "term": "International Diplomacy",
+            "explanation": "The practice of conducting relations between countries"
+          }
+        ],
+        "questions": [
+          {
+            "question": "What was Trump's primary reason for canceling the Putin meeting?",
+            "options": [
+              "Avoiding a wasted meeting",
+              "Scheduling conflicts",
+              "Health concerns",
+              "Transportation issues"
+            ],
+            "correct_answer": "Avoiding a wasted meeting"
+          },
+          {
+            "question": "Which specific Ukrainian conflict issue caused the cancellation?",
+            "options": [
+              "Freezing current battle lines",
+              "Economic sanctions",
+              "Military equipment",
+              "Border disputes"
+            ],
+            "correct_answer": "Freezing current battle lines"
+          },
+          {
+            "question": "When was the last Trump-Putin summit held?",
+            "options": [
+              "August in Alaska",
+              "June in Geneva",
+              "March in Helsinki",
+              "October in Moscow"
+            ],
+            "correct_answer": "August in Alaska"
+          },
+          {
+            "question": "What was the outcome of the previous Trump-Putin meeting?",
+            "options": [
+              "No concrete results",
+              "Peace agreement signed",
+              "Trade deal reached",
+              "Military alliance formed"
+            ],
+            "correct_answer": "No concrete results"
+          },
+          {
+            "question": "Which officials had preparatory discussions instead of meeting?",
+            "options": [
+              "Rubio and Lavrov",
+              "Trump and Putin",
+              "Military commanders",
+              "Economic advisors"
+            ],
+            "correct_answer": "Rubio and Lavrov"
+          },
+          {
+            "question": "How did the White House describe the Rubio-Lavrov communication?",
+            "options": [
+              "Productive",
+              "Unsuccessful",
+              "Hostile",
+              "Confusing"
+            ],
+            "correct_answer": "Productive"
+          },
+          {
+            "question": "Which countries support the ceasefire plan Trump endorsed?",
+            "options": [
+              "Ukraine and European nations",
+              "Only Russia",
+              "Only China",
+              "All NATO members"
+            ],
+            "correct_answer": "Ukraine and European nations"
+          },
+          {
+            "question": "What did the European diplomat suggest about Russian demands?",
+            "options": [
+              "They wanted too much",
+              "They were reasonable",
+              "They were flexible",
+              "They were unclear"
+            ],
+            "correct_answer": "They wanted too much"
+          },
+          {
+            "question": "Where was the potential summit planned to occur?",
+            "options": [
+              "Budapest",
+              "Washington",
+              "Moscow",
+              "Berlin"
+            ],
+            "correct_answer": "Budapest"
+          },
+          {
+            "question": "What is the current status of US-Russia negotiations?",
+            "options": [
+              "Stalled over fundamental differences",
+              "Progressing well",
+              "Completed successfully",
+              "Just beginning"
+            ],
+            "correct_answer": "Stalled over fundamental differences"
+          }
+        ],
+        "background_reading": "The Russia-Ukraine conflict represents one of Europe's most significant geopolitical crises since the Cold War. Beginning with Russia's annexation of Crimea in 2014, the conflict expanded into eastern Ukraine where Russian-backed separatists have fought Ukrainian government forces. Multiple peace initiatives, including the Minsk agreements, have attempted to resolve the conflict but implementation has been inconsistent. The United States has provided military and economic support to Ukraine while imposing sanctions on Russia. Previous US-Russia summits have yielded mixed results, with the Helsinki meeting in 2018 generating controversy and the Alaska summit in August producing no breakthrough. The current diplomatic impasse reflects broader tensions in US-Russia relations, including disputes over NATO expansion, arms control, and influence in post-Soviet states. International efforts to mediate have involved European powers, with France and Germany playing key roles in the Normandy Format talks.",
+        "analysis": "The article follows a clear cause-effect structure, beginning with Trump's announcement and explaining the underlying reasons for the summit cancellation. It effectively contrasts US and Russian positions through direct quotes and diplomatic sources, creating a balanced presentation of the diplomatic deadlock. The argument develops logically from the immediate cancellation news to the fundamental policy differences preventing agreement.",
+        "perspectives": [
+          {
+            "perspective": "Trump's decision demonstrates pragmatic leadership by recognizing when negotiations are futile, avoiding symbolic diplomacy that yields no substantive results",
+            "attitude": "positive"
+          },
+          {
+            "perspective": "The cancellation represents a failure of international diplomacy and signals worsening US-Russia relations that could prolong the Ukraine conflict",
+            "attitude": "negative"
+          },
+          {
+            "perspective": "The situation reflects fundamental policy differences between the two powers, with neither side willing to compromise on core strategic interests in Ukraine",
+            "attitude": "neutral"
+          }
+        ]
+      },
+      "hard": {
+        "title": "Diplomatic Impasse: Trump Cancels Putin Summit Over Irreconcilable Differences in Ukraine Conflict Resolution",
+        "title_zh": "外交僵局：特朗普因乌克兰冲突解决方案不可调和的分歧取消普京峰会",
+        "summary": "The cancellation of the planned Trump-Putin summit represents a significant diplomatic setback in international efforts to resolve the Ukraine conflict, revealing deep structural divisions in US-Russia relations. President Trump's characterization of the aborted meeting as potentially \"wasted\" underscores the fundamental incompatibility between American and Russian approaches to conflict resolution. The core disagreement centers on Moscow's refusal to accept a ceasefire along current front lines, a position Trump has explicitly endorsed alongside Ukrainian and European leadership. This diplomatic rupture follows the inconclusive Alaska summit in August, which established a pattern of high-level engagement failing to produce substantive outcomes. The White House's decision to rely instead on \"productive\" communications between Secretary of State Marco Rubio and Russian Foreign Minister Sergei Lavrov suggests a strategic pivot toward lower-level diplomatic channels when summit-level engagement appears unpromising. Trump's unambiguous statement—\"Let it be cut the way it is. I said: cut and stop at the battle line. Go home. Stop fighting, stop killing people\"—represents the clearest articulation yet of the US position, which aligns with European and Ukrainian preferences for conflict stabilization. However, Russia's consistent rejection of freezing military positions along current boundaries indicates Moscow's determination to preserve strategic flexibility and potential territorial gains. The European diplomatic assessment that \"Russians wanted too much\" highlights the perception that Moscow's negotiating demands exceeded politically feasible concessions from the American side. This development occurs within the broader context of deteriorating US-Russia relations, complicated by competing strategic interests, sanctions regimes, and fundamental disagreements about European security architecture. The cancellation not only reflects immediate diplomatic obstacles but also signals the limitations of personal diplomacy between leaders in overcoming deep-seated geopolitical conflicts.",
+        "zh_hard": "特朗普取消与普京峰会的计划标志着国际社会解决乌克兰冲突的外交努力遭遇重大挫折，揭示了美俄关系中深刻的结构性分歧。总统特朗普将这次流产的会议描述为可能\"浪费\"，突显了美国与俄罗斯在冲突解决方案上根本性的不相容。核心分歧集中在莫斯科拒绝接受沿当前战线停火，而特朗普已明确支持这一立场，并与乌克兰和欧洲领导层保持一致。这次外交破裂紧随八月阿拉斯加峰会无果而终之后，确立了高层接触未能产生实质性成果的模式。白宫决定转而依赖国务卿马可·鲁比奥与俄罗斯外长谢尔盖·拉夫罗夫之间的\"富有成效\"沟通，表明当峰会级别接触前景不佳时，战略转向较低层级外交渠道。特朗普明确的声明——\"就按现状划分。我说：在战线处划分并停止。回家。停止战斗，停止杀人\"——代表了美国立场最清晰的表述，这与欧洲和乌克兰偏好冲突稳定的立场一致。然而，俄罗斯持续拒绝沿当前边界冻结军事阵地，表明莫斯科决心保持战略灵活性和潜在领土收益。欧洲外交评估认为\"俄罗斯人要求太多\"，突显了莫斯科的谈判要求超出美国方面政治可行让步范围的看法。这一事态发展发生在美俄关系恶化的大背景下，因竞争性战略利益、制裁机制以及关于欧洲安全架构的根本分歧而复杂化。取消会议不仅反映了直接的外交障碍，也标志着领导人之间个人外交在克服根深蒂固的地缘政治冲突方面的局限性。当前僵局凸显了冲突各方的根本利益分歧：乌克兰寻求领土完整，俄罗斯追求战略缓冲，而美国则平衡支持盟友与避免直接对抗。外交进程的未来可能取决于能否找到创新解决方案，弥合这些相互竞争的目标，或者冲突可能演变为长期冻结的对抗，重塑东欧的安全动态。",
+        "keywords": [
+          {
+            "term": "Diplomatic Impasse",
+            "explanation": "A situation in which progress in negotiations becomes impossible due to fundamental disagreements"
+          },
+          {
+            "term": "Conflict Resolution Mechanisms",
+            "explanation": "Structured processes and frameworks for addressing and settling disputes between parties"
+          },
+          {
+            "term": "Geopolitical Calculus",
+            "explanation": "The strategic assessment of national interests within international power dynamics"
+          },
+          {
+            "term": "Strategic Flexibility",
+            "explanation": "The ability to adapt military and diplomatic positions to changing circumstances"
+          },
+          {
+            "term": "Diplomatic Channels",
+            "explanation": "The various levels and methods through which international communication occurs"
+          },
+          {
+            "term": "Territorial Integrity",
+            "explanation": "The principle that states should respect each other's borders and sovereignty"
+          },
+          {
+            "term": "Sanctions Regime",
+            "explanation": "A comprehensive system of economic and political restrictions imposed on a country"
+          },
+          {
+            "term": "European Security Architecture",
+            "explanation": "The framework of treaties, alliances and agreements governing European security"
+          },
+          {
+            "term": "Personal Diplomacy",
+            "explanation": "Direct leader-to-leader engagement bypassing traditional bureaucratic channels"
+          },
+          {
+            "term": "Frozen Conflict",
+            "explanation": "A situation where active fighting has ceased but political resolution remains elusive"
+          }
+        ],
+        "questions": [
+          {
+            "question": "What fundamental incompatibility led to the summit cancellation?",
+            "options": [
+              "Conflict resolution approaches",
+              "Personal relationships",
+              "Economic policies",
+              "Cultural differences"
+            ],
+            "correct_answer": "Conflict resolution approaches"
+          },
+          {
+            "question": "Which previous summit established the pattern of unproductive high-level engagement?",
+            "options": [
+              "Alaska summit in August",
+              "Helsinki meeting 2018",
+              "Geneva talks 2021",
+              "Moscow conference 2019"
+            ],
+            "correct_answer": "Alaska summit in August"
+          },
+          {
+            "question": "What does the shift to Rubio-Lavrov communications indicate?",
+            "options": [
+              "Strategic pivot to lower-level channels",
+              "Complete diplomatic breakdown",
+              "Military escalation",
+              "Economic cooperation"
+            ],
+            "correct_answer": "Strategic pivot to lower-level channels"
+          },
+          {
+            "question": "How does Trump's ceasefire position align with other stakeholders?",
+            "options": [
+              "Matches Ukrainian and European preferences",
+              "Contradicts all other positions",
+              "Supports Russian objectives",
+              "Isolated US stance"
+            ],
+            "correct_answer": "Matches Ukrainian and European preferences"
+          },
+          {
+            "question": "What strategic objective does Russia's rejection of front-line freezing serve?",
+            "options": [
+              "Preserving territorial flexibility",
+              "Economic development",
+              "Cultural exchange",
+              "Environmental protection"
+            ],
+            "correct_answer": "Preserving territorial flexibility"
+          },
+          {
+            "question": "What broader context complicates US-Russia relations beyond Ukraine?",
+            "options": [
+              "Competing strategic interests and sanctions",
+              "Only personal disagreements",
+              "Exclusively economic competition",
+              "Purely cultural differences"
+            ],
+            "correct_answer": "Competing strategic interests and sanctions"
+          },
+          {
+            "question": "What does the European assessment \"Russians wanted too much\" imply?",
+            "options": [
+              "Exceeding politically feasible US concessions",
+              "Reasonable negotiation positions",
+              "Inadequate Russian demands",
+              "Perfectly balanced proposals"
+            ],
+            "correct_answer": "Exceeding politically feasible US concessions"
+          },
+          {
+            "question": "What limitation does this cancellation reveal about international diplomacy?",
+            "options": [
+              "Constraints of personal leader diplomacy",
+              "Effectiveness of summit meetings",
+              "Success of multilateral approaches",
+              "Strength of economic incentives"
+            ],
+            "correct_answer": "Constraints of personal leader diplomacy"
+          },
+          {
+            "question": "Which principle is central to Ukraine's position in the conflict?",
+            "options": [
+              "Territorial integrity",
+              "Economic integration",
+              "Cultural autonomy",
+              "Military expansion"
+            ],
+            "correct_answer": "Territorial integrity"
+          },
+          {
+            "question": "What potential outcome does the current stalemate suggest?",
+            "options": [
+              "Long-term frozen conflict",
+              "Immediate resolution",
+              "Military victory",
+              "Economic collapse"
+            ],
+            "correct_answer": "Long-term frozen conflict"
+          },
+          {
+            "question": "How does the cancellation affect European security dynamics?",
+            "options": [
+              "Reinforces existing divisions",
+              "Creates new alliances",
+              "Eliminates all tensions",
+              "Unifies all positions"
+            ],
+            "correct_answer": "Reinforces existing divisions"
+          },
+          {
+            "question": "What role do preparatory meetings play in summit diplomacy?",
+            "options": [
+              "Foundation for substantive agreements",
+              "Merely ceremonial functions",
+              "Military planning sessions",
+              "Economic negotiation platforms"
+            ],
+            "correct_answer": "Foundation for substantive agreements"
+          }
+        ],
+        "background_reading": "The Ukraine conflict represents a critical juncture in post-Cold War European security, emerging from Russia's perception of NATO expansion as an existential threat and Western concerns about Russian revanchism. The 2014 Maidan Revolution and subsequent Russian annexation of Crimea shattered the post-Soviet settlement, while the ongoing conflict in Donbas has claimed over 14,000 lives and displaced millions. Multiple diplomatic frameworks—including the Minsk Agreements, Normandy Format, and various US-Russia bilateral channels—have attempted conflict resolution with limited success. The United States has pursued a policy of calibrated engagement with Russia while maintaining sanctions and providing military assistance to Ukraine, creating a complex balancing act between deterrence and diplomacy. Previous Trump-Putin summits, particularly the controversial Helsinki meeting, revealed both the potential and limitations of personal diplomacy in bridging fundamental geopolitical divides. The current diplomatic stalemate occurs against the backdrop of evolving European security architecture, with questions about NATO's future role, EU-Russia relations, and the broader contest between liberal international order and emerging multipolarity. Understanding this context is essential for appreciating the structural constraints facing any resolution of the Ukraine conflict.",
+        "analysis": "The article employs a sophisticated narrative structure that moves from specific diplomatic events to broader geopolitical implications, effectively contextualizing the summit cancellation within larger US-Russia strategic competition. The argument development skillfully connects immediate policy disagreements to fundamental differences in conflict resolution philosophy, using multiple sources including direct presidential statements, diplomatic assessments, and historical precedent to build a comprehensive analysis of the diplomatic deadlock.",
+        "perspectives": [
+          {
+            "perspective": "The cancellation represents strategic maturity in recognizing when diplomatic engagement becomes counterproductive, avoiding the legitimization of unreasonable Russian demands through high-level summits",
+            "attitude": "positive"
+          },
+          {
+            "perspective": "This diplomatic failure exacerbates the Ukraine conflict's intractability, demonstrating the bankruptcy of current approaches to US-Russia relations and European security management",
+            "attitude": "negative"
+          },
+          {
+            "perspective": "The situation reflects the structural limitations of bilateral diplomacy in resolving complex multilateral conflicts where competing strategic interests and historical grievances create fundamental incompatibilities",
+            "attitude": "neutral"
+          }
+        ]
+      }
+    }
+  }
+}

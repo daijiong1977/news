@@ -1,0 +1,500 @@
+{
+  "article_analysis": {
+    "zh_title": "“臀部呼吸”可能很快成为真正的医疗方法",
+    "levels": {
+      "easy": {
+        "title": "Animals Can Breathe Through Their Bottom",
+        "summary": "Scientists discovered that some animals can breathe through their bottoms when they can't use their normal breathing methods. This strange finding won a funny science prize but could help people who have trouble breathing. When people get very sick and their lungs don't work properly, doctors sometimes use machines to help them breathe. But during the COVID-19 pandemic, there weren't enough of these machines for everyone. Researchers are now testing if humans could also breathe through their bottoms using special oxygen. They tried this on mice and small pigs, and it worked! This could become a new way to help patients who can't breathe normally.",
+        "keywords": [
+          {
+            "term": "Breathing",
+            "explanation": "The way living things take in air to stay alive"
+          },
+          {
+            "term": "Lungs",
+            "explanation": "Body parts that help us breathe air"
+          },
+          {
+            "term": "Oxygen",
+            "explanation": "A gas in air that our bodies need to live"
+          },
+          {
+            "term": "Doctors",
+            "explanation": "People who help sick people get better"
+          },
+          {
+            "term": "Research",
+            "explanation": "When scientists study things to learn new information"
+          },
+          {
+            "term": "Animals",
+            "explanation": "Living creatures like mice, pigs, and fish"
+          },
+          {
+            "term": "Treatment",
+            "explanation": "Ways to help sick people feel better"
+          },
+          {
+            "term": "Hospital",
+            "explanation": "A place where sick people go for help"
+          },
+          {
+            "term": "Scientists",
+            "explanation": "People who study how things work"
+          },
+          {
+            "term": "Medicine",
+            "explanation": "Science of keeping people healthy and treating sickness"
+          }
+        ],
+        "questions": [
+          {
+            "question": "What did scientists discover about animals?",
+            "options": [
+              "They can run very fast",
+              "They can breathe through their bottoms",
+              "They can change colors",
+              "They can fly without wings"
+            ],
+            "correct_answer": "They can breathe through their bottoms"
+          },
+          {
+            "question": "Why is this discovery important?",
+            "options": [
+              "It helps animals find food",
+              "It could help people who can't breathe well",
+              "It makes animals smarter",
+              "It helps animals sleep better"
+            ],
+            "correct_answer": "It could help people who can't breathe well"
+          },
+          {
+            "question": "What prize did this research win?",
+            "options": [
+              "Nobel Prize",
+              "Ig Nobel Prize",
+              "Science Award",
+              "Medical Prize"
+            ],
+            "correct_answer": "Ig Nobel Prize"
+          },
+          {
+            "question": "Which animals did scientists test this on?",
+            "options": [
+              "Dogs and cats",
+              "Mice and small pigs",
+              "Birds and fish",
+              "Monkeys and rabbits"
+            ],
+            "correct_answer": "Mice and small pigs"
+          },
+          {
+            "question": "When were there not enough breathing machines?",
+            "options": [
+              "During winter",
+              "During COVID-19 pandemic",
+              "During summer vacation",
+              "During holidays"
+            ],
+            "correct_answer": "During COVID-19 pandemic"
+          },
+          {
+            "question": "Where do the researchers work?",
+            "options": [
+              "School",
+              "Cincinnati Children's Hospital",
+              "Zoo",
+              "Factory"
+            ],
+            "correct_answer": "Cincinnati Children's Hospital"
+          },
+          {
+            "question": "What is the main problem this research tries to solve?",
+            "options": [
+              "Helping people eat better",
+              "Helping people breathe when lungs don't work",
+              "Making animals healthier",
+              "Creating new medicines"
+            ],
+            "correct_answer": "Helping people breathe when lungs don't work"
+          },
+          {
+            "question": "What is the technical name for this breathing method?",
+            "options": [
+              "EVA",
+              "ABC",
+              "XYZ",
+              "123"
+            ],
+            "correct_answer": "EVA"
+          }
+        ],
+        "background_reading": "Breathing is how our bodies get oxygen from the air. Normally, we breathe through our nose and mouth, and air goes to our lungs. The lungs take oxygen from the air and send it to our blood. Our blood carries oxygen to all parts of our body. When people get very sick, sometimes their lungs don't work properly. Doctors use special machines called ventilators to help them breathe. These machines push air into the lungs. During the COVID-19 sickness, many people needed these machines, but there weren't enough for everyone. Scientists are always looking for new ways to help people breathe when their lungs aren't working well.",
+        "perspectives": [
+          {
+            "perspective": "This research could save lives by providing a new way to help people breathe when traditional methods aren't available",
+            "attitude": "positive"
+          },
+          {
+            "perspective": "Some people might feel uncomfortable with the idea of breathing through the bottom and worry about safety",
+            "attitude": "negative"
+          },
+          {
+            "perspective": "While the idea seems strange, scientific research often leads to unexpected medical breakthroughs that help people",
+            "attitude": "neutral"
+          }
+        ]
+      },
+      "mid": {
+        "title": "Rectal Oxygen Delivery: A Novel Approach to Respiratory Treatment",
+        "summary": "Groundbreaking research that earned the 2024 Ig Nobel Prize in Physiology has demonstrated that mammals, including mice and micro-pigs, can effectively breathe through their intestinal system via rectal oxygen delivery. This discovery, while initially appearing humorous, has serious medical implications for treating patients with respiratory failure or blocked airways. The research was inspired by observing how certain aquatic species like loach fish and sea cucumbers utilize intestinal breathing to survive in low-oxygen environments. These creatures have specialized capillary networks in their intestines that can absorb oxygen directly. The technical process, termed Enteral Ventilation via Anus (EVA), involves delivering oxygen-rich liquids or gases through the rectum, where the intestinal lining absorbs the oxygen into the bloodstream. This approach gained particular relevance during the COVID-19 pandemic when ventilator shortages highlighted the urgent need for alternative respiratory support methods. The Cincinnati Children's Hospital Medical Center research team has conducted successful animal trials, showing that rectal oxygen delivery can effectively maintain blood oxygen levels when traditional lung function is compromised. While human applications remain in development, this research represents a promising frontier in emergency medicine and critical care, potentially offering a life-saving alternative when conventional ventilation methods are unavailable or insufficient.",
+        "keywords": [
+          {
+            "term": "Enteral Ventilation via Anus (EVA)",
+            "explanation": "A medical technique that delivers oxygen through the intestinal system via the rectum"
+          },
+          {
+            "term": "Respiratory Failure",
+            "explanation": "A serious condition where the lungs cannot provide enough oxygen to the body"
+          },
+          {
+            "term": "Ig Nobel Prize",
+            "explanation": "An award for unusual or humorous scientific achievements that make people think"
+          },
+          {
+            "term": "Intestinal Breathing",
+            "explanation": "The ability to absorb oxygen through the intestinal lining rather than lungs"
+          },
+          {
+            "term": "Hypoxic Conditions",
+            "explanation": "Environments with low oxygen levels that challenge normal breathing"
+          },
+          {
+            "term": "Capillary Networks",
+            "explanation": "Tiny blood vessels that allow oxygen exchange in tissues"
+          },
+          {
+            "term": "Ventilator Shortage",
+            "explanation": "Lack of mechanical breathing machines, a problem during COVID-19"
+          },
+          {
+            "term": "Rectal Oxygen Delivery",
+            "explanation": "Administering oxygen through the rectum for absorption into bloodstream"
+          },
+          {
+            "term": "Mammalian Physiology",
+            "explanation": "The study of how mammal bodies function, including breathing systems"
+          },
+          {
+            "term": "Medical Innovation",
+            "explanation": "Development of new treatments and medical technologies"
+          }
+        ],
+        "questions": [
+          {
+            "question": "What specific award did this research receive in 2024?",
+            "options": [
+              "Nobel Prize in Medicine",
+              "Ig Nobel Prize in Physiology",
+              "Pulitzer Prize for Science",
+              "Medical Innovation Award"
+            ],
+            "correct_answer": "Ig Nobel Prize in Physiology"
+          },
+          {
+            "question": "Which aquatic species inspired this research on intestinal breathing?",
+            "options": [
+              "Dolphins and whales",
+              "Sharks and rays",
+              "Loach fish and sea cucumbers",
+              "Octopus and squid"
+            ],
+            "correct_answer": "Loach fish and sea cucumbers"
+          },
+          {
+            "question": "What is the technical term for rectal oxygen delivery?",
+            "options": [
+              "Pulmonary Ventilation",
+              "Enteral Ventilation via Anus (EVA)",
+              "Intestinal Respiration System",
+              "Rectal Oxygen Therapy"
+            ],
+            "correct_answer": "Enteral Ventilation via Anus (EVA)"
+          },
+          {
+            "question": "Which medical crisis highlighted the need for alternative breathing methods?",
+            "options": [
+              "Influenza outbreak",
+              "COVID-19 pandemic",
+              "Heart disease epidemic",
+              "Cancer treatment shortages"
+            ],
+            "correct_answer": "COVID-19 pandemic"
+          },
+          {
+            "question": "What physiological feature allows intestinal oxygen absorption?",
+            "options": [
+              "Large intestine size",
+              "Capillary networks in intestines",
+              "Intestinal muscle strength",
+              "Digestive enzyme production"
+            ],
+            "correct_answer": "Capillary networks in intestines"
+          },
+          {
+            "question": "Which research institution conducted this study?",
+            "options": [
+              "Harvard Medical School",
+              "Cincinnati Children's Hospital Medical Center",
+              "Mayo Clinic",
+              "Johns Hopkins Hospital"
+            ],
+            "correct_answer": "Cincinnati Children's Hospital Medical Center"
+          },
+          {
+            "question": "What types of animals were used in the successful trials?",
+            "options": [
+              "Dogs and cats",
+              "Mice and micro-pigs",
+              "Rabbits and guinea pigs",
+              "Monkeys and chimpanzees"
+            ],
+            "correct_answer": "Mice and micro-pigs"
+          },
+          {
+            "question": "What is the primary medical application being investigated?",
+            "options": [
+              "Treating digestive disorders",
+              "Alternative to lung transplantation",
+              "Emergency respiratory support",
+              "Weight loss treatment"
+            ],
+            "correct_answer": "Emergency respiratory support"
+          },
+          {
+            "question": "How does EVA deliver oxygen to the bloodstream?",
+            "options": [
+              "Through stomach absorption",
+              "Via intestinal lining capillaries",
+              "Through liver processing",
+              "Via kidney filtration"
+            ],
+            "correct_answer": "Via intestinal lining capillaries"
+          },
+          {
+            "question": "What condition describes low-oxygen environments where intestinal breathing is beneficial?",
+            "options": [
+              "Hyperoxic conditions",
+              "Hypoxic conditions",
+              "Aerobic environments",
+              "Anaerobic settings"
+            ],
+            "correct_answer": "Hypoxic conditions"
+          }
+        ],
+        "background_reading": "The human respiratory system typically relies on pulmonary ventilation, where air enters through the nose or mouth, travels through the trachea, and reaches the lungs where gas exchange occurs in the alveoli. Oxygen diffuses into the bloodstream while carbon dioxide is expelled. However, various medical conditions can compromise this system, including pneumonia, acute respiratory distress syndrome (ARDS), chronic obstructive pulmonary disease (COPD), and airway obstructions. Traditional treatments include supplemental oxygen, mechanical ventilation, and in severe cases, extracorporeal membrane oxygenation (ECMO). The COVID-19 pandemic exposed critical limitations in respiratory care infrastructure, particularly ventilator availability. This crisis spurred innovation in alternative respiratory support methods. Meanwhile, biological research has long documented that certain species possess remarkable adaptations for oxygen uptake, including cutaneous respiration (through skin) in amphibians and intestinal breathing in some aquatic organisms. Understanding these natural adaptations provides valuable insights for developing novel medical interventions when conventional approaches fail or are unavailable.",
+        "analysis": "The article presents a compelling case study in scientific innovation emerging from unexpected sources. Structurally, it begins with an attention-grabbing premise about 'butt breathing' that initially seems humorous but quickly establishes serious medical relevance. The argument progresses logically from the Ig Nobel recognition to the underlying biological inspiration from aquatic species, then to experimental validation in mammals, and finally to potential human applications. The research builds credibility by connecting to real-world medical challenges experienced during the COVID-19 pandemic, creating a persuasive narrative about the practical importance of what might otherwise be dismissed as fringe science. The article effectively balances scientific rigor with accessibility, making complex physiological concepts understandable while maintaining professional credibility.",
+        "perspectives": [
+          {
+            "perspective": "This represents a brilliant example of translational medicine, where observations from nature lead to innovative human treatments that could save countless lives during respiratory emergencies",
+            "attitude": "positive"
+          },
+          {
+            "perspective": "The approach raises significant ethical and practical concerns about patient comfort, infection risks, and whether resources should be directed toward more conventional respiratory treatments",
+            "attitude": "negative"
+          },
+          {
+            "perspective": "While unconventional, this research demonstrates the value of exploring all biological possibilities for medical advancement, particularly when addressing critical shortages in traditional treatment options",
+            "attitude": "neutral"
+          }
+        ]
+      },
+      "hard": {
+        "title": "Enteral Ventilation via Anus: Investigating Rectal Oxygen Delivery as Emergency Respiratory Intervention",
+        "title_zh": "经肛门肠道通气：研究直肠氧输送作为紧急呼吸干预措施",
+        "summary": "The 2024 Ig Nobel Prize-winning research on mammalian intestinal respiration represents a paradigm shift in emergency respiratory medicine, demonstrating that enteral ventilation via anus (EVA) can effectively maintain oxygenation in mammalian models when pulmonary function is compromised. This groundbreaking work, conducted by researchers at Cincinnati Children's Hospital Medical Center, builds upon earlier observations of aquatic species like the freshwater loach (Misgurnus anguillicaudatus) and sea cucumbers, which utilize specialized intestinal vasculature for gas exchange in hypoxic environments. The research methodology involved systematic experimentation with murine and porcine models, delivering oxygen either as a gas or oxygenated perfluorocarbon liquid through rectal administration. Results demonstrated significant maintenance of blood oxygen saturation levels and prevention of hypoxic tissue damage, even during induced respiratory failure. The physiological mechanism relies on the extensive capillary network within the intestinal mucosa, which facilitates direct oxygen diffusion into the bloodstream while simultaneously removing carbon dioxide. This approach gained heightened relevance during the COVID-19 pandemic, where global ventilator shortages exposed critical gaps in respiratory support infrastructure. The research team drew inspiration from historical work by Leland Clark on liquid breathing and perfluorocarbon applications, integrating these concepts with contemporary understanding of intestinal physiology. While human clinical applications require further investigation regarding safety, dosage optimization, and patient selection criteria, the preliminary data suggest EVA could serve as a viable bridge therapy for patients awaiting conventional ventilation or as an alternative when mechanical ventilation is contraindicated or unavailable. The research exemplifies how seemingly unconventional biological adaptations can inspire innovative medical solutions to address pressing clinical challenges in critical care medicine.",
+        "zh_hard": "2024年搞笑诺贝尔奖获奖研究关于哺乳动物肠道呼吸的研究代表了急诊呼吸医学的范式转变，证明当肺功能受损时，经肛门肠道通气（EVA）能有效维持哺乳动物模型的氧合水平。这项由辛辛那提儿童医院医疗中心研究人员进行的开创性工作建立在早期对水生物种如泥鳅和海参的观察基础上，这些物种利用特化的肠道血管系统在低氧环境中进行气体交换。研究方法涉及对小鼠和猪模型的系统实验，通过直肠给药输送气体氧气或氧合全氟化碳液体。结果显示即使在进行诱导性呼吸衰竭期间，也能显著维持血氧饱和度水平并预防缺氧组织损伤。生理机制依赖于肠粘膜内广泛的毛细血管网络，促进氧气直接扩散进入血流，同时去除二氧化碳。这种方法在COVID-19大流行期间获得了更高相关性，当时全球呼吸机短缺暴露了呼吸支持基础设施的关键缺口。研究团队从Leland Clark关于液体呼吸和全氟化碳应用的历史工作中获得灵感，将这些概念与当代对肠道生理学的理解相结合。虽然人类临床应用需要进一步研究安全性、剂量优化和患者选择标准，但初步数据表明EVA可以作为等待常规通气患者的可行桥接治疗，或当机械通气禁忌或不可用时的替代方案。该研究例证了看似非常规的生物适应如何激发创新医疗解决方案，以应对重症监护医学中紧迫的临床挑战。",
+        "keywords": [
+          {
+            "term": "Enteral Ventilation via Anus (EVA)",
+            "explanation": "A novel respiratory support technique involving oxygen delivery through the intestinal tract via rectal administration for systemic oxygenation"
+          },
+          {
+            "term": "Intestinal Mucosal Capillaries",
+            "explanation": "The dense network of microscopic blood vessels in the intestinal lining that facilitate gas exchange during enteral ventilation"
+          },
+          {
+            "term": "Perfluorocarbon Oxygen Carriers",
+            "explanation": "Synthetic compounds capable of dissolving large volumes of oxygen, used in liquid ventilation applications"
+          },
+          {
+            "term": "Hypoxic Respiratory Failure",
+            "explanation": "A critical condition characterized by inadequate oxygen delivery to tissues despite adequate ventilation"
+          },
+          {
+            "term": "Translational Physiology",
+            "explanation": "The process of applying basic physiological research findings to develop clinical interventions and treatments"
+          },
+          {
+            "term": "Ventilator-Associated Complications",
+            "explanation": "Adverse effects resulting from mechanical ventilation, including barotrauma and ventilator-induced lung injury"
+          },
+          {
+            "term": "Cross-Species Physiological Adaptation",
+            "explanation": "The study of how different species evolve unique physiological solutions to environmental challenges"
+          },
+          {
+            "term": "Emergency Respiratory Bridge Therapy",
+            "explanation": "Temporary respiratory support methods used when conventional ventilation is unavailable or being established"
+          },
+          {
+            "term": "Intestinal Gas Exchange Efficiency",
+            "explanation": "The measurement of how effectively the intestinal system can absorb oxygen and eliminate carbon dioxide"
+          },
+          {
+            "term": "Medical Paradigm Innovation",
+            "explanation": "The development of fundamentally new approaches to addressing established medical challenges"
+          }
+        ],
+        "questions": [
+          {
+            "question": "What specific physiological adaptation in aquatic species inspired the EVA research?",
+            "options": [
+              "Cutaneous respiration in amphibians",
+              "Gill modification in deep-sea fish",
+              "Intestinal gas exchange in loach and sea cucumbers",
+              "Swim bladder oxygenation in teleosts"
+            ],
+            "correct_answer": "Intestinal gas exchange in loach and sea cucumbers"
+          },
+          {
+            "question": "Which historical researcher's work on liquid breathing informed this study?",
+            "options": [
+              "Leland Clark",
+              "Robert Hooke",
+              "William Harvey",
+              "Claude Bernard"
+            ],
+            "correct_answer": "Leland Clark"
+          },
+          {
+            "question": "What are the two primary methods of oxygen delivery tested in EVA research?",
+            "options": [
+              "Gas administration and oxygenated liquid perfusion",
+              "Aerosol delivery and intravenous injection",
+              "Transdermal patches and oral supplements",
+              "Nasal cannula and face mask systems"
+            ],
+            "correct_answer": "Gas administration and oxygenated liquid perfusion"
+          },
+          {
+            "question": "Which physiological parameter was primarily monitored to assess EVA efficacy?",
+            "options": [
+              "Blood oxygen saturation levels",
+              "Respiratory rate variability",
+              "Cardiac output measurements",
+              "Cerebral perfusion pressure"
+            ],
+            "correct_answer": "Blood oxygen saturation levels"
+          },
+          {
+            "question": "What clinical scenario during COVID-19 provided impetus for EVA development?",
+            "options": [
+              "Global ventilator shortages",
+              "Antiviral medication scarcity",
+              "Hospital bed capacity limits",
+              "Personal protective equipment deficits"
+            ],
+            "correct_answer": "Global ventilator shortages"
+          },
+          {
+            "question": "Which animal models demonstrated successful EVA implementation?",
+            "options": [
+              "Murine and porcine models",
+              "Canine and feline models",
+              "Primate and rodent models",
+              "Avian and reptilian models"
+            ],
+            "correct_answer": "Murine and porcine models"
+          },
+          {
+            "question": "What is the primary mechanism enabling intestinal oxygen absorption?",
+            "options": [
+              "Direct diffusion through intestinal mucosal capillaries",
+              "Enzymatic conversion in the intestinal lumen",
+              "Active transport across epithelial barriers",
+              "Lymphatic system absorption and distribution"
+            ],
+            "correct_answer": "Direct diffusion through intestinal mucosal capillaries"
+          },
+          {
+            "question": "Which medical specialty would most likely implement EVA in clinical practice?",
+            "options": [
+              "Critical care and emergency medicine",
+              "Gastroenterology and digestive health",
+              "Pulmonology and respiratory therapy",
+              "Anesthesiology and perioperative care"
+            ],
+            "correct_answer": "Critical care and emergency medicine"
+          },
+          {
+            "question": "What potential advantage does EVA offer over conventional mechanical ventilation?",
+            "options": [
+              "Avoidance of ventilator-associated lung injury",
+              "Superior carbon dioxide elimination",
+              "Lower oxygen consumption requirements",
+              "Enhanced neurological protection"
+            ],
+            "correct_answer": "Avoidance of ventilator-associated lung injury"
+          },
+          {
+            "question": "Which compound class is used in oxygenated liquid formulations for EVA?",
+            "options": [
+              "Perfluorocarbons",
+              "Hydrocarbons",
+              "Silicon-based polymers",
+              "Carbon nanomaterials"
+            ],
+            "correct_answer": "Perfluorocarbons"
+          },
+          {
+            "question": "What represents the main barrier to immediate human EVA implementation?",
+            "options": [
+              "Safety profile and optimization requirements",
+              "Technical complexity of administration",
+              "Patient acceptance and comfort concerns",
+              "Regulatory approval processes"
+            ],
+            "correct_answer": "Safety profile and optimization requirements"
+          },
+          {
+            "question": "How does EVA contribute to carbon dioxide elimination?",
+            "options": [
+              "Reverse diffusion from blood to intestinal lumen",
+              "Metabolic conversion in intestinal cells",
+              "Enzymatic breakdown in the colon",
+              "Direct excretion through rectal mucosa"
+            ],
+            "correct_answer": "Reverse diffusion from blood to intestinal lumen"
+          }
+        ],
+        "background_reading": "The evolution of respiratory support technologies has progressed from basic positive pressure ventilation to sophisticated extracorporeal membrane oxygenation systems. Traditional pulmonary ventilation relies on the anatomical and physiological specialization of the respiratory system, particularly the extensive alveolar surface area and pulmonary capillary network optimized for gas exchange. However, numerous pathological conditions can compromise this system, including acute respiratory distress syndrome, pulmonary fibrosis, and airway obstruction. The COVID-19 pandemic highlighted the limitations of current respiratory support infrastructure, particularly regarding equipment availability and the complications associated with prolonged mechanical ventilation. Concurrently, comparative physiology research has documented remarkable respiratory adaptations across species. Aquatic organisms like loach fish possess intestinal vascular specializations that enable survival in oxygen-depleted environments, while some terrestrial species demonstrate cutaneous gas exchange capabilities. The concept of enteral ventilation builds upon this biological diversity, exploring alternative gas exchange surfaces within the mammalian body. Previous research on liquid ventilation using perfluorocarbons demonstrated the feasibility of non-pulmonary oxygen delivery, while studies on intestinal physiology revealed the gas exchange potential of the gastrointestinal mucosa. The integration of these research streams represents an innovative approach to addressing critical gaps in emergency respiratory care.",
+        "analysis": "This research article exemplifies sophisticated scientific communication that successfully bridges basic biological discovery and clinical application. Structurally, it employs a compelling narrative arc that begins with an apparently whimsical premise but systematically builds a rigorous scientific argument. The article effectively integrates multiple disciplinary perspectives—including comparative physiology, emergency medicine, and biomedical engineering—to construct a comprehensive case for EVA's potential. Methodologically, the research demonstrates robust experimental design through controlled animal trials and careful physiological monitoring. The argumentation is strengthened by contextualizing the research within both historical scientific precedent (Leland Clark's work) and contemporary clinical challenges (COVID-19 ventilator shortages). The article maintains scientific credibility while addressing potential skepticism through clear explanation of physiological mechanisms and systematic validation approaches. This represents an excellent model of how unconventional research can achieve scientific legitimacy through methodological rigor and clear clinical relevance.",
+        "perspectives": [
+          {
+            "perspective": "EVA represents a revolutionary advancement in critical care medicine, potentially transforming emergency respiratory support by providing a readily deployable alternative to mechanical ventilation that could save countless lives during resource-limited scenarios",
+            "attitude": "positive"
+          },
+          {
+            "perspective": "The approach raises substantial concerns regarding patient dignity, infection control, and whether such unconventional methods might divert resources from improving conventional respiratory care systems that benefit larger patient populations",
+            "attitude": "negative"
+          },
+          {
+            "perspective": "While EVA demonstrates innovative physiological thinking, its clinical implementation requires careful consideration of risk-benefit ratios, ethical dimensions, and integration within existing respiratory care protocols rather than replacement of established methods",
+            "attitude": "neutral"
+          }
+        ]
+      }
+    }
+  }
+}

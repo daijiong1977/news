@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>%%EMAIL_SUBJECT%%</title>
+    <style>
+        /* Basic failsafe styles for clients that honor embedded CSS */
+        body, table, td { font-family: Arial, Helvetica, sans-serif; color: #1f1f1f; }
+        a { color: #1a73e8; text-decoration: none; }
+        .btn-primary { background-color: #1a73e8; color: #ffffff !important; padding: 14px 26px; border-radius: 28px; font-weight: bold; display: inline-block; }
+        .btn-secondary { background-color: #ffffff; color: #1a73e8 !important; padding: 12px 24px; border-radius: 26px; border: 1px solid #1a73e8; display: inline-block; }
+        .level-badge { display: inline-block; background-color: #e8f0fe; color: #1a73e8; padding: 6px 14px; border-radius: 999px; font-size: 13px; margin-bottom: 12px; font-weight: bold; }
+        .section-divider { border-top: 1px solid #e0e0e0; margin: 32px 0; }
+        @media screen and (max-width: 620px) {
+            .wrapper { width: 100% !important; }
+            .feature-image { width: 100% !important; height: auto !important; }
+            .btn-primary, .btn-secondary { width: 100% !important; text-align: center !important; }
+        }
+    </style>
+</head>
+<body style="margin:0; padding:0; background-color:#f4f4f9;">
+    <center style="width:100%; background-color:#f4f4f9;">
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:#f4f4f9;">
+            <tr>
+                <td align="center" style="padding: 24px 12px;">
+                    <table role="presentation" class="wrapper" cellspacing="0" cellpadding="0" border="0" width="600" style="width:600px; max-width:600px; background-color:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 6px 20px rgba(0,0,0,0.08);">
+                        <!-- Header -->
+                        <tr>
+                            <td style="padding:28px 32px 18px 32px; background-color:#f8f9fa; text-align:center;">
+                                <p style="margin:0 0 12px 0; font-size:12px; color:#6b7280;">
+                                    <a href="%%UNSUBSCRIBE_URL%%" style="color:#6b7280;">Unsubscribe</a>
+                                </p>
+                                <h1 style="margin:0; font-size:26px; letter-spacing:1.8px; color:#1a73e8; font-weight:700;">NEWS FOR KIDS</h1>
+                                <p style="margin:12px 0 0 0; font-size:16px; color:#4b5563;">Here is your news for the day, <strong>%%USER_LEVEL%%</strong> reader!</p>
+                            </td>
+                        </tr>
+
+                        <!-- Feature 1 -->
+                        <tr>
+                            <td style="padding:30px 32px 26px 32px; background-color:#eef3ff;">
+                                <div class="level-badge">%%FEATURE1_LEVEL%%</div>
+                                <h2 style="margin:0 0 16px 0; font-size:24px; color:#1f2937;">%%FEATURE1_TITLE%%</h2>
+                                <img src="%%FEATURE1_IMAGE%%" alt="%%FEATURE1_TITLE%%" width="536" style="width:100%; max-width:536px; border-radius:14px; display:block; margin:0 auto 20px auto;" class="feature-image">
+                                <p style="margin:0; font-size:16px; line-height:1.7; color:#1f2937;">%%FEATURE1_BODY%%</p>
+                                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-top:26px;">
+                                    <tr>
+                                        <td align="left" style="padding-bottom:10px;">
+                                            <a href="%%FEATURE1_QUIZ_URL%%" class="btn-primary">Start the Quiz 🧠</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td align="left">
+                                            <a href="%%FEATURE1_ARTICLE_URL%%" class="btn-secondary">Read Full Article Page 📚</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+
+                        <!-- Spacer -->
+                        <tr>
+                            <td style="height:24px; background-color:#ffffff;"></td>
+                        </tr>
+
+                        <!-- Feature 2 -->
+                        <tr>
+                            <td style="padding:30px 32px; background-color:#ffffff;">
+                                <div class="level-badge">%%FEATURE2_LEVEL%%</div>
+                                <h2 style="margin:0 0 16px 0; font-size:22px; color:#1f2937;">%%FEATURE2_TITLE%%</h2>
+                                <img src="%%FEATURE2_IMAGE%%" alt="%%FEATURE2_TITLE%%" width="536" style="width:100%; max-width:536px; border-radius:14px; display:block; margin:0 auto 20px auto;" class="feature-image">
+                                <p style="margin:0; font-size:16px; line-height:1.7; color:#1f2937;">%%FEATURE2_BODY%%</p>
+                                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-top:26px;">
+                                    <tr>
+                                        <td align="left" style="padding-bottom:10px;">
+                                            <a href="%%FEATURE2_QUIZ_URL%%" class="btn-primary">Start the Quiz 🧠</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td align="left">
+                                            <a href="%%FEATURE2_ARTICLE_URL%%" class="btn-secondary">Read Full Article Page 📚</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+
+                        <!-- Divider -->
+                        <tr>
+                            <td style="padding:0 32px; background-color:#ffffff;">
+                                <div class="section-divider"></div>
+                            </td>
+                        </tr>
+
+                        <!-- Navigation Menu -->
+                        <tr>
+                            <td style="padding:0 32px 32px 32px; background-color:#ffffff;">
+                                <h3 style="margin:0 0 18px 0; font-size:18px; color:#374151;">More Stories to Explore on the Site</h3>
+                                <!-- News Category -->
+                                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom:18px;">
+                                    <tr>
+                                        <td style="font-weight:bold; font-size:15px; color:#1f2937; padding-bottom:4px;">%%CATEGORY1_NAME%%</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-size:14px; line-height:1.6; color:#374151;">
+                                            <a href="%%CATEGORY1_LINK1%%">%%CATEGORY1_TITLE1%%</a><br>
+                                            <a href="%%CATEGORY1_LINK2%%">%%CATEGORY1_TITLE2%%</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <!-- Science Category -->
+                                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom:18px;">
+                                    <tr>
+                                        <td style="font-weight:bold; font-size:15px; color:#1f2937; padding-bottom:4px;">%%CATEGORY2_NAME%%</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-size:14px; line-height:1.6; color:#374151;">
+                                            <a href="%%CATEGORY2_LINK1%%">%%CATEGORY2_TITLE1%%</a><br>
+                                            <a href="%%CATEGORY2_LINK2%%">%%CATEGORY2_TITLE2%%</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <!-- Sports Category -->
+                                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                    <tr>
+                                        <td style="font-weight:bold; font-size:15px; color:#1f2937; padding-bottom:4px;">%%CATEGORY3_NAME%%</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-size:14px; line-height:1.6; color:#374151;">
+                                            <a href="%%CATEGORY3_LINK1%%">%%CATEGORY3_TITLE1%%</a><br>
+                                            <a href="%%CATEGORY3_LINK2%%">%%CATEGORY3_TITLE2%%</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+
+                        <!-- Footer -->
+                        <tr>
+                            <td style="padding:26px 32px; background-color:#f8f9fa; text-align:center; font-size:12px; color:#6b7280;">
+                                <p style="margin:0 0 10px 0;">
+                                    <a href="%%UNSUBSCRIBE_URL%%" style="color:#6b7280;">Unsubscribe</a> | 
+                                    <a href="%%PREFERENCES_URL%%" style="color:#6b7280;">Manage Preferences</a>
+                                </p>
+                                <p style="margin:0;">© 2025 News for Kids. 123 Learning Way, Education City.</p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </center>
+</body>
+</html>
