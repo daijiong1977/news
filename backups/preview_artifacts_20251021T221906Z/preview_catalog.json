@@ -1,0 +1,110 @@
+{
+  "generated_at": "2025-10-21T18:14:42.714442",
+  "total_items": 24,
+  "per_feed": [
+    {
+      "feed_id": 5,
+      "feed_name": "Ars Science",
+      "feed_url": "https://feeds.arstechnica.com/arstechnica/science",
+      "found_total": 10,
+      "accepted_total": 2,
+      "target": 2
+    },
+    {
+      "feed_id": 8,
+      "feed_name": "Ars Technology Lab",
+      "feed_url": "https://feeds.arstechnica.com/arstechnica/technology-lab",
+      "found_total": 10,
+      "accepted_total": 2,
+      "target": 2
+    },
+    {
+      "feed_id": 12,
+      "feed_name": "BBC Athletics",
+      "feed_url": "https://feeds.bbci.co.uk/sport/athletics/rss.xml",
+      "found_total": 10,
+      "accepted_total": 2,
+      "target": 2
+    },
+    {
+      "feed_id": 9,
+      "feed_name": "BBC Business",
+      "feed_url": "http://feeds.bbci.co.uk/news/business/rss.xml",
+      "found_total": 10,
+      "accepted_total": 2,
+      "target": 2
+    },
+    {
+      "feed_id": 13,
+      "feed_name": "BBC Entertainment",
+      "feed_url": "https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml",
+      "found_total": 10,
+      "accepted_total": 2,
+      "target": 2
+    },
+    {
+      "feed_id": 2,
+      "feed_name": "BBC News",
+      "feed_url": "http://feeds.bbci.co.uk/news/rss.xml",
+      "found_total": 10,
+      "accepted_total": 2,
+      "target": 2
+    },
+    {
+      "feed_id": 4,
+      "feed_name": "BBC Science",
+      "feed_url": "http://feeds.bbci.co.uk/news/science_and_environment/rss.xml",
+      "found_total": 10,
+      "accepted_total": 2,
+      "target": 2
+    },
+    {
+      "feed_id": 11,
+      "feed_name": "BBC Tennis",
+      "feed_url": "https://feeds.bbci.co.uk/sport/tennis/rss.xml",
+      "found_total": 10,
+      "accepted_total": 2,
+      "target": 2
+    },
+    {
+      "feed_id": 1,
+      "feed_name": "PBS NewsHour",
+      "feed_url": "https://www.pbs.org/newshour/feeds/rss/headlines",
+      "found_total": 10,
+      "accepted_total": 2,
+      "target": 2
+    },
+    {
+      "feed_id": 3,
+      "feed_name": "Science Daily",
+      "feed_url": "https://www.sciencedaily.com/rss/top.xml",
+      "found_total": 10,
+      "accepted_total": 2,
+      "target": 2
+    },
+    {
+      "feed_id": 6,
+      "feed_name": "Science Daily - Technology",
+      "feed_url": "https://www.sciencedaily.com/rss/top/technology.xml",
+      "found_total": 10,
+      "accepted_total": 2,
+      "target": 2
+    },
+    {
+      "feed_id": 7,
+      "feed_name": "TechRadar",
+      "feed_url": "https://www.techradar.com/feeds.xml",
+      "found_total": 10,
+      "accepted_total": 2,
+      "target": 2
+    },
+    {
+      "feed_id": 10,
+      "feed_name": "The Street",
+      "feed_url": "https://www.thestreet.com/.rss/feed/a386f542-9b65-4245-9e22-e3cfd33d7d34.xml",
+      "found_total": 10,
+      "accepted_total": 0,
+      "target": 2
+    }
+  ]
+}
