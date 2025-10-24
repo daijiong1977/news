@@ -11,16 +11,6 @@
       "enabled": true
     },
     {
-      "name": "TechRadar",
-      "url": "https://www.techradar.com/rss",
-      "enabled": true
-    },
-    {
-      "name": "Science Daily",
-      "url": "https://www.sciencedaily.com/rss/top.xml",
-      "enabled": true
-    },
-    {
       "name": "BBC News",
       "url": "http://feeds.bbc.co.uk/news/rss.xml",
       "enabled": false
@@ -36,7 +26,7 @@
     "recipient2@example.com"
   ],
   "digest_settings": {
-    "articles_per_source": 5,
+    "articles_per_source": 3,
     "hours_lookback": 24,
     "include_images": true,
     "output_html": "daily_digest.html",

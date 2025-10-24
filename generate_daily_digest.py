@@ -23,7 +23,6 @@ from html.parser import HTMLParser
 from typing import Any
 
 from generate_us_news_page import ParagraphExtractor, PlainTextExtractor  # type: ignore
-from db_utils import insert_article, extract_image_url  # type: ignore
 
 CONFIG_FILE = pathlib.Path("config.json")
 
@@ -223,166 +222,6 @@ def strip_snippet(snippet: str) -> str:
     return normalise_text(stripper.text())
 
 
-def clean_pbs_content(content: str) -> str:
-    """For PBS News articles, remove metadata and footer content but keep article body."""
-    if not content:
-        return content
-    
-    import re
-    
-    # Remove all author/AP attributions at the START only
-    content = re.sub(r'^([A-Za-zá\s]+,\s*(?:Associated\s+Press|PolitiFact)\s*)+', '', content, flags=re.IGNORECASE)
-    
-    # Remove "Leave your feedback" text
-    content = re.sub(r'Leave\s+your\s+feedback', '', content, flags=re.IGNORECASE)
-    
-    # Remove "This article originally appeared on..." lines
-    content = re.sub(r'This\s+article\s+originally\s+appeared\s+on\s+[A-Za-z]+\.', '', content, flags=re.IGNORECASE)
-    
-    # Remove "Read More" sentence/links
-    content = re.sub(r'\s*\[?Read\s+More\]?\s*', ' ', content, flags=re.IGNORECASE)
-    
-    # **CRITICAL FIX**: The article content is interrupted by newsletter promotions in the middle.
-    # Remove ONLY the newsletter section that appears in the middle: "Subscribe to Here's the Deal..."
-    # and "Linda Weavil..." text that follows it - but keep everything else
-    content = re.sub(
-        r'Subscribe\s+to\s+Here\'?s\s+the\s+Deal[^\n]*\n[^\n]*\n[^\n]*Linda\s+Weavil.*?(?=\n[A-Za-z])',
-        '',
-        content,
-        flags=re.IGNORECASE | re.DOTALL
-    )
-    
-    # Remove "Support trusted journalism" footer at the very end
-    content = re.sub(r'Support\s+trusted\s+journalism.*?$', '', content, flags=re.IGNORECASE | re.DOTALL)
-    
-    # Remove the repeated author bylines at the end (after the article ends)
-    # Match pattern: "Name, Associated Press" appearing 2+ times in a row
-    content = re.sub(
-        r'([A-Za-zá\s]+,\s*(?:Associated\s+Press|PolitiFact)\s*){2,}\s*$',
-        '',
-        content,
-        flags=re.IGNORECASE | re.DOTALL
-    )
-    
-    # Remove leading punctuation and whitespace
-    content = re.sub(r'^[\s.,\-()"""\s]*', '', content)
-    
-    # Normalize multiple spaces/newlines to single space
-    content = re.sub(r'\s+', ' ', content)
-    
-    return content.strip()
-
-
-def clean_techradar_content(content: str) -> str:
-    """For TechRadar articles, remove promotional content and footer."""
-    if not content:
-        return content
-    
-    import re
-    
-    # Remove newsletter signup prompts
-    content = re.sub(
-        r'Sign\s+up\s+to\s+the\s+TechRadar\s+Pro\s+newsletter.*?(?=\n|$)',
-        '',
-        content,
-        flags=re.IGNORECASE | re.DOTALL
-    )
-    
-    # Remove "Follow TechRadar on Google News" and related social media promotions
-    content = re.sub(
-        r'Follow\s+TechRadar\s+on\s+Google\s+News.*?(?=\n\n|$)',
-        '',
-        content,
-        flags=re.IGNORECASE | re.DOTALL
-    )
-    
-    # Remove "And of course you can also follow TechRadar on TikTok" sections
-    content = re.sub(
-        r'And\s+of\s+course\s+you\s+can\s+also\s+follow\s+TechRadar.*?(?=\n\n|$)',
-        '',
-        content,
-        flags=re.IGNORECASE | re.DOTALL
-    )
-    
-    # Remove author bio sections that start with author names
-    # Usually format: "Firstname has been writing about..." or similar
-    content = re.sub(
-        r'[A-Z][a-z]+\s+has\s+been\s+(?:writing|covering|reporting).*?(?=\n\n|$)',
-        '',
-        content,
-        flags=re.IGNORECASE | re.DOTALL
-    )
-    
-    # Remove comment section prompts
-    content = re.sub(
-        r'You\s+must\s+confirm\s+your\s+public\s+display\s+name.*?(?=\n\n|$)',
-        '',
-        content,
-        flags=re.IGNORECASE | re.DOTALL
-    )
-    
-    content = re.sub(
-        r'Please\s+(?:logout|login|signup).*?(?=\n\n|$)',
-        '',
-        content,
-        flags=re.IGNORECASE | re.DOTALL
-    )
-    
-    # Remove generic footer text
-    content = re.sub(r'Please\s+wait\.\.\.$', '', content, flags=re.IGNORECASE)
-    
-    # Normalize multiple spaces/newlines to single space
-    content = re.sub(r'\s+', ' ', content)
-    
-    return content.strip()
-
-
-def clean_sciencedaily_content(content: str) -> str:
-    """For Science Daily articles, remove related articles section that appears at the end."""
-    if not content:
-        return content
-    
-    import re
-    
-    # Find where the main article ends
-    # Science Daily includes related article links at the end after "Story Source:"
-    # The structure is: [article content] [Story Source: ...] [Related articles list]
-    
-    # Remove the "Story Source:" line entirely
-    story_source_match = re.search(r'Story\s+Source:[^\n]*', content, re.IGNORECASE)
-    if story_source_match:
-        # Remove everything from "Story Source:" onwards
-        end_pos = story_source_match.start()
-        content = content[:end_pos].rstrip()
-    else:
-        # If no "Story Source", look for common metadata markers
-        cite_match = re.search(r'Cite\s+This\s+Page:[^\n]*', content, re.IGNORECASE)
-        if cite_match:
-            end_pos = cite_match.start()
-            content = content[:end_pos].rstrip()
-    
-    # Remove trailing metadata/note lines
-    content = re.sub(
-        r'\s*Note:\s+Content\s+may\s+be\s+edited[^\n]*',
-        '',
-        content,
-        flags=re.IGNORECASE
-    )
-    
-    # Remove journal reference
-    content = re.sub(
-        r'\s*Journal\s+Reference:[^\n]*',
-        '',
-        content,
-        flags=re.IGNORECASE
-    )
-    
-    # Normalize multiple spaces/newlines to single space
-    content = re.sub(r'\s+', ' ', content)
-    
-    return content.strip()
-
-
 def get_top_articles(
     items: list[dict[str, str]], count: int, hours: int
 ) -> list[dict[str, str]]:
@@ -394,7 +233,7 @@ def get_top_articles(
 def process_sources(
     config: dict[str, Any],
 ) -> list[dict[str, Any]]:
-    """Process all configured RSS sources and insert into database."""
+    """Process all configured RSS sources."""
     sources = config.get("rss_sources", [])
     articles_per_source = config.get("digest_settings", {}).get("articles_per_source", 3)
     hours_lookback = config.get("digest_settings", {}).get("hours_lookback", 24)
@@ -408,14 +247,9 @@ def process_sources(
         print(f"Fetching: {source['name']}", file=sys.stderr)
         items = fetch_rss_feed(source["url"])
         
-        # Get more items than needed to account for skipped audio/video content
-        top_items = get_top_articles(items, articles_per_source * 3, hours_lookback)
+        top_items = get_top_articles(items, articles_per_source, hours_lookback)
 
-        articles_added = 0
         for item in top_items:
-            if articles_added >= articles_per_source:
-                break
-            
             snippet = strip_snippet(item.get("description", ""))
             pub_date = parse_pub_date(item.get("pub_date", ""))
             pub_date_iso = pub_date.isoformat() if pub_date else dt.datetime.now(dt.timezone.utc).isoformat()
@@ -423,62 +257,16 @@ def process_sources(
             print(f"  Extracting: {item['title'][:50]}...", file=sys.stderr)
             content = extract_article_content(item["link"], item["title"])
 
-            # Skip articles that are audio/video content
-            if "watch the full episode" in content.lower():
-                print(f"    Skipping (audio/video): {item['title'][:50]}...", file=sys.stderr)
-                time.sleep(0.3)
-                continue
-
-            # Clean PBS News content by removing everything before "Read More"
-            if "PBS" in source["name"]:
-                content = clean_pbs_content(content)
-            
-            # Clean TechRadar content by removing promotional footers
-            if "TechRadar" in source["name"]:
-                content = clean_techradar_content(content)
-            
-            # Clean Science Daily content by removing related articles and metadata
-            if "Science Daily" in source["name"]:
-                content = clean_sciencedaily_content(content)
-
-            # Extract first image URL from content
-            image_url = None
-            try:
-                html_text = fetch_url(item["link"], max_bytes=3_000_000)
-                if isinstance(html_text, str):
-                    image_url = extract_image_url(html_text)
-            except Exception:
-                pass
-
-            # Insert article into database
-            # Create summary from snippet (first 500 chars for better preview)
-            summary = snippet[:500] if snippet else ""
-            
-            article_id = insert_article(
-                title=item["title"],
-                date_iso=pub_date_iso,
-                source=source["name"],
-                link=item["link"],
-                content=content or snippet,
-                snippet=snippet,
-                image_url=image_url,
-                summary=summary,
-            )
-
-            if article_id:
-                article = {
-                    "id": article_id,
-                    "source": source["name"],
-                    "title": item["title"],
-                    "link": item["link"],
-                    "pub_date": pub_date_iso,
-                    "snippet": snippet,
-                }
-                all_articles.append(article)
-                articles_added += 1
-                time.sleep(0.3)  # Be respectful to servers
-            else:
-                print(f"    Duplicate article (skipped): {item['title'][:50]}...", file=sys.stderr)
+            article = {
+                "source": source["name"],
+                "title": item["title"],
+                "link": item["link"],
+                "pub_date": pub_date_iso,
+                "snippet": snippet,
+                "content": content or snippet,
+            }
+            all_articles.append(article)
+            time.sleep(0.3)  # Be respectful to servers
 
     return all_articles
 
@@ -633,35 +421,35 @@ def main() -> None:
 
     config = load_config()
     digest_settings = config.get("digest_settings", {})
+    
+    html_output = pathlib.Path(args.html_output or digest_settings.get("output_html", "daily_digest.html"))
+    json_output = pathlib.Path(args.json_output or digest_settings.get("output_json", "daily_digest.json"))
 
     print("Generating daily digest...", file=sys.stderr)
     articles = process_sources(config)
 
     if not articles:
-        print("No new articles found", file=sys.stderr)
+        print("No articles found", file=sys.stderr)
         return
 
-    print(f"Found {len(articles)} new articles", file=sys.stderr)
+    print(f"Found {len(articles)} articles", file=sys.stderr)
 
-    # Generate HTML from database
-    print("Generating HTML from database...", file=sys.stderr)
-    import subprocess
-    result = subprocess.run([sys.executable, "generate_html_from_db.py"], capture_output=True, text=True)
-    print(result.stdout, file=sys.stderr)
-    if result.returncode != 0:
-        print(result.stderr, file=sys.stderr)
+    # Write JSON
+    with open(json_output, "w", encoding="utf-8") as f:
+        json.dump(articles, f, ensure_ascii=False, indent=2)
+    print(f"Wrote JSON to {json_output}")
+
+    # Write HTML
+    html_content = render_html(articles)
+    with open(html_output, "w", encoding="utf-8") as f:
+        f.write(html_content)
+    print(f"Wrote HTML to {html_output}")
 
     # Send email if requested
     if args.send_email:
         recipients = config.get("recipients", [])
         if recipients:
-            html_output = digest_settings.get("output_html", "daily_digest.html")
-            try:
-                with open(html_output, "r", encoding="utf-8") as f:
-                    html_content = f.read()
-                send_email(recipients, html_content, config.get("smtp", {}))
-            except Exception as e:
-                print(f"Error sending email: {e}", file=sys.stderr)
+            send_email(recipients, html_content, config.get("smtp", {}))
         else:
             print("No email recipients configured", file=sys.stderr)
 
