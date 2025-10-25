@@ -123,7 +123,7 @@ Analyze this article and output ONLY the JSON matching the structure above."""
     return user_prompt
 
 
-def call_deepseek_api(user_prompt, api_key):
+def call_deepseek_api(user_prompt, api_key, article_id=None):
     """Call Deepseek API and return response."""
     print(f"  ℹ️  API Key available: {bool(api_key)}")
     print(f"  ℹ️  API URL: {API_URL}")
@@ -178,14 +178,34 @@ def call_deepseek_api(user_prompt, api_key):
         print("  ✓ Extracting content from response...")
         # Extract the JSON from the response
         content = api_response['choices'][0]['message']['content']
+        
+        # Write raw response to file first for debugging
+        raw_response_file = None
+        if article_id:
+            raw_response_file = f"/var/www/news/website/responses/raw_response_article_{article_id}.txt"
+            try:
+                os.makedirs(os.path.dirname(raw_response_file), exist_ok=True)
+                with open(raw_response_file, 'w') as f:
+                    f.write(content)
+                print(f"  ✓ Raw response saved to: {raw_response_file}")
+            except Exception as e:
+                print(f"  ⚠ Warning: Could not save raw response: {e}")
+        
+        # Now try to parse as JSON
         try:
             response_json = json.loads(content)
             print("  ✓ Successfully parsed API response as JSON")
             return response_json
         except json.JSONDecodeError as e:
             print(f"  ❌ ERROR: Could not parse API response as JSON: {e}")
-            print(f"  ℹ️  Malformed JSON at position {e.pos}")
-            print(f"  Raw content (first 500 chars): {content[:500]}")
+            print(f"  ℹ️  Malformed JSON at character position {e.pos}")
+            if raw_response_file:
+                print(f"  ℹ️  Raw response saved to: {raw_response_file}")
+            print(f"  Raw content (chars 0-200): {content[0:200]}")
+            if e.pos:
+                start = max(0, e.pos - 100)
+                end = min(len(content), e.pos + 100)
+                print(f"  Around error (chars {start}-{end}): {content[start:end]}")
             return None
             
     except requests.exceptions.RequestException as e:
@@ -387,7 +407,7 @@ def process_single_article(article_id):
     
     # Step 5: Call Deepseek API
     print("\nStep 5: Calling Deepseek API...")
-    response_json = call_deepseek_api(user_prompt, api_key)
+    response_json = call_deepseek_api(user_prompt, api_key, article_id)
     if not response_json:
         print("  ❌ API call failed - skipping this article")
         print("  ℹ️  Next run will retry this article")
