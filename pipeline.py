@@ -520,6 +520,92 @@ def phase_deepseek(dry_run=False, verbose=False):
     return success, results
 
 
+def phase_deepseek_with_retry(dry_run=False, verbose=False, max_passes=2):
+    """
+    PHASE 3 WITH RETRY: Deepseek processing with automatic retry for remaining articles
+    
+    Runs Deepseek processing up to max_passes times.
+    - First pass: Process all unprocessed articles
+    - Check database for how many were actually processed
+    - If there are still unprocessed articles, run again (second pass)
+    - Continue until all are processed or max passes reached
+    
+    Args:
+        dry_run: Preview mode
+        verbose: Verbose output
+        max_passes: Maximum number of processing passes (default: 2)
+    
+    Returns: (success, combined_results)
+    """
+    print_header(f"PHASE 3: DEEPSEEK PROCESSING WITH RETRY (MAX {max_passes} PASSES)")
+    
+    combined_results = {
+        'phase': 'deepseek_with_retry',
+        'start_time': datetime.now().isoformat(),
+        'passes': [],
+        'total_processed': 0
+    }
+    
+    for pass_num in range(1, max_passes + 1):
+        print_info(f"\n{'='*60}")
+        print_info(f"DEEPSEEK PROCESSING PASS {pass_num}/{max_passes}")
+        print_info(f"{'='*60}\n")
+        
+        # Run one pass of deepseek processing
+        success, pass_results = phase_deepseek(dry_run=dry_run, verbose=verbose)
+        combined_results['passes'].append({
+            'pass': pass_num,
+            'result': pass_results
+        })
+        
+        # Check how many articles are still unprocessed
+        try:
+            import sqlite3
+            conn = sqlite3.connect(str(DB_PATH))
+            cur = conn.cursor()
+            
+            cur.execute("SELECT COUNT(*) FROM articles WHERE deepseek_processed = 1")
+            processed = cur.fetchone()[0]
+            
+            cur.execute("SELECT COUNT(*) FROM articles WHERE deepseek_processed = 0")
+            remaining = cur.fetchone()[0]
+            
+            conn.close()
+            
+            combined_results['total_processed'] = processed
+            print_info(f"\nAfter pass {pass_num}:")
+            print_info(f"  - Processed: {processed} articles")
+            print_info(f"  - Remaining: {remaining} articles")
+            
+            # If no remaining articles, we're done
+            if remaining == 0:
+                print_success(f"All articles processed after {pass_num} pass(es)!")
+                combined_results['status'] = 'completed_all'
+                combined_results['passes_used'] = pass_num
+                return True, combined_results
+            
+            # If this is the last pass, show warning
+            if pass_num == max_passes:
+                if remaining > 0:
+                    print_warning(f"Max passes ({max_passes}) reached with {remaining} articles still unprocessed")
+                    print_warning("These will be retried in the next pipeline run")
+                    combined_results['status'] = 'max_passes_reached'
+                    combined_results['articles_still_remaining'] = remaining
+                else:
+                    combined_results['status'] = 'completed_all'
+                    print_success(f"All articles processed!")
+            
+        except Exception as e:
+            msg = f"Could not check processed count: {e}"
+            print_error(msg)
+            combined_results['status'] = 'error_checking_count'
+            return False, combined_results
+    
+    print_info(f"\nDeepseek processing complete ({max_passes} passes)")
+    combined_results['end_time'] = datetime.now().isoformat()
+    return True, combined_results
+
+
 def phase_verification(dry_run=False, verbose=False):
     """
     Verify pipeline results
@@ -690,7 +776,7 @@ Examples:
             sys.exit(1)
     
     if args.full or args.deepseek:
-        success, results = phase_deepseek(dry_run=args.dry_run, verbose=args.verbose)
+        success, results = phase_deepseek_with_retry(dry_run=args.dry_run, verbose=args.verbose, max_passes=2)
         pipeline_results['phases'].append(results)
     
     # Verification
