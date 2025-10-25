@@ -19,3 +19,9 @@ output/
 secrets.json
 subscriptions.db
 venv/
+
+# API responses and generated files (keep locally, not synced to git)
+deepseek/responses/
+mining/responses/
+website/article_response/
+website/article_image/
