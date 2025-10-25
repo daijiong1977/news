@@ -68,7 +68,7 @@ def count_files(directory, pattern):
 def get_file_stats():
     """Get file statistics."""
     return {
-        'response_json': count_files(RESPONSES_DIR, 'response_article_*.json'),
+        'response_json': count_files(RESPONSES_DIR, 'article_*_response.json'),
         'image_small': count_files(IMAGES_DIR, 'image_small_*.jpg'),
         'image_big': count_files(IMAGES_DIR, 'image_big_*.jpg'),
         'raw_response': count_files(RESPONSES_DIR, 'raw_response_article_*.txt')
