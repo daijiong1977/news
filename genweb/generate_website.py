@@ -228,7 +228,7 @@ class HTMLGenerator:
 <p>{source}</p>
 </div>
 <p class="text-subtle-light dark:text-subtle-dark text-sm font-normal leading-relaxed flex-grow article-summary">{summary_short}</p>
-<button class="mt-auto flex w-full items-center justify-center rounded-md h-10 px-4 bg-primary/20 text-primary text-sm font-bold leading-normal tracking-wide hover:bg-primary/30 transition-colors">
+<button class="mt-auto flex w-full items-center justify-center rounded-md h-10 px-4 bg-primary/20 text-primary text-sm font-bold leading-normal tracking-wide hover:bg-primary/30 transition-colors" data-article-id="{article_id}" data-level="{level}">
 <span class="truncate">Read More</span>
 </button>
 </div>
@@ -364,7 +364,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (dropdown) {
         dropdown.addEventListener('change', function() {
             const selectedText = this.options[this.selectedIndex].text;
-            let levelKey = levelMapping[selectedText] || 'easy';
+            let levelKey = levelMapping[selectedText] || 'mid';
             
             // Special case for CN
             if (this.value === 'CN' || selectedText.includes('CN')) {
@@ -377,6 +377,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             currentLevel = levelKey;
+            
+            // Update URL with current level
+            updateURLParameter('level', currentLevel);
+            
             filterAndUpdateCards();
         });
     }
@@ -426,6 +430,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Switched back to English (EN)');
             }
             
+            // Update URL with current level
+            updateURLParameter('level', currentLevel);
+            
             filterAndUpdateCards();
         });
     } else {
@@ -441,7 +448,28 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
+    
+    // Add Read More button click handler
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('button[data-article-id]')) {
+            const button = e.target.closest('button[data-article-id]');
+            const articleId = button.dataset.articleId;
+            const level = button.dataset.level;
+            
+            // Store the current level and redirect to article detail page
+            // URL format: article.html?id=ARTICLE_ID&level=LEVEL
+            const url = `article.html?id=${articleId}&level=${level}`;
+            console.log('Read More clicked:', {articleId, level, url});
+            // window.location.href = url; // Uncomment when article detail page is ready
+        }
+    });
 });
+
+function updateURLParameter(param, value) {
+    const url = new URL(window.location);
+    url.searchParams.set(param, value);
+    window.history.replaceState({}, document.title, url);
+}
 
 function filterAndUpdateCards() {
     const gridDiv = document.querySelector('.grid');
