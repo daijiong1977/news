@@ -142,7 +142,7 @@ def call_deepseek_api(user_prompt, api_key, article_id=None):
             }
         ],
         'temperature': 0.7,
-        'max_tokens': 6000,
+        'max_tokens': 7000,
         'response_format': {
             'type': 'json_object'
         }
