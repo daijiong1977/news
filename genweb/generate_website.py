@@ -346,17 +346,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // CN button for language toggle
+    // CN button for language toggle - find by looking at header buttons (3rd one)
     let cnButton = null;
-    document.querySelectorAll('button').forEach(btn => {
-        if (btn.textContent.trim() === 'CN') {
-            cnButton = btn;
-        }
-    });
+    const headerButtons = document.querySelectorAll('header button');
+    if (headerButtons.length >= 3) {
+        cnButton = headerButtons[2]; // The CN button is the 3rd button in header
+    }
     
     if (cnButton) {
         cnButton.addEventListener('click', function(e) {
-            e.preventDefault();
+            console.log('CN Button clicked, currentLanguage:', currentLanguage);
             
             if (currentLanguage === 'en') {
                 // Switch to Chinese - show CN dropdown selection
@@ -366,7 +365,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Hide the dropdown when in CN mode
                 if (dropdown) dropdown.style.display = 'none';
                 
-                cnButton.textContent = 'EN';
+                // Update button text
+                const spanEl = cnButton.querySelector('span.truncate');
+                if (spanEl) {
+                    spanEl.textContent = 'EN';
+                } else {
+                    cnButton.textContent = 'EN';
+                }
+                console.log('Switched to Chinese (CN)');
             } else {
                 // Switch back to English
                 currentLanguage = 'en';
@@ -375,11 +381,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Show dropdown again
                 if (dropdown) dropdown.style.display = '';
                 
-                cnButton.textContent = 'CN';
+                // Update button text
+                const spanEl = cnButton.querySelector('span.truncate');
+                if (spanEl) {
+                    spanEl.textContent = 'CN';
+                } else {
+                    cnButton.textContent = 'CN';
+                }
+                console.log('Switched back to English (EN)');
             }
             
             filterAndUpdateCards();
         });
+    } else {
+        console.log('CN Button not found');
     }
     
     // Initialize first tab as active
