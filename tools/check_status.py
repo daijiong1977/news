@@ -67,10 +67,15 @@ def count_files(directory, pattern):
 
 def get_file_stats():
     """Get file statistics."""
+    # Count regular JPGs (full-size images)
+    jpg_count = count_files(IMAGES_DIR, '*.jpg')
+    # Count mobile WebP (small images)
+    webp_count = count_files(IMAGES_DIR, '*.webp')
+    
     return {
         'response_json': count_files(RESPONSES_DIR, 'article_*_response.json'),
-        'image_small': count_files(IMAGES_DIR, 'image_small_*.jpg'),
-        'image_big': count_files(IMAGES_DIR, 'image_big_*.jpg'),
+        'image_full': jpg_count,  # Full-size JPG images
+        'image_mobile': webp_count,  # Mobile WebP images
         'raw_response': count_files(RESPONSES_DIR, 'raw_response_article_*.txt')
     }
 
@@ -107,8 +112,8 @@ def print_status():
     file_stats = get_file_stats()
     
     print(f"  Response JSON:     {file_stats['response_json']} files")
-    print(f"  Image Small:       {file_stats['image_small']} files")
-    print(f"  Image Big:         {file_stats['image_big']} files")
+    print(f"  Image Full-Size:   {file_stats['image_full']} JPG files")
+    print(f"  Image Mobile:      {file_stats['image_mobile']} WebP files")
     print(f"  Raw Response:      {file_stats['raw_response']} files (parse errors)")
     
     # Summary
@@ -125,6 +130,11 @@ def print_status():
         print(f"  ✅ All {processed} processed articles have response files")
     else:
         print(f"  ⚠️  Response files ({file_stats['response_json']}) != Processed DB ({processed})")
+    
+    if file_stats['image_full'] > 0:
+        print(f"  ✅ {file_stats['image_full']} full-size images, {file_stats['image_mobile']} mobile versions")
+    else:
+        print(f"  ℹ️  No images downloaded yet (expected after data collection phase)")
     
     # Progress bar
     if total > 0:
