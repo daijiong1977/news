@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 """
-Complete Purge Tool - Reset everything to clean state
+Complete Purge Tool - Reset article data while preserving configuration
 
-This tool provides ONE-COMMAND purging of all data:
-- Database: All articles and related data
+This tool provides ONE-COMMAND purging of article-related data:
+- Database: All articles and related processing data (preserves config tables)
 - Website files: All article pages, images, responses
 - Deepseek responses: All processing results
 - Mining responses: All collected data
+
+PRESERVED (never deleted):
+- apikey, feeds, categories, difficulty_levels
+- users, user_difficulty_levels, user_categories, user_preferences, user_awards
+- All configuration and setup data
 
 Use cases:
 1. Fresh start: python3 reset_all.py --force
@@ -14,7 +19,7 @@ Use cases:
 3. Selective purge: See options below
 
 Options:
-  --db-only       Delete database records only (preserve website files)
+  --db-only       Delete article data only (preserve website files)
   --files-only    Delete website files only (preserve database)
   --deepseek-only Delete deepseek responses only
   --mining-only   Delete mining responses only
@@ -122,7 +127,8 @@ class PurgeManager:
             conn = sqlite3.connect(str(DB_PATH))
             cursor = conn.cursor()
             
-            # Tables to purge (respecting foreign key order)
+            # Tables to purge (ONLY article-related data)
+            # PRESERVED: apikey, feeds, categories, difficulty_levels, users, user_* tables
             tables_ordered = [
                 'choices',           # Depends on questions
                 'questions',         # Depends on articles
@@ -133,7 +139,20 @@ class PurgeManager:
                 'comments',          # Depends on articles
                 'background_read',   # Depends on articles
                 'response',          # Depends on articles
-                'articles',          # Main table
+                'articles',          # Main table (last, after all dependent data)
+            ]
+            
+            # Configuration tables that are NEVER deleted
+            preserved_tables = [
+                'apikey',                    # API keys
+                'feeds',                     # RSS feed sources
+                'categories',                # Article categories
+                'difficulty_levels',         # Difficulty ratings
+                'users',                     # User accounts
+                'user_difficulty_levels',    # User preferences
+                'user_categories',           # User preferences
+                'user_preferences',          # User settings
+                'user_awards',               # User stats
             ]
             
             # Count records before deletion
@@ -148,7 +167,7 @@ class PurgeManager:
                     pass
             
             if not self.dry_run:
-                print("\n🗑️  Deleting database records...")
+                print("\n🗑️  Deleting article data (preserving configuration tables)...")
                 # Disable foreign key checks temporarily
                 cursor.execute("PRAGMA foreign_keys = OFF")
                 
@@ -162,13 +181,29 @@ class PurgeManager:
                 conn.commit()
                 self.stats['database']['articles'] = sum(self.stats['database']['records'].values())
                 print(f"\n✅ Database purged: {self.stats['database']['articles']} records deleted")
+                
+                # Show preserved tables
+                print("\n📌 Preserved (not deleted):")
+                for table in preserved_tables:
+                    cursor.execute(f"SELECT COUNT(*) FROM {table}")
+                    count = cursor.fetchone()[0]
+                    if count > 0:
+                        print(f"  • {table}: {count} records")
             else:
                 total = sum(self.stats['database']['records'].values())
                 self.stats['database']['articles'] = total
-                print(f"\n📊 DRY RUN - Would delete {total} database records:")
+                print(f"\n📊 DRY RUN - Would delete {total} article records:")
                 for table, count in self.stats['database']['records'].items():
                     if count > 0:
                         print(f"  • {table}: {count}")
+                
+                # Show what will be preserved
+                print(f"\n📌 Preserved (not deleted):")
+                for table in preserved_tables:
+                    cursor.execute(f"SELECT COUNT(*) FROM {table}")
+                    count = cursor.fetchone()[0]
+                    if count > 0:
+                        print(f"  • {table}: {count} records")
             
             conn.close()
         

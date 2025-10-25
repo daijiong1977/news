@@ -85,29 +85,45 @@ python3 tools/pagepurge.py --all --force
 
 ## Included Tools
 
+
 ### 1. reset_all.py - ONE-COMMAND Complete Purge (NEW)
 
-**Purpose**: Complete system reset - delete everything in one command with safe dry-run preview.
+**Purpose**: Clean article data while preserving configuration - delete everything in one command with safe dry-run preview.
 
-🎯 **USE THIS FOR FRESH STARTS** - Recommended for resetting the entire system before pipeline runs.
+🎯 **USE THIS FOR FRESH STARTS** - Recommended for resetting article data before pipeline runs.
 
 #### What Gets Deleted
 
 ```
-✓ Database: All articles (18 tables, cascading deletes)
+✓ Database: All articles and article-related data ONLY
+  - articles, article_images, keywords, questions, choices
+  - article_summaries, article_analysis, comments, background_read, response
 ✓ Website Files: article_page/, article_image/, article_response/
 ✓ Deepseek Responses: deepseek/responses/*.json
 ✓ Mining Responses: mining/responses/*.json
-✓ Log Results: Optionally clean log/ directory
+```
+
+#### What Gets Preserved (Never Deleted)
+
+```
+✓ Configuration tables (always kept):
+  - apikey (API credentials)
+  - feeds (RSS feed sources)
+  - categories (article categories)
+  - difficulty_levels (content difficulty ratings)
+  - users, user_difficulty_levels, user_categories
+  - user_preferences, user_awards
+  - All setup and configuration data
 ```
 
 #### Key Features
 
 - **Safe by Default**: Always shows dry-run preview first
-- **Flexible Purging**: Selective options (database-only, files-only, etc.)
-- **Progress Reporting**: Shows exactly what will/was deleted
+- **Selective Purging**: Database-only, files-only, or complete options
+- **Preserves Configuration**: Never deletes setup tables (feeds, categories, etc.)
+- **Progress Reporting**: Shows exactly what will/was deleted and preserved
 - **Atomic Operations**: Foreign key handling for data integrity
-- **Fast**: Deletes all data in seconds
+- **Fast**: Deletes all article data in seconds
 
 #### Usage Examples
 
@@ -115,7 +131,7 @@ python3 tools/pagepurge.py --all --force
 # Preview (DRY-RUN): Shows what will be deleted, nothing is removed
 python3 tools/reset_all.py
 
-# Execute full purge: Delete everything (CAUTION!)
+# Execute full purge: Delete everything except config (CAUTION!)
 python3 tools/reset_all.py --force
 
 # Database only (keep website files)
@@ -127,53 +143,46 @@ python3 tools/reset_all.py --files-only --force
 # Everything except database
 python3 tools/reset_all.py --keep-db --force
 
+
 # Deepseek responses only
-python3 tools/reset_all.py --deepseek-only --force
+````
 
-# Mining responses only
-python3 tools/reset_all.py --mining-only --force
+#### Comparison: reset_all.py vs datapurge.py vs pagepurge.py
 
-# Verbose output
-python3 tools/reset_all.py --force -v
+| Task | Tool | Command |
+|------|------|---------|
+| Complete reset (clean articles, keep config) | reset_all.py | `reset_all.py --force` |
+| Delete specific date (DB only) | datapurge.py | `datapurge.py --date 2025-10-24 --force` |
+| Delete specific date (files) | pagepurge.py | `pagepurge.py --date 2025-10-24 --force` |
+| Keep database, clean everything else | reset_all.py | `reset_all.py --keep-db --force` |
+| Database config preserved | reset_all.py | Always (feeds, categories, users, etc.) |
+
+#### Example: After Fresh Purge
+
+```
+✓ Articles: 0 (all deleted)
+✓ Images: 0 (all deleted)
+✓ Keywords: 0 (all deleted)
+✓ Summaries: 0 (all deleted)
+✓ Deepseek responses: 0 (all deleted)
+
+✓ Feeds: 13 (PRESERVED)
+✓ Categories: 7 (PRESERVED)
+✓ API Keys: 2 (PRESERVED)
+✓ Users: X (PRESERVED)
+✓ Difficulty Levels: 4 (PRESERVED)
 ```
 
-#### Purge Options
+---
 
-| Option | Effect |
-|--------|--------|
-| (none) | Full purge with dry-run preview |
-| `--force` | Actually execute the purge |
-| `--db-only` | Delete database records only |
-| `--files-only` | Delete website files only |
-| `--deepseek-only` | Delete deepseek responses only |
-| `--mining-only` | Delete mining responses only |
-| `--keep-db` | Delete everything except database |
-| `-v, --verbose` | Detailed progress output |
+### 2. datapurge.py - Database Purging Utility
 
-#### Example Workflow: Complete Fresh Start
+**Purpose**: Remove articles and all related data from the database ONLY.
 
-```bash
-# Step 1: Preview what will be deleted
-$ python3 tools/reset_all.py
-⚠️  DRY RUN MODE (no data will be deleted)
-📊 Summary:
-  • Database: 41 records
-  • Website files: 11 files
-  • Deepseek responses: 6 files
-  • Mining responses: 1 files
+⚠️  **DATABASE ONLY** - This tool deletes database records only. It does NOT delete files in the website/ directory.
 
-# Step 2: Review and confirm, then execute
-$ python3 tools/reset_all.py --force
-✅ PURGE COMPLETE
-📊 Summary:
-  • Database: 41 records deleted
-  • Website files: 11 files deleted
-  • Deepseek responses: 6 files deleted
-  • Mining responses: 1 files deleted
-
-# Step 3: Now ready for fresh pipeline run
-$ python3 pipeline.py --full --articles-per-seed 5
-```
+`````
+````
 
 #### Comparison: reset_all.py vs datapurge.py vs pagepurge.py
 
