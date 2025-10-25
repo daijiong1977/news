@@ -115,11 +115,13 @@ sqlite3 articles.db "SELECT COUNT(*) FROM articles; SELECT COUNT(*) FROM article
 ✅ **Real-Time Database Updates** - DB updates immediately per article (not at end)  
 ✅ **Retry Logic** - Deepseek will retry once if timeout occurs  
 ✅ **Extended Timeout** - 2-hour timeout for Deepseek processing (up from 1 hour)  
-✅ **Enhanced Logging** - Detailed debug output before API calls  
+✅ **Enhanced Logging** - Detailed debug output with 200 status feedback  
 ✅ **Timezone-Aware DateTime** - Modern Python 3.12+ compatible (no deprecation warnings)  
 ✅ **Image Processing Verified** - Pillow/PIL working on EC2 production server  
 ✅ **Automated Image Linking** - Articles automatically linked to images  
+✅ **Direct Response Storage** - Deepseek responses saved directly to website/responses/  
 ✅ **Simplified Mining** - No API key requirement in phase 1  
+✅ **Clean Cleanup Tool** - Reset tool now cleans website/responses directory  
 
 ## Recent Test Results
 
@@ -166,15 +168,15 @@ sqlite3 articles.db ".headers on" ".mode column" "SELECT id, title, source, deep
 │   ├── run_mining_cycle.py         ← Phase 1 entry
 │   └── data_collector.py            ← Feed fetching + image download
 ├── deepseek/
-│   ├── process_one_article.py      ← Phase 3: API calls
-│   ├── insert_from_response.py      ← Phase 3: DB insertion
-│   └── responses/                   ← Temp response storage
+│   ├── process_one_article.py      ← Phase 3: API calls + DB updates
+│   └── prompts.md                  ← AI analysis prompts
 ├── tools/
 │   ├── imgcompress.py              ← Phase 2: Image optimization
 │   └── reset_all.py                ← Database cleanup utility
 ├── website/
 │   ├── article_image/              ← Article images (web + mobile)
-│   └── article_response/           ← AI response JSON files
+│   ├── article_response/           ← Legacy response directory
+│   └── responses/                  ← Deepseek API response files (active)
 └── log/
     ├── phase_*.log                 ← Phase logs (timestamped)
     └── pipeline_results_*.json      ← Pipeline summary results
@@ -322,6 +324,12 @@ Reset everything (articles, images, responses) but keep configuration:
 ```bash
 python3 tools/reset_all.py --force
 ```
+
+This command will clean:
+- ✅ Database: All articles (keeps configuration tables)
+- ✅ Website: `article_image/`, `article_response/`, `responses/`
+- ✅ Deepseek responses: `deepseek/responses/`
+- ✅ Mining responses: `mining/responses/`
 
 ## Support & Documentation
 

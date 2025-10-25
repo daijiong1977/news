@@ -5,8 +5,9 @@ Complete Purge Tool - Reset article data while preserving configuration
 This tool provides ONE-COMMAND purging of article-related data:
 - Database: All articles and related processing data (preserves config tables)
 - Website files: All article pages, images, responses
-- Deepseek responses: All processing results
+- Deepseek responses: All processing results (deepseek/responses)
 - Mining responses: All collected data
+- Response directory: All API response files (website/responses)
 
 PRESERVED (never deleted):
 - apikey, feeds, categories, difficulty_levels
@@ -219,6 +220,7 @@ class PurgeManager:
             ('article_page', WEBSITE_DIR / 'article_page'),
             ('article_image', WEBSITE_DIR / 'article_image'),
             ('article_response', WEBSITE_DIR / 'article_response'),
+            ('responses', WEBSITE_DIR / 'responses'),
         ]
         
         total_files = 0
