@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article 1 Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .tab-button {
+            padding: 12px 24px;
+            border: none;
+            background: #667eea;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .tab-button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .tab-button.active {
+            background: #764ba2;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .tab-content.easy { border-top: 5px solid #10b981; }
+        .tab-content.middle { border-top: 5px solid #f59e0b; }
+        .tab-content.high { border-top: 5px solid #ef4444; }
+        .tab-content.zh { border-top: 5px solid #3b82f6; }
+        
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+        
+        h3 {
+            color: #666;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .summary {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .keywords {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .keyword-item {
+            background: #f0f4ff;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .keyword-term {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        
+        .keyword-explanation {
+            color: #666;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+        
+        .questions {
+            margin-bottom: 20px;
+        }
+        
+        .question-item {
+            background: #f9fafb;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .option {
+            padding: 8px 12px;
+            background: white;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        
+        .correct {
+            background: #dcfce7;
+            border: 2px solid #10b981;
+            font-weight: bold;
+            color: #166534;
+        }
+        
+        .background {
+            background: #fffbeb;
+            padding: 15px;
+            border-radius: 8px;
+            line-height: 1.8;
+            border-left: 4px solid #f59e0b;
+            margin-bottom: 20px;
+        }
+        
+        .article-structure {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .structure-item {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        
+        .perspectives {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .perspective-item {
+            background: #fce7f3;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ec4899;
+        }
+        
+        .perspective-title {
+            font-weight: bold;
+            color: #be185d;
+            margin-bottom: 8px;
+            font-size: 1.05em;
+        }
+        
+        .perspective-desc {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .info-box {
+            background: #f0f4ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .info-box strong {
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Article Analysis</h1>
+            <p>Article ID: 1</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab-button active" onclick="showTab('easy')">🟢 Easy Level</button>
+            <button class="tab-button" onclick="showTab('middle')">🟠 Middle Level</button>
+            <button class="tab-button" onclick="showTab('high')">🔴 High Level</button>
+            <button class="tab-button" onclick="showTab('zh')">🔵 Chinese (中文)</button>
+        </div>
+        
+        <!-- EASY LEVEL -->
+        <div id="easy" class="tab-content active easy">
+            <h2>🟢 New Book Prize for Kids with Kid Judges</h2>
+            
+            <h3>Summary</h3>
+            <div class="summary">The famous Booker Prize is starting a special new prize just for children's books. This new Children's Booker Prize will begin in 2026 and give out its first award in 2027. It's for the best books written for kids aged 8 to 12. What makes this prize really special is that children will help choose the winning book! Three kids will join adult judges to pick the best book. The judges will read lots of books and choose eight finalists. Then they all work together to pick one winner. The author who wins gets £50,000, and all the finalist authors get £2,500 each. The prize organizers want to help more children discover great books and get excited about reading. They plan to give away at least 30,000 copies of the shortlisted books to children. Famous children's authors like Frank Cottrell-Boyce are very happy about this new prize and think it will help children's books get more attention.</div>
+            
+            <h3>Keywords</h3>
+            <div class="keywords">
+                <div class="keyword-item">
+                    <div class="keyword-term">Booker Prize</div>
+                    <div class="keyword-explanation">A famous book award that gives prizes to the best books</div>
+                </div>
+                <div class="keyword-item">
+                    <div class="keyword-term">judges</div>
+                    <div class="keyword-explanation">People who read books and decide which ones should win prizes</div>
+                </div>
+                <div class="keyword-item">
+                    <div class="keyword-term">fiction</div>
+                    <div class="keyword-explanation">Books with made-up stories that aren't real</div>
+                </div>
+                <div class="keyword-item">
+                    <div class="keyword-term">shortlist</div>
+                    <div class="keyword-explanation">A small list of the best books chosen from many entries</div>
+                </div>
+                <div class="keyword-item">
+                    <div class="keyword-term">author</div>
+                    <div class="keyword-explanation">A person who writes books</div>
+                </div>
+                <div class="keyword-item">
+                    <div class="keyword-term">Laureate</div>
+                    <div class="keyword-explanation">A special title given to someone who is an expert in their field</div>
+                </div>
+            </div>
+            
+            <h3>Questions</h3>
+            <div class="questions">
+                <div class="question-item">
+                    <div class="question-text">Q1: What is the name of the new children's book prize?</div>
+                    <div class="options">
+                        <div class="option correct">Children's Booker Prize</div>
+                        <div class="option">Kids Book Award</div>
+                        <div class="option">Young Readers Prize</div>
+                        <div class="option">Children's Story Award</div>
+                    </div>
+                </div>
+                <div class="question-item">
+                    <div class="question-text">Q2: When will the first Children's Booker Prize be awarded?</div>
+                    <div class="options">
+                        <div class="option">2025</div>
+                        <div class="option">2026</div>
+                        <div class="option correct">2027</div>
+                        <div class="option">2028</div>
+                    </div>
+                </div>
+                <div class="question-item">
+                    <div class="question-text">Q3: Who is the chair of judges for the first prize?</div>
+                    <div class="options">
+                        <div class="option correct">Frank Cottrell-Boyce</div>
+                        <div class="option">Jacqueline Wilson</div>
+                        <div class="option">Anne Fine</div>
+                        <div class="option">Gaby Wood</div>
+                    </div>
+                </div>
+                <div class="question-item">
+                    <div class="question-text">Q4: How many child judges will help choose the winning book?</div>
+                    <div class="options">
+                        <div class="option">Two</div>
+                        <div class="option correct">Three</div>
+                        <div class="option">Four</div>
+                        <div class="option">Five</div>
+                    </div>
+                </div>
+                <div class="question-item">
+                    <div class="question-text">Q5: How many books will be on the shortlist?</div>
+                    <div class="options">
+                        <div class="option">Five</div>
+                        <div class="option">Six</div>
+                        <div class="option">Seven</div>
+                        <div class="option correct">Eight</div>
+                    </div>
+                </div>
+                <div class="question-item">
+                    <div class="question-text">Q6: How much money does the winning author receive?</div>
+                    <div class="options">
+                        <div class="option">£25,000</div>
+                        <div class="option">£35,000</div>
+                        <div class="option correct">£50,000</div>
+                        <div class="option">£75,000</div>
+                    </div>
+                </div>
+                <div class="question-item">
+                    <div class="question-text">Q7: How many copies of shortlisted books will be given to children?</div>
+                    <div class="options">
+                        <div class="option">10,000</div>
+                        <div class="option">20,000</div>
+                        <div class="option correct">30,000</div>
+                        <div class="option">40,000</div>
+                    </div>
+                </div>
+                <div class="question-item">
+                    <div class="question-text">Q8: What age group is this prize for?</div>
+                    <div class="options">
+                        <div class="option">5-8 years</div>
+                        <div class="option correct">8-12 years</div>
+                        <div class="option">10-14 years</div>
+                        <div class="option">12-16 years</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>Background Reading</h3>
+            <div class="background">The Booker Prize is one of the most famous book awards in the world. It started in 1969 and gives prizes to the best novels written in English. Now they are creating a special version just for children's books. Children's books are stories written specifically for young readers. Having children help judge the prize is a new and exciting idea that lets kids have a say in which books they think are the best. This helps make sure the winning books are ones that children will really enjoy reading.</div>
+            
+            <h3>Article Structure</h3>
+            <div class="article-structure">
+                <div class="structure-item">What: A new children's book prize is starting</div>
+                <div class="structure-item">Why: To celebrate great children's books and get kids excited about reading</div>
+                <div class="structure-item">How: Children and adults will work together to choose the best books</div>
+            </div>
+            
+            <h3>Perspectives</h3>
+            <div class="perspectives">
+                <div class="perspective-item">
+                    <div class="perspective-title">Author's view</div>
+                    <div class="perspective-desc">Authors are excited because this prize will help children's books get more attention</div>
+                </div>
+                <div class="perspective-item">
+                    <div class="perspective-title">Organizer's view</div>
+                    <div class="perspective-desc">The prize organizers want to inspire more children to read and discover great books</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="middle" class="tab-content middle">
+            <h2>🟠 Children's Booker Prize: Young Readers Become Judges</h2>
+            
+            <h3>Summary</h3>
+            <div class="summary">The prestigious Booker Prize Foundation has announced the creation of a groundbreaking new literary award specifically for children's fiction. The Children's Booker Prize, scheduled to launch in 2026 with the first award ceremony in 2027, will recognize outstanding contemporary fiction written for readers aged eight to twelve. A unique feature of this prize is its innovative judging structure that incorporates both adult and child perspectives. The judging panel will be chaired by Frank Cottrell-Boyce, the current UK Children's Laureate and acclaimed author of Millions. He will be joined by two other adult judges who will initially select a shortlist of eight exceptional books. Subsequently, three child judges will join the panel to participate in the final selection process for the winning title. According to Gaby Wood, chief executive of the Booker Prize Foundation, this initiative represents their most ambitious project in two decades, with anticipated long-term impact on children's literacy and engagement with literature. The foundation plans to distribute at least 30,000 copies of shortlisted and winning books to children nationwide, aiming to increase accessibility to quality literature. The monetary awards mirror those of the adult Booker Prizes, with shortlisted authors receiving £2,500 each and the winner receiving £50,000. The prize has received enthusiastic support from prominent children's authors including Dame Jacqueline Wilson and Anne Fine, who noted that children's literature has often been overlooked in major literary awards. Submissions will open in spring 2026, with the shortlist and child judges announced in November 2026, culminating in the winner's announcement at a special young readers' event in February 2027.</div>
+            
+            <h3>Keywords</h3>
+            <div class="keywords">
+                <div class="keyword-item">
+                    <div class="keyword-term">Booker Prize Foundation</div>
+                    <div class="keyword-explanation">The organization that runs the famous Booker Prize awards for literature</div>
+                </div>
+                <div class="keyword-item">
+                    <div class="keyword-term">Children's Laureate</div>
+                    <div class="keyword-explanation">A prestigious role given to a prominent children's author to promote children's literature</div>
+                </div>
+                <div class="keyword-item">
+                    <div class="keyword-term">contemporary fiction</div>
+                    <div class="keyword-explanation">Modern stories written in recent times that reflect current life and themes</div>
+                </div>
+                <div class="keyword-item">
+                    <div class="keyword-term">judging panel</div>
+                    <div class="keyword-explanation">A group of experts who evaluate and select the best entries in a competition</div>
+                </div>
+                <div class="keyword-item">
+                    <div class="keyword-term">literary award</div>
+                    <div class="keyword-explanation">A prize given to recognize excellence in writing and literature</div>
+                </div>
+                <div class="keyword-item">
+                    <div class="keyword-term">shortlist selection</div>
+                    <div class="keyword-explanation">The process of choosing the best candidates from many entries for final consideration</div>
+                </div>
+                <div class="keyword-item">
+                    <div class="keyword-term">publisher submissions</div>
+                    <div class="keyword-explanation">Books that publishing companies officially enter into a competition</div>
+                </div>
+                <div class="keyword-item">
+                    <div class="keyword-term">accessibility</div>
+                    <div class="keyword-explanation">Making something available and easy to obtain or use</div>
+                </div>
+            </div>
+            
+            <h3>Questions</h3>
+            <div class="questions">
+                <div class="question-item">
+                    <div class="question-text">Q1: What organization is launching the Children's Booker Prize?</div>
+                    <div class="options">
+                        <div class="option correct">Booker Prize Foundation</div>
+                        <div class="option">UK Literacy Council</div>
+                        <div class="option">Children's Book Trust</div>
+                        <div class="option">National Reading Association</div>
+                    </div>
+                </div>
+                <div class="question-item">
+                    <div class="question-text">Q2: Who described the prize as their most ambitious endeavor in 20 years?</div>
+                    <div class="options">
+                        <div class="option correct">Gaby Wood</div>
+                        <div class="option">Frank Cottrell-Boyce</div>
+                        <div class="option">Jacqueline Wilson</div>
+                        <div class="option">Anne Fine</div>
+                    </div>
+                </div>
+                <div class="question-item">
+                    <div class="question-text">Q3: What is Frank Cottrell-Boyce's current role in children's literature?</div>
+                    <div class="options">
+                        <div class="option correct">UK Children's Laureate</div>
+                        <div class="option">Head of Children's Publishing</div>
+                        <div class="option">Children's Book Reviewer</div>
+                        <div class="option">School Reading Coordinator</div>
+                    </div>
+                </div>
+                <div class="question-item">
+                    <div class="question-text">Q4: How many adult judges will initially select the shortlist?</div>
+                    <div class="options">
+                        <div class="option">Two</div>
+                        <div class="option correct">Three</div>
+                        <div class="option">Four</div>
+                        <div class="option">Five</div>
+                    </div>
+                </div>
+                <div class="question-item">
+                    <div class="question-text">Q5: When will publishers be able to submit books for consideration?</div>
+                    <div class="options">
+                        <div class="option">Spring 2025</div>
+                        <div class="option correct">Spring 2026</div>
+                        <div class="option">Fall 2026</div>
+                        <div class="option">Winter 2027</div>
+                    </div>
+                </div>
+                <div class="question-item">
+                    <div class="question-text">Q6: What famous book did Frank Cottrell-Boyce write?</div>
+                    <div class="options">
+                        <div class="option correct">Millions</div>
+                        <div class="option">The More The Merrier</div>
+                        <div class="option">Tracey Beaker</div>
+                        <div class="option">Matilda</div>
+                    </div>
+                </div>
+                <div class="question-item">
+                    <div class="question-text">Q7: Which author compared children's literature to Cinderella?</div>
+                    <div class="options">
+                        <div class="option correct">Anne Fine</div>
+                        <div class="option">Jacqueline Wilson</div>
+                        <div class="option">Frank Cottrell-Boyce</div>
+                        <div class="option">Gaby Wood</div>
+                    </div>
+                </div>
+                <div class="question-item">
+                    <div class="question-text">Q8: Where must books be published to be eligible for the prize?</div>
+                    <div class="options">
+                        <div class="option correct">UK or Ireland</div>
+                        <div class="option">USA or Canada</div>
+                        <div class="option">Australia or New Zealand</div>
+                        <div class="option">Any English-speaking country</div>
+                    </div>
+                </div>
+                <div class="question-item">
+                    <div class="question-text">Q9: When will the winner be announced?</div>
+                    <div class="options">
+                        <div class="option">November 2026</div>
+                        <div class="option">December 2026</div>
+                        <div class="option">January 2027</div>
+                        <div class="option correct">February 2027</div>
+                    </div>
+                </div>
+                <div class="question-item">
+                    <div class="question-text">Q10: What is the main goal of distributing 30,000 books to children?</div>
+                    <div class="options">
+                        <div class="option correct">Increase accessibility to literature</div>
+                        <div class="option">Reduce book costs</div>
+                        <div class="option">Support publishers</div>
+                        <div class="option">Promote specific authors</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>Background Reading</h3>
+            <div class="background">The Booker Prize is one of the world's most prestigious literary awards, established in 1969 to recognize the best original novel written in English and published in the UK or Ireland. Over the decades, it has significantly influenced literary trends and book sales. The Booker Prize Foundation also administers the International Booker Prize for translated fiction. Children's literature has historically received less recognition in major literary awards compared to adult fiction. The role of Children's Laureate in the UK was created in 1999 to celebrate outstanding achievement in children's literature and to promote reading among young people. The inclusion of child judges in literary awards represents an innovative approach to engaging young readers and ensuring that children's perspectives are valued in evaluating literature intended for them. This initiative aligns with broader educational goals of improving literacy rates and fostering lifelong reading habits from an early age.</div>
+            
+            <h3>Article Structure</h3>
+            <div class="article-structure">
+                <div class="structure-item">Context: Background of Booker Prize and need for children's literature recognition</div>
+                <div class="structure-item">Main: Details of the new Children's Booker Prize and its unique features</div>
+                <div class="structure-item">Impact: Expected benefits for children's reading and literature accessibility</div>
+            </div>
+            
+            <h3>Perspectives</h3>
+            <div class="perspectives">
+                <div class="perspective-item">
+                    <div class="perspective-title">Organizational perspective</div>
+                    <div class="perspective-desc">The Booker Prize Foundation sees this as a strategic initiative to expand their literary influence and promote children's literacy</div>
+                </div>
+                <div class="perspective-item">
+                    <div class="perspective-title">Author perspective</div>
+                    <div class="perspective-desc">Children's authors view this as long-overdue recognition for their genre and an opportunity to reach wider audiences</div>
+                </div>
+                <div class="perspective-item">
+                    <div class="perspective-title">Educational perspective</div>
+                    <div class="perspective-desc">This initiative supports literacy development and engages children directly in literary evaluation</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="high" class="tab-content high">
+            <h2>🔴 Literary Innovation: The Children's Booker Prize and the Democratization of Literary Judgement</h2>
+            
+            <h3>Summary</h3>
+            <div class="summary">The Booker Prize Foundation has unveiled a transformative addition to its literary awards portfolio with the establishment of the Children's Booker Prize, marking a significant evolution in the recognition of children's literature within the mainstream literary establishment. Scheduled for launch in 2026 with inaugural awards presented in 2027, this pioneering initiative specifically targets contemporary fiction for readers aged eight to twelve years. The prize's most revolutionary aspect lies in its hybrid judging model, which integrates both professional adult assessment and authentic child perspectives. The inaugural judging panel will be chaired by Frank Cottrell-Boyce, the current UK Children's Laureate and celebrated author of the critically acclaimed Millions. He will be accompanied by two additional adult judges who will undertake the preliminary selection process, identifying eight exemplary works for the shortlist. Subsequently, three child judges will join the deliberation process, contributing their unique insights to the final selection of the winning title. Gaby Wood, chief executive of the Booker Prize Foundation, characterized this venture as their most ambitious undertaking in two decades, anticipating profound and lasting impact on children's engagement with literature. The foundation's commitment to accessibility is demonstrated through plans to distribute a minimum of 30,000 copies of shortlisted and winning titles to children, addressing issues of literary access and equity. The financial rewards mirror the structure of the established Booker Prizes, with shortlisted authors receiving £2,500 and the winner awarded £50,000. The announcement has garnered enthusiastic endorsement from literary figures including Dame Jacqueline Wilson and Anne Fine, the latter notably observing that children's literature has historically occupied a marginalized position within the literary ecosystem, analogous to the 'overlooked Cinderella' of the publishing world. The submission process will commence in spring 2026, with the shortlist and child judges revealed in November 2026, culminating in the winner's announcement at a dedicated young readers' event in February 2027. Eligibility extends to global authors of original English-language works and translated editions, provided they are published in the UK or Ireland within the specified timeframe of November 2025 to October 2026.</div>
+            
+            <h3>Keywords</h3>
+            <div class="keywords">
+                <div class="keyword-item">
+                    <div class="keyword-term">literary establishment</div>
+                    <div class="keyword-explanation">The network of institutions, critics, and awards that define and validate literary merit within a culture</div>
+                </div>
+                <div class="keyword-item">
+                    <div class="keyword-term">hybrid judging model</div>
+                    <div class="keyword-explanation">A judging system that incorporates multiple types of evaluators with different perspectives and expertise</div>
+                </div>
+                <div class="keyword-item">
+                    <div class="keyword-term">democratization of judgement</div>
+                    <div class="keyword-explanation">The process of expanding decision-making authority beyond traditional experts to include broader participation</div>
+                </div>
+                <div class="keyword-item">
+                    <div class="keyword-term">literary ecosystem</div>
+                    <div class="keyword-explanation">The interconnected network of authors, publishers, critics, awards, and readers that sustains literary culture</div>
+                </div>
+                <div class="keyword-item">
+                    <div class="keyword-term">marginalized genre</div>
+                    <div class="keyword-explanation">A category of literature that has historically received less critical attention and institutional recognition</div>
+                </div>
+                <div class="keyword-item">
+                    <div class="keyword-term">accessibility and equity</div>
+                    <div class="keyword-explanation">Principles ensuring that cultural resources are available to all segments of society regardless of socioeconomic status</div>
+                </div>
+                <div class="keyword-item">
+                    <div class="keyword-term">contemporary fiction</div>
+                    <div class="keyword-explanation">Literary works produced in the current era that engage with modern themes, styles, and societal concerns</div>
+                </div>
+                <div class="keyword-item">
+                    <div class="keyword-term">inaugural panel</div>
+                    <div class="keyword-explanation">The first group of judges appointed to establish the standards and precedents for a new award</div>
+                </div>
+                <div class="keyword-item">
+                    <div class="keyword-term">literary portfolio</div>
+                    <div class="keyword-explanation">The complete collection of awards and initiatives managed by a literary organization</div>
+                </div>
+                <div class="keyword-item">
+                    <div class="keyword-term">critical acclaim</div>
+                    <div class="keyword-explanation">Recognition and praise from professional critics and literary experts for artistic excellence</div>
+                </div>
+            </div>
+            
+            <h3>Questions</h3>
+            <div class="questions">
+                <div class="question-item">
+                    <div class="question-text">Q1: What does the hybrid judging model represent in terms of literary evaluation?</div>
+                    <div class="options">
+                        <div class="option correct">Democratization of literary judgement</div>
+                        <div class="option">Standardization of criticism</div>
+                        <div class="option">Commercialization of awards</div>
+                        <div class="option">Professionalization of reviewing</div>
+                    </div>
+                </div>
+                <div class="question-item">
+                    <div class="question-text">Q2: How does Anne Fine characterize the historical position of children's literature?</div>
+                    <div class="options">
+                        <div class="option correct">Overlooked Cinderella of the book world</div>
+                        <div class="option">Neglected stepsister of publishing</div>
+                        <div class="option">Forgotten corner of literature</div>
+                        <div class="option">Ignored branch of storytelling</div>
+                    </div>
+                </div>
+                <div class="question-item">
+                    <div class="question-text">Q3: What broader literary trend does this initiative reflect regarding genre recognition?</div>
+                    <div class="options">
+                        <div class="option correct">Mainstream acceptance of marginalized genres</div>
+                        <div class="option">Commercial expansion of prize categories</div>
+                        <div class="option">Academic validation of popular fiction</div>
+                        <div class="option">International standardization of awards</div>
+                    </div>
+                </div>
+                <div class="question-item">
+                    <div class="question-text">Q4: What strategic significance does Gaby Wood attribute to this initiative?</div>
+                    <div class="options">
+                        <div class="option correct">Most ambitious endeavor in 20 years</div>
+                        <div class="option">Largest financial investment to date</div>
+                        <div class="option">Most internationally focused project</div>
+                        <div class="option">Most technologically innovative award</div>
+                    </div>
+                </div>
+                <div class="question-item">
+                    <div class="question-text">Q5: How does the prize address issues of literary access?</div>
+                    <div class="options">
+                        <div class="option correct">Distribution of 30,000 copies to children</div>
+                        <div class="option">Reduced pricing for school purchases</div>
+                        <div class="option">Digital availability of all entries</div>
+                        <div class="option">Library partnership programs</div>
+                    </div>
+                </div>
+                <div class="question-item">
+                    <div class="question-text">Q6: What literary role does Frank Cottrell-Boyce currently hold?</div>
+                    <div class="options">
+                        <div class="option correct">UK Children's Laureate</div>
+                        <div class="option">Head of Children's Publishing Association</div>
+                        <div class="option">Director of Youth Literacy</div>
+                        <div class="option">Chair of Young Readers Foundation</div>
+                    </div>
+                </div>
+                <div class="question-item">
+                    <div class="question-text">Q7: What is the significance of the prize's monetary structure mirroring adult Booker Prizes?</div>
+                    <div class="options">
+                        <div class="option correct">Equal valuation of children's and adult literature</div>
+                        <div class="option">Standardized award amounts across categories</div>
+                        <div class="option">Financial sustainability model</div>
+                        <div class="option">Commercial sponsorship requirements</div>
+                    </div>
+                </div>
+                <div class="question-item">
+                    <div class="question-text">Q8: What timeframe defines eligibility for book submissions?</div>
+                    <div class="options">
+                        <div class="option correct">November 2025 to October 2026</div>
+                        <div class="option">January 2026 to December 2026</div>
+                        <div class="option">March 2026 to February 2027</div>
+                        <div class="option">June 2026 to May 2027</div>
+                    </div>
+                </div>
+                <div class="question-item">
+                    <div class="question-text">Q9: How does the judging process sequence adult and child participation?</div>
+                    <div class="options">
+                        <div class="option correct">Adults select shortlist, then children join for winner selection</div>
+                        <div class="option">Children and adults judge simultaneously throughout</div>
+                        <div class="option">Children suggest candidates, adults make final decisions</div>
+                        <div class="option">Separate judging panels for different criteria</div>
+                    </div>
+                </div>
+                <div class="question-item">
+                    <div class="question-text">Q10: What international scope does the prize encompass?</div>
+                    <div class="options">
+                        <div class="option correct">Global authors writing in or translated to English</div>
+                        <div class="option">Commonwealth authors only</div>
+                        <div class="option">European Union authors exclusively</div>
+                        <div class="option">English-speaking countries primarily</div>
+                    </div>
+                </div>
+                <div class="question-item">
+                    <div class="question-text">Q11: What symbolic function does the young readers' announcement event serve?</div>
+                    <div class="options">
+                        <div class="option correct">Centering children in the literary celebration</div>
+                        <div class="option">Maximizing media coverage</div>
+                        <div class="option">Reducing ceremonial costs</div>
+                        <div class="option">Streamlining administrative processes</div>
+                    </div>
+                </div>
+                <div class="question-item">
+                    <div class="question-text">Q12: How does this initiative potentially impact the children's literature market?</div>
+                    <div class="options">
+                        <div class="option correct">Elevates prestige and commercial visibility</div>
+                        <div class="option">Standardizes publishing formats</div>
+                        <div class="option">Reduces production costs</div>
+                        <div class="option">Limits international competition</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>Background Reading</h3>
+            <div class="background">The Booker Prize, established in 1969, represents one of the most influential literary awards globally, significantly impacting book sales, critical reception, and literary careers. Its evolution includes the 2005 creation of the International Booker Prize for translated fiction, reflecting growing global literary engagement. Children's literature has historically occupied a complex position within the literary hierarchy, often dismissed as pedagogically oriented rather than artistically significant. The UK Children's Laureate program, initiated in 1999, represents one effort to redress this imbalance by celebrating excellence in children's writing. The concept of involving children in literary judgement challenges traditional hierarchies of cultural authority, aligning with broader educational movements emphasizing student voice and participatory learning. Contemporary debates in literary studies increasingly question the exclusion of children's perspectives in evaluating literature intended for them, while sociological research demonstrates the importance of early literary engagement in developing critical thinking and empathy. The distribution component addresses ongoing concerns about literary access and the correlation between book ownership and educational outcomes.</div>
+            
+            <h3>Article Structure</h3>
+            <div class="article-structure">
+                <div class="structure-item">History: Evolution of Booker Prize and historical marginalization of children's literature</div>
+                <div class="structure-item">Current: Detailed implementation of the Children's Booker Prize with innovative features</div>
+                <div class="structure-item">Impact: Potential effects on literary culture, accessibility, and genre recognition</div>
+                <div class="structure-item">Counter: Considerations about maintaining literary standards while incorporating child perspectives</div>
+            </div>
+            
+            <h3>Perspectives</h3>
+            <div class="perspectives">
+                <div class="perspective-item">
+                    <div class="perspective-title">Literary institutional perspective</div>
+                    <div class="perspective-desc">This represents strategic expansion of the Booker brand while addressing historical gaps in genre recognition</div>
+                </div>
+                <div class="perspective-item">
+                    <div class="perspective-title">Educational sociology perspective</div>
+                    <div class="perspective-desc">The initiative challenges traditional power dynamics in cultural evaluation and promotes intergenerational dialogue</div>
+                </div>
+                <div class="perspective-item">
+                    <div class="perspective-title">Publishing industry perspective</div>
+                    <div class="perspective-desc">This could significantly impact children's book markets and author careers through enhanced prestige and visibility</div>
+                </div>
+                <div class="perspective-item">
+                    <div class="perspective-title">Child advocacy perspective</div>
+                    <div class="perspective-desc">The inclusion of child judges represents meaningful participation rather than tokenism in cultural decision-making</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="zh" class="tab-content zh">
+            <h2>🔵 布克奖推出儿童小说新奖项，年轻评委参与评选</h2>
+            
+            <h3>中文摘要 (Chinese Summary)</h3>
+            <div class="summary">著名的布克奖组织方宣布推出专门针对儿童小说的新奖项，该奖项将由成人和儿童共同组成评审团进行评选。儿童布克奖将于2026年启动，2027年首次颁奖，旨在表彰8至12岁年龄段的最佳当代儿童小说。英国儿童文学奖得主弗兰克·科特雷尔-博伊斯将担任首届评委会主席，他与另外两名成人评委将先选出八本书的入围名单，然后三名儿童评委加入共同决定获奖作品。布克奖基金会首席执行官表示这是他们20年来最雄心勃勃的项目，计划向儿童赠送至少3万本入围和获奖图书，以增加优质文学的普及度。获奖作者将获得5万英镑奖金，入围作者各获2500英镑。该奖项已获得多位著名儿童作家的热烈支持，他们认为儿童文学在主流文学奖项中长期被忽视。投稿将于2026年春季开始，入围名单和儿童评委将于2026年11月公布，获奖者将在2027年2月的年轻读者活动中揭晓。</div>
+        </div>
+    </div>
+    
+    <script>
+        function showTab(tabName) {
+            // Hide all tabs
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

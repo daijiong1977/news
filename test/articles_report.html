@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Articles Report - 2025-10-24 17:50:19</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+        
+        .stats {
+            background: white;
+            padding: 30px;
+            margin: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+            font-size: 0.9em;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .article {
+            background: white;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .article:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+        
+        .article-header {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            padding: 30px;
+            background: #f9f9f9;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .article-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 6px;
+            background: #e0e0e0;
+        }
+        
+        .article-meta {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .article-title {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+        
+        .article-info {
+            display: grid;
+            gap: 10px;
+            font-size: 0.95em;
+        }
+        
+        .info-row {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 8px;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .info-value {
+            color: #333;
+            word-break: break-word;
+        }
+        
+        .source-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            width: fit-content;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            width: fit-content;
+        }
+        
+        .status-unprocessed {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-processed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .article-content {
+            padding: 30px;
+        }
+        
+        .article-description {
+            background: #f0f4ff;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-style: italic;
+        }
+        
+        .article-body {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.8;
+            color: #333;
+            font-size: 0.95em;
+        }
+        
+        .article-id {
+            background: #e8e8e8;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        
+        .url-link {
+            color: #667eea;
+            text-decoration: none;
+            word-break: break-all;
+        }
+        
+        .url-link:hover {
+            text-decoration: underline;
+        }
+        
+        .footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+        
+        @media (max-width: 768px) {
+            .article-header {
+                grid-template-columns: 1fr;
+            }
+            
+            .article-image {
+                height: 300px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .info-row {
+                grid-template-columns: 1fr;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📰 Articles Mining Report</h1>
+        <p>Complete article collection with images and content verification</p>
+        <p>Generated: 2025-10-24 17:50:19</p>
+    </div>
+    
+    <div class="container">
+        <div class="stats">
+
+            <div class="stat-item">
+                <div class="stat-number">18</div>
+                <div class="stat-label">Total Articles</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">18</div>
+                <div class="stat-label">Unprocessed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">0</div>
+                <div class="stat-label">Processed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">0</div>
+                <div class="stat-label">Failed</div>
+            </div>
+        </div>
+        
+        <div class="articles-list">
+
+            <div class="article">
+                <div class="article-header">
+                    <img src="../article_images/article_18_a5a080e26276.webp" alt="Article 18" class="article-image">
+                    <div class="article-meta">
+                        <h2 class="article-title">Incogni vs DeleteMe: Which data removal platform is your perfect choice?</h2>
+                        <div class="article-info">
+                            <div class="info-row">
+                                <div class="info-label">ID:</div>
+                                <div class="info-value"><span class="article-id">18</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Source:</div>
+                                <div class="info-value"><span class="source-badge">TechRadar</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Status:</div>
+                                <div class="info-value"><span class="status-badge status-unprocessed">Unprocessed</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">URL:</div>
+                                <div class="info-value"><a href="https://www.techradar.com/phones/iphone/incogni-vs-deleteme-which-data-removal-platform-is-your-perfect-choice" target="_blank" class="url-link">https://www.techradar.com/phones/iphone/incogni-vs-deleteme-...</a></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Published:</div>
+                                <div class="info-value">Fri, 24 Oct 2025 16:27:00 +0000</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Crawled:</div>
+                                <div class="info-value">2025-10-24T17:50:16.796214</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="article-content">
+                    <div class="article-description">
+                        <strong>Description:</strong><br>
+                        
+                             Learn how Incogni and DeleteMe stack against each other in key areas, including broker coverage, reporting, ease of use, customer support, pricing, and complementary feat...
+                    </div>
+                    <div class="article-body">
+                        <strong>Full Content:</strong><br><br>
+A detailed comparison of Incogni and DeleteMe, two of the most popular data removal services.
+
+With a monthly or annual subscription, Incogni users can scan the web for their personal data and send automated removal requests to data brokers. After the initial scan, Incogni frequently rescans for the same personal data and sends fresh removal requests, particularly to new data brokers that seemingly don't cease to emerge.
+
+Founded in 2010, DeleteMe offers a similar data removal service. Users can submit their personal information and run a deep scan to find this information wherever it appears across the web. Then, DeleteMe will send removal requests to data brokers to scrub this information. It'll also run frequent re-scans and send new data removal requests to ensure your personal information stays off the web.
+
+We've covered the surface of these two data removal services, but there's much more beneath. This guide compares Incogni and DeleteMe across key areas - broker coverage, pricing, features, ease of use, and customer support - to help you choose the best option for your needs.
+
+Incogni covers roughly 420 data brokers, while DeleteMe covers 750+ data brokers. However, these figures don't tell the complete story. These numbers represent the number of brokers where both platforms can send automated removal requests. However, users can send custom removal requests to other sites. A custom request involves Incogni or DeleteMe's team contacting the site on your behalf to request the deletion of your personal information.
+
+Based on the number of brokers to which you can send automated and manual removal requests, Incogni is a better option than DeleteMe.
+
+Both Incogni and DeleteMe provide intuitive dashboards to track your data removal requests and their status. However, in my experience, DeleteMe offers more detailed, labeled reports, while Incogni offers generalized reports tailored to the risks associated with my data.
+
+On Incogni, I received regular email updates on data removal requests, including when they were formally submitted and when the request was successful. I could also track the progress of my removal requests on the Incogni dashboard, including the estimated timeline for each pending request.
+
+On DeleteMe, I also got frequent email updates about removal requests from start to finish. Likewise, I could always track the progress of each request from my DeleteMe dashboard.
+
+However, DeleteMe stood out with its PDF reports listing each site where my personal information was found, when removal requests were sent to each site, and the progress of each request. Its reports were more personalized than Incogni's.
+
+DeleteMe sends users their first detailed PDF report one week after signing up. Afterwards, detailed data removal reports are sent to users subscribed to the Standard plan every three months, or to users on the Premium plan every two months.
+
+DeleteMe offers the most comprehensive statistical reports, while Incogni offers simpler, generalized insights. Understandably, not everyone is interested in the minute details DeleteMe provides, but it's the best option if you want to understand every nook and cranny of your personal data removal.
+
+Along with their core features, data removal services often provide some extra functionalities to help users boost their online privacy. From my experience testing Incogni and DeleteMe, the latter is the clear winner in this criterion.
+
+DeleteMe offers a complementary Cyber platform with valuable features. For one, you can search the dark web to see if your email address was compromised in any data leak. If you detect your email credentials on any website leak, it's a signal to change passwords for the affected website immediately.
+
+For website owners, DeleteMe also offers a service to scan your domain name and detect whether sensitive data linked to it is present on the dark web. Several other complementary features exist, but these are the most notable I can point out.
+                    </div>
+                </div>
+            </div>
+
+            <div class="article">
+                <div class="article-header">
+                    <img src="../article_images/article_17_b32ebf1d139f.jpg" alt="Article 17" class="article-image">
+                    <div class="article-meta">
+                        <h2 class="article-title">Springsteen: Deliver Me From Nowhere delivers an honest, deeply human look at Bruce in his darkest period</h2>
+                        <div class="article-info">
+                            <div class="info-row">
+                                <div class="info-label">ID:</div>
+                                <div class="info-value"><span class="article-id">17</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Source:</div>
+                                <div class="info-value"><span class="source-badge">TechRadar</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Status:</div>
+                                <div class="info-value"><span class="status-badge status-unprocessed">Unprocessed</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">URL:</div>
+                                <div class="info-value"><a href="https://www.techradar.com/streaming/disney-plus/springsteen-deliver-me-from-nowhere-delivers-an-honest-deeply-human-look-at-bruce-in-his-darkest-period" target="_blank" class="url-link">https://www.techradar.com/streaming/disney-plus/springsteen-...</a></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Published:</div>
+                                <div class="info-value">Fri, 24 Oct 2025 20:30:00 +0000</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Crawled:</div>
+                                <div class="info-value">2025-10-24T17:50:16.477912</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="article-content">
+                    <div class="article-description">
+                        <strong>Description:</strong><br>
+                        
+                             It may not hit every note perfectly, but Springsteen: Deliver Me From Nowhere is an honest, heavy, and deeply human look at Bruce Springsteen during arguably one of his d...
+                    </div>
+                    <div class="article-body">
+                        <strong>Full Content:</strong><br><br>
+It may not hit every note perfectly, but Springsteen: Deliver Me From Nowhere is an honest, heavy, and deeply human look at Bruce Springsteen during arguably one of his darkest periods, one that still showcases the music-making process with just a taste of E Street Band greatness. Ultimately, an antithesis of most biopics, and that's a good thing.
+
+Intimate, deeply human look at Bruce during a dark period.
+
+Strong performances from Jeremy Allen White and Jeremy Strong
+
+Honest, emotionally authentic storytelling
+
+For the Bruce Springsteen faithful - and probably those who feel that way about Jeremy Allen White - today, October 24, 2025, has been a long time coming, as Springsteen: Deliver Me From Nowhere is finally showing in movie theaters across the globe.
+
+Now, for lack of a better analogy, the Boss has been the soundtrack of my life - well, for most of it - so I headed to a local AMC Theatre with Dolby Cinema in the great state of New Jersey for an opening-night preview screening.
+
+I had a lot of feelings going in, especially since Springsteen: Deliver Me From Nowhere isn't like most biopics. But I wouldn't even call it that, because it focuses on a very specific, short time in Springsteen's career. Instead of portraying the many months spent on getting Born to Run just right or even Born in the U.S.A.'s release or Springteen's rise to stratospheric stardom, it turns the spotlight onto one of his darker chapters - one that Springsteen became more open about in his memoir Born to Run and in Warren Zanes's Deliver Me From Nowhere, which is the book that inspired this film.
+
+So, let's dive into it - and fair warning, I'll have some mild spoilers ahead, though it's kind of comical as this is based in reality, and we all know about Nebraska.
+
+Warning: some spoilers for Springsteen: Deliver Me From Nowhere lie ahead.
+
+Springsteen: Deliver Me From Nowhere is a lot better than I was expecting it to be. It's a good film that's more like a deep character study of a specific time in Bruce Springsteen's life. It jumps from before, during, and a bit after the recording of Nebraska, giving a deep dive into his mental health - both Bruce's and his family's - and his upbringing. The latter is done through black-and-white flashbacks, which at times feel a bit out of place but do an excellent job of at least rooting the pain and depression.
+
+It opens showing a glimpse into that upbringing, but soon ties the anxiety and rush of an encounter into the rush and thrill of performing Born to Run to close out The River Tour. This is our first glimpse, and one of the few, of the E Street Band during Springsteen: Deliver Me From Nowhere.
+
+I never really got comfortable believing Jeremy Allen White was entirely the embodiment of Bruce Springsteen, but he sure gives off the look of a rock star known for energetic performances. Maybe most importantly, Allen White doesn't just do an imitative voice of the Boss but, in my opinion, does a lot more with body language and how he presents himself.
+
+From there on out, we see the relationship between Jon Landau - played by Jeremy Strong - and Bruce unfold on screen, and it matches the real-life relationship. They were two friends forever, who clearly had each other's backs, and Landau definitely does a masterclass in being an agent, manager, and friend - fighting for what the artist wants.
+
+We see Bruce then settle into a rental in Colts Neck, dive deep into some reading, and eventually watch Terrence Malick's 1973 film Badlands, which pushes him to research a bit more and eventually start on a track of songs dubbed Starkweather, which becomes Nebraska. Seeing this process depicted on the big screen, and the historic room with the orange shag carpet, is something of a bit of a holy grail. And Jeremy Allen White does get the singing voice pretty close, as well as the guitar playing, though there is a unique blending. I also need to give a shout to the audio quality in this Dolby Cinema theater, but also to the mixing team on Springsteen: Deliver From Nowhere, it is done excellently. And there are a few tracks where the singing shifts from Jeremy Allen White to Bruce Springsteen, and vice versa.
+
+We also see Bruce go on a few dates with a character, Faye - who in reality is a composite, and we see that struggle as he runs away from fame and goes on some self-discovery, which in turn is himself feeling like an outsider in his own body.
+                    </div>
+                </div>
+            </div>
+
+            <div class="article">
+                <div class="article-header">
+                    <img src="../article_images/article_16_e258539b12d1.jpg" alt="Article 16" class="article-image">
+                    <div class="article-meta">
+                        <h2 class="article-title">Halo: Campaign Evolved delivers a beautiful version of the first-person shooter’s story, but I still want to see more</h2>
+                        <div class="article-info">
+                            <div class="info-row">
+                                <div class="info-label">ID:</div>
+                                <div class="info-value"><span class="article-id">16</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Source:</div>
+                                <div class="info-value"><span class="source-badge">TechRadar</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Status:</div>
+                                <div class="info-value"><span class="status-badge status-unprocessed">Unprocessed</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">URL:</div>
+                                <div class="info-value"><a href="https://www.techradar.com/gaming/halo-campaign-evolved-delivers-a-beautiful-version-of-the-first-person-shooters-campaign-but-i-still-want-to-see-more" target="_blank" class="url-link">https://www.techradar.com/gaming/halo-campaign-evolved-deliv...</a></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Published:</div>
+                                <div class="info-value">Fri, 24 Oct 2025 20:30:17 +0000</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Crawled:</div>
+                                <div class="info-value">2025-10-24T17:50:15.975263</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="article-content">
+                    <div class="article-description">
+                        <strong>Description:</strong><br>
+                        
+                             We go hands-on with a small slice of Halo: Campaign Evolved, the stunning upcoming remake of the first Halo campaign. 
+                                                   ...
+                    </div>
+                    <div class="article-body">
+                        <strong>Full Content:</strong><br><br>
+Diving into the start of the fan-favorite 'The Silent Cartographer' mission, it's clear why the developers chose this section of the campaign to show off their vision. It's a level that back in 2001 seemed incredibly ahead of its time, with a semi-open environment that encouraged exploration and defied the more linear designs of other first-person shooter (FPS) games of the era.
+
+It was a real looker, too, with lush sandy beaches that provided breathtaking views across a wide ocean expanse.
+
+Built in Unreal Engine 5, Halo: Campaign Evolved is very much positioned to recapture the same sense of magic and wonder when it launches in 2026.
+
+Running at a crisp 4K resolution, this new version of that famous beach landing is dripping in cutting-edge visual tech, be that the near photorealistic textures or impressively life-like lighting effects.
+
+This is very much Halo: Combat Evolved as you remember it, though I did spot a few interesting changes here and there that hint at a little more going on behind the scenes. Firstly, the beach environment definitely seems a lot closer to its remastered incarnation in 2014's Halo: The Master Chief Collection, with quite a bit of added grass and foliage that wasn't originally there. A minor, but interesting decision.
+
+Although I didn't clock it at first, the controls have also been substantially altered to be more in line with modern expectations.
+
+The right trigger is still used to fire as you would expect, though you now have to hold the left trigger to zoom in your weapon. Grenades are much less fiddly than before, bound to the left bumper, and you now no longer have to scramble for the B button every time you want to use your melee - that's now bound to pressing down the right thumbstick.
+
+Do the same to the left thumbstick and you'll enter a sprint, something entirely absent from the original game. It all feels completely natural and should go a long way to making it more approachable than before, and if you're not such a fan of it, Halo Studios has confirmed that you'll be able to turn it off.
+
+The developers have also said that there will be some more comprehensive changes in the full game.
+
+Visual differences aside, the segment of 'The Silent Cartographer' that I sampled played out nearly identically to its original incarnation, though other parts will receive more substantial tweaks. The infamous library, for example, will be significantly less maze-like with design alterations to improve the pacing of encounters and additional dialog for 343 Guilty Spark, your AI companion, to presumably guide you so that you don't get lost.
+
+New weapons are coming in from across the series, too, including the Energy Sword, Battle Rifle, and Needle Rifle, which should give even the most seasoned Halo veteran a few more combat possibilities. I didn't spot any in my play time, so I'm interested to see just how well they fit in each level they appear. If that wasn't enough, you'll be able to pilot more vehicles, or crank up the challenge with the Skulls modifiers that return from the Master Chief Collection.
+
+There are three tantalizing new prequel missions to boot, set before the events of the original story and bringing in brand new enemies and characters. The developers say that this remake is powered by the 2001 game's code, with Unreal Engine 5 acting something like a layer for its visuals (an approach that also underpinned the recent The Elder Scrolls 4: Oblivion Remastered), so I'm curious to see what kind of things they'll be able to cook up while still using parts of that original tech.
+
+I just wish that some of these exciting additions were present in my demo, as die-hard series fans will surely be wondering whether these new arrivals enhance or detract from the overall experience. With the game set to release in 2026 for Xbox Series X and Series S, PlayStation 5, and PC, it's still early days, so I'll be waiting with baited breath for further news. At least the visuals have been nailed down quickly.
+                    </div>
+                </div>
+            </div>
+
+            <div class="article">
+                <div class="article-header">
+                    <img src="../article_images/article_15_2a3c326c9eb9.webp" alt="Article 15" class="article-image">
+                    <div class="article-meta">
+                        <h2 class="article-title">Popular cholesterol drugs may help prevent dementia</h2>
+                        <div class="article-info">
+                            <div class="info-row">
+                                <div class="info-label">ID:</div>
+                                <div class="info-value"><span class="article-id">15</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Source:</div>
+                                <div class="info-value"><span class="source-badge">Science Daily</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Status:</div>
+                                <div class="info-value"><span class="status-badge status-unprocessed">Unprocessed</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">URL:</div>
+                                <div class="info-value"><a href="https://www.sciencedaily.com/releases/2025/10/251024041815.htm" target="_blank" class="url-link">https://www.sciencedaily.com/releases/2025/10/251024041815.h...</a></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Published:</div>
+                                <div class="info-value">Fri, 24 Oct 2025 11:24:49 EDT</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Crawled:</div>
+                                <div class="info-value">2025-10-24T17:50:10.386412</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="article-content">
+                    <div class="article-description">
+                        <strong>Description:</strong><br>
+                        A massive genetic study found that naturally lower cholesterol is linked to a dramatically reduced risk of dementia. The research simulated the effects of cholesterol-lowering drugs and showed up to a...
+                    </div>
+                    <div class="article-body">
+                        <strong>Full Content:</strong><br><br>
+Having lower cholesterol levels may help protect against dementia, according to a large-scale international study led by the University of Bristol. The research, involving data from more than one million participants, found that people with genetic traits that naturally reduce cholesterol are less likely to develop dementia.
+
+The work was led by Dr. Liv Tybjærg Nordestgaard during her time at the University of Bristol and at the Department of Clinical Biochemistry at Copenhagen University Hospital -- Herlev and Gentofte. The findings were published in Alzheimer's & Dementia: The Journal of the Alzheimer's Association.
+
+Genetic Clues and Cholesterol-Lowering Effects
+
+Some individuals are born with genetic variants that affect the same proteins targeted by cholesterol-lowering medications such as statins and ezetimibe. To explore whether these drugs might influence dementia risk, the team used a technique called Mendelian Randomization. This method allows scientists to study how specific genetic variants mimic the effects of a treatment while minimizing the influence of outside factors like weight, diet, or lifestyle.
+
+By comparing people with and without these cholesterol-lowering genetic variants, the researchers observed a clear difference in dementia risk. A small decrease in cholesterol levels (about one millimole per liter) was associated with up to an 80% reduction in dementia risk for certain drug-related genetic targets.
+
+Lower Cholesterol, Lower Dementia Risk
+
+"What our study indicates is that if you have these variants that lower your cholesterol, it looks like you have a significantly lower risk of developing dementia," said Dr. Nordestgaard, who now works in the Department of Clinical Biochemistry at Copenhagen University Hospital -- Bispebjerg and Frederiksberg hospital.
+
+The results suggest that keeping cholesterol levels low -- whether through genetics or medical treatment -- may protect against dementia. However, the research does not yet confirm that cholesterol-lowering drugs themselves directly prevent the disease.
+
+Why Studying Dementia Is So Challenging
+
+Because dementia often develops late in life, studying its causes requires tracking participants for decades. This makes it difficult to establish cause and effect in traditional clinical trials.
+
+It also remains unclear why high cholesterol raises dementia risk. One explanation, according to Dr. Nordestgaard, is that high cholesterol contributes to atherosclerosis -- the buildup of fatty deposits in blood vessels.
+
+How Cholesterol May Harm the Brain
+
+"Atherosclerosis is a result of the accumulation of cholesterol in your blood vessels," Dr. Nordestgaard said. "It can be in both the body and the brain and increases the risk of forming small blood clots -- one of the causes of dementia.
+
+"It would be a really good next step to carry out randomised clinical trials over 10 or 30 years, for example, where you give the participants cholesterol-lowering medication and then look at the risk of developing dementia," Dr. Nordestgaard added.
+
+Global Collaboration and Funding
+                    </div>
+                </div>
+            </div>
+
+            <div class="article">
+                <div class="article-header">
+                    <img src="../article_images/article_14_124c98ba3645.webp" alt="Article 14" class="article-image">
+                    <div class="article-meta">
+                        <h2 class="article-title">Your gut microbes might be turning fiber into extra calories</h2>
+                        <div class="article-info">
+                            <div class="info-row">
+                                <div class="info-label">ID:</div>
+                                <div class="info-value"><span class="article-id">14</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Source:</div>
+                                <div class="info-value"><span class="source-badge">Science Daily</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Status:</div>
+                                <div class="info-value"><span class="status-badge status-unprocessed">Unprocessed</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">URL:</div>
+                                <div class="info-value"><a href="https://www.sciencedaily.com/releases/2025/10/251024041819.htm" target="_blank" class="url-link">https://www.sciencedaily.com/releases/2025/10/251024041819.h...</a></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Published:</div>
+                                <div class="info-value">Fri, 24 Oct 2025 12:46:40 EDT</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Crawled:</div>
+                                <div class="info-value">2025-10-24T17:50:10.140989</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="article-content">
+                    <div class="article-description">
+                        <strong>Description:</strong><br>
+                        ASU scientists found that people whose gut microbes make more methane extract more calories from fiber-rich foods. Methanogens help the microbiome turn fiber into energy by consuming hydrogen and prod...
+                    </div>
+                    <div class="article-body">
+                        <strong>Full Content:</strong><br><br>
+Deep within your gut lives a bustling world of microbes, each playing a role in digesting your food. Among them is one unusual microbe that produces methane -- a gas more often associated with cows and landfills than humans. According to new research from Arizona State University (ASU), this methane-making microorganism may influence how many calories your body extracts from what you eat.
+
+The collection of microbes living in your digestive tract is known as the gut microbiome. While everyone has one, some people's microbiomes produce large amounts of methane, whereas others produce very little.
+
+Microbes and the Energy Hidden in Fiber
+
+The study found that people whose microbiomes generate more methane tend to extract more energy from high-fiber foods. This may help explain why the same meal can provide different calorie counts for different individuals once it reaches the colon.
+
+Researchers emphasized that high-fiber foods remain beneficial. People generally absorb more calories from a typical Western diet high in processed foods, regardless of methane levels. Even so, calorie absorption on a fiber-rich diet varies depending on how much methane a person's gut produces.
+
+These findings suggest that gut methane could become a key factor in personalized nutrition -- a future where diets are tailored to the unique microbial activity in each person's digestive system
+
+"That difference has important implications for diet interventions. It shows people on the same diet can respond differently. Part of that is due to the composition of their gut microbiome," says Blake Dirks, lead author of the study and graduate researcher at the Biodesign Center for Health Through Microbiomes. Dirks is also a PhD student in ASU's School of Life Sciences.
+
+Published in The ISME Journal, the study identifies the key players: methane-producing microbes known as methanogens. These microorganisms appear to be linked with more efficient digestion and higher energy absorption.
+
+A major job of the microbiome is breaking down food that the body cannot digest on its own. Microbes ferment fiber into short-chain fatty acids (SCFAs), which provide a valuable energy source. During this process, hydrogen gas is released. Too much hydrogen can slow fermentation, but other microbes prevent this by consuming hydrogen -- keeping the digestive chemistry in balance.
+
+Methanogens are the hydrogen consumers. As they feed on hydrogen, they release methane as a byproduct. They are the only microbes in the human gut that produce this gas.
+
+"The human body itself doesn't make methane, only the microbes do. So we suggested it can be a biomarker that signals efficient microbial production of short-chain fatty acids," says Rosy Krajmalnik-Brown, corresponding author of the study and director of the Biodesign Center for Health Through Microbiomes.
+
+How Microbes May Shape Metabolism
+
+The ASU researchers found that the interactions between these microbes may directly affect metabolism. Participants who produced more methane also had higher levels of short-chain fatty acids, indicating that more energy was being created and absorbed in the gut.
+
+To test these effects, each participant followed two different diets. One included highly processed, low-fiber foods, while the other emphasized whole foods and fiber. Both diets contained equal proportions of carbohydrates, proteins, and fats.
+
+The research was conducted in collaboration with the AdventHealth Translational Research Institute, which provided access to a specialized facility. Each participant spent six days in a sealed, hotel-like room called a whole-room calorimeter. This environment allowed researchers to precisely measure metabolism and methane output.
+                    </div>
+                </div>
+            </div>
+
+            <div class="article">
+                <div class="article-header">
+                    <img src="../article_images/article_13_be23e04229fe.webp" alt="Article 13" class="article-image">
+                    <div class="article-meta">
+                        <h2 class="article-title">Before T. rex, there was the “dragon prince”</h2>
+                        <div class="article-info">
+                            <div class="info-row">
+                                <div class="info-label">ID:</div>
+                                <div class="info-value"><span class="article-id">13</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Source:</div>
+                                <div class="info-value"><span class="source-badge">Science Daily</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Status:</div>
+                                <div class="info-value"><span class="status-badge status-unprocessed">Unprocessed</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">URL:</div>
+                                <div class="info-value"><a href="https://www.sciencedaily.com/releases/2025/10/251024041828.htm" target="_blank" class="url-link">https://www.sciencedaily.com/releases/2025/10/251024041828.h...</a></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Published:</div>
+                                <div class="info-value">Fri, 24 Oct 2025 10:01:07 EDT</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Crawled:</div>
+                                <div class="info-value">2025-10-24T17:50:09.760891</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="article-content">
+                    <div class="article-description">
+                        <strong>Description:</strong><br>
+                        Scientists have unveiled Khankhuuluu, a new Mongolian dinosaur species that predates and closely resembles early Tyrannosaurs. With its long snout, small horns, and lean build, it represents a transit...
+                    </div>
+                    <div class="article-body">
+                        <strong>Full Content:</strong><br><br>
+An international team of paleontologists has identified a previously unknown dinosaur species named Khankhuuluu, believed to be the closest-known ancestor of the giant Tyrannosaurs. The discovery, led by Jared Voris and Dr. Darla Zelenitsky from the University of Calgary's Faculty of Science, has been published in Nature.
+
+Voris, a PhD candidate in the Department of Earth, Energy, and Environment, explains that this newly identified Tyrannosaur lived about 86 million years ago. It was a medium-sized, fast-moving predator that evolved after the extinction of other large carnivorous dinosaurs.
+
+A Glimpse Into Tyrannosaur Evolution
+
+According to Voris, "This new species provides us the window into the ascent stage of Tyrannosaur evolution; right when they're transitioning from small predators to their apex predator form." Khankhuuluu is regarded as the nearest known ancestor of the colossal Tyrannosaurs popularized by films like Jurassic Park.
+
+The name Khankhuuluu comes from Mongolian and translates to "prince of dragons" or "the dragon prince." The name reflects its position in the Tyrannosaur family tree -- standing as the "prince" before the "king," Tyrannosaurus rex. At roughly 750 kilograms (about the size of a horse), it was two to three times smaller than its enormous descendants but shared many of their defining traits.
+
+Physical Traits and Hunting Style
+
+Khankhuuluu displayed small horn-like structures on its head, features that later became more pronounced in later Tyrannosaur species such as Albertosaurus and Gorgosaurus, likely used for mating displays or intimidation. Its long, shallow skull indicates it lacked the bone-crushing bite strength of T. rex. Instead, scientists describe Khankhuuluu as a mesopredator, similar to modern coyotes, relying on speed and agility to hunt.
+
+Fossils From Mongolia Tell a New Story
+
+The fossils were unearthed from the Bayanshiree Formation in southeastern Mongolia and were first studied in the 1970s by paleontologist Altangerel Perle, who initially compared them to a similar species known as Alectrosaurus from China. When Voris examined the fossils in 2023 at the Institute of Paleontology in Mongolia, he noticed subtle but key differences that distinguished them from Alectrosaurus.
+
+The Journey of Tyrannosaurs Between Continents
+
+Dr. Zelenitsky explains that Khankhuuluu or a closely related species likely migrated from Asia to North America around 85 million years ago."Our study provides solid evidence that large Tyrannosaurs first evolved in North America as a result of this immigration event," she says.
+
+The research suggests these migrations between Asia and North America were rarer and more limited than previously believed. Khankhuuluu appears to be the last known Asian ancestor of the Tyrannosaurs before their diversification in North America.
+
+From the "Dragon Prince" to the Tyrant King
+
+Scientists believe that Khankhuuluu, or one of its relatives, crossed a land bridge into North America, where it evolved into the formidable apex predator Tyrannosaurs. Fossil evidence shows that Tyrannosaurs thrived in North America for several million years before returning to Asia, where their lineage split into two branches: one evolved into massive predators like T. rex, while the other produced more slender, long-snouted types nicknamed "Pinocchio rexes."
+
+What Comes Next in the Research
+                    </div>
+                </div>
+            </div>
+
+            <div class="article">
+                <div class="article-header">
+                    <img src="../article_images/article_12_2749229a8ad5.jpg" alt="Article 12" class="article-image">
+                    <div class="article-meta">
+                        <h2 class="article-title">U.S. deploys aircraft carrier to waters off South America in major military escalation</h2>
+                        <div class="article-info">
+                            <div class="info-row">
+                                <div class="info-label">ID:</div>
+                                <div class="info-value"><span class="article-id">12</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Source:</div>
+                                <div class="info-value"><span class="source-badge">PBS NewsHour</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Status:</div>
+                                <div class="info-value"><span class="status-badge status-unprocessed">Unprocessed</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">URL:</div>
+                                <div class="info-value"><a href="https://www.pbs.org/newshour/nation/u-s-deploys-aircraft-carrier-to-waters-off-south-america-in-major-military-escalation" target="_blank" class="url-link">https://www.pbs.org/newshour/nation/u-s-deploys-aircraft-car...</a></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Published:</div>
+                                <div class="info-value">Fri, 24 Oct 2025 15:34:35 -0400</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Crawled:</div>
+                                <div class="info-value">2025-10-24T17:50:04.543673</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="article-content">
+                    <div class="article-description">
+                        <strong>Description:</strong><br>
+                        The U.S. military is sending an aircraft carrier to the waters off South America, the Pentagon announced Friday, in the latest escalation of&nbsp;military firepower in a region&nbsp;where the Trump ad...
+                    </div>
+                    <div class="article-body">
+                        <strong>Full Content:</strong><br><br>
+Konstantin Toropin, Associated Press Konstantin Toropin, Associated Press
+
+WASHINGTON (AP) - The U.S. military is sending an aircraft carrier to the waters off South America, the Pentagon announced Friday, in the latest escalation of military firepower in a region where the Trump administration has unleashed more rapid strikes in recent days against boats it accuses of carrying drugs.
+
+Defense Secretary Pete Hegseth ordered the USS Gerald R. Ford and its strike group to deploy to the U.S. Southern Command region to "bolster U.S. capacity to detect, monitor, and disrupt illicit actors and activities that compromise the safety and prosperity of the United States," Pentagon spokesman Sean Parnell said on social media.
+
+The USS Ford, which has five destroyers in its strike group, is now deployed to the Mediterranean Sea. One of its destroyers is in the Arabian Sea and another is in the Red Sea, a person familiar with the operation told The Associated Press. As of Friday, the aircraft carrier was in port in Croatia on the Adriatic Sea.
+
+The person, who spoke on condition of anonymity to discuss sensitive military operations, would not say how long it would take for the strike group to arrive in the waters off South America or if all five destroyers would make the journey.
+
+Deploying an aircraft carrier will surge major additional resources to a region that has already seen an unusually large U.S. military buildup in the Caribbean Sea and the waters off Venezuela. The latest deployment and the quickening pace of the U.S. strikes, including one Friday, raised new speculation about how far the Trump administration may go in operations it says are targeted at drug trafficking, including whether it could try to topple Venezuelan President Nicolás Maduro. He faces charges of narcoterrorism in the U.S.
+
+There are already more than 6,000 sailors and Marines on eight warships in the region. If the entire USS Ford strike group arrives, that could bring nearly 4,500 more sailors as well as the nine squadrons of aircraft assigned to the carrier.
+
+Complicating the situation is Tropical Storm Melissa, which has been nearly stationary in the central Caribbean with forecasters warning it could soon strengthen into a powerful hurricane.
+
+Hours before Parnell announced the news, Hegseth said the military had conducted the 10th strike on a suspected drug-running boat, leaving six people dead and bringing the death count for the attacks that began in early September to at least 43 people.
+
+Hegseth said on social media that the vessel struck overnight was operated by the Tren de Aragua gang. It was the second time the Trump administration has tied one of its operations to the gang that originated in a Venezuelan prison.
+
+The strikes have ramped up from one every few weeks when they first began last month to three this week, killing a total of at least 43 people. Two of the most recent strikes were carried out in the eastern Pacific Ocean, expanding the area where the military has launched attacks and shifting to where much of the cocaine from the world's largest producers is smuggled.
+
+"If you are a narco-terrorist smuggling drugs in our hemisphere, we will treat you like we treat Al-Qaeda," Hegseth said in his post. "Day or NIGHT, we will map your networks, track your people, hunt you down, and kill you."
+
+The strike drew parallels to the first announced by the U.S. last month by focusing on Tren de Aragua, which the Trump administration has designated a foreign terrorist organization and blamed for being at the root of the violence and drug dealing that plague some cities.
+
+While not mentioning the origin of the latest boat, the Republican administration says at least four of the boats it has hit have come from Venezuela. On Thursday, the U.S. military flew a pair of supersonic heavy bombers up to the coast of Venezuela.
+
+Maduro on Thursday praised security forces and a civilian militia for defense exercises along some 2,000 kilometers (about 1,200 miles) of coastline to prepare for the possibility of a U.S. attack.
+                    </div>
+                </div>
+            </div>
+
+            <div class="article">
+                <div class="article-header">
+                    <img src="../article_images/article_11_1c2fc4c530f5.jpg" alt="Article 11" class="article-image">
+                    <div class="article-meta">
+                        <h2 class="article-title">The East Wing of the White House has been demolished. Here’s a look at its history</h2>
+                        <div class="article-info">
+                            <div class="info-row">
+                                <div class="info-label">ID:</div>
+                                <div class="info-value"><span class="article-id">11</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Source:</div>
+                                <div class="info-value"><span class="source-badge">PBS NewsHour</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Status:</div>
+                                <div class="info-value"><span class="status-badge status-unprocessed">Unprocessed</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">URL:</div>
+                                <div class="info-value"><a href="https://www.pbs.org/newshour/politics/the-east-wing-of-the-white-house-has-been-demolished-heres-a-look-at-its-history" target="_blank" class="url-link">https://www.pbs.org/newshour/politics/the-east-wing-of-the-w...</a></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Published:</div>
+                                <div class="info-value">Fri, 24 Oct 2025 15:35:52 -0400</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Crawled:</div>
+                                <div class="info-value">2025-10-24T17:50:04.216789</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="article-content">
+                    <div class="article-description">
+                        <strong>Description:</strong><br>
+                        Several preservation groups have expressed concern in recent weeks about the project, which is the first major change to the exterior of the White House in 83 years. 
+                    </div>
+                    <div class="article-body">
+                        <strong>Full Content:</strong><br><br>
+The East Wing of the White House, the traditional headquarters for the first lady and her staff as well as the public entrance to the "people's house," was largely torn down this week to make way for President Donald Trump's new $300 million ballroom.
+
+But the images that emerged this week of construction equipment demolishing the facade have prompted outrage over the lack of oversight of the project and raised questions about its scope.
+
+Two satellite views that show the East Wing of the White House before (top) and after demolition (below) in Washington, D.C. Images by 2025 Planet Labs PBC via Reuters
+
+A Virginia couple sued the Trump administration on Thursday in an attempt to halt the ballroom project. Charles and Judith Voorhees asked a federal judge to issue a temporary restraining order to stop further destruction to the mansion, saying the project moved forward "without legally required approvals or reviews."
+
+Several preservation groups have expressed concern in recent weeks about the project, which is the first major change to the exterior of the White House in 83 years. Collectively, their separate statements said a more transparent and thorough review process was needed before the ballroom project got underway.
+
+Communication about how the ballroom project would affect the main structure of the building was confusing from the beginning, said Priya Jain, chair of the Society of Architectural Historians' Heritage Conservation Committee.
+
+"There was kind of an ambiguity about the way things were framed from the get-go," she said, adding that the society's letter asked for more clarification and transparency around the White House's statements, given the mansion is a highly significant historical building.
+
+Thank you. Please check your inbox to confirm.
+
+In remarks to reporters last week, Trump said that two unnamed advisors had told him he could start the ballroom construction immediately, forgoing any oversight or zoning. He said the advisors told him, "Sir, this is the White House. You're the president of the United States.
+
+In flattening the East Wing of the White House, "we lose a significant piece of history," author Kate Andersen Brower said.
+
+The wing, which was originally constructed in 1902 and renovated in 1942, served as the public entrance to the White House, and housed the family movie theater as well as offices on legislative affairs, the military and the in-house calligraphers. Perhaps most prominently, though, it included office space for the first lady and her aides.
+
+For Brower, who wrote "The Residence" about daily life inside the White House and "First Women" about the role of modern first ladies, what has happened to the East Wing "speaks a lot to how diminished the role of the president's spouse has become."
+
+"Truly, the power center in the White House is always the Oval Office and the West Wing, and proximity to the Oval Office is so important," she added. "If you have the first lady and her staff working out of the Eisenhower Executive Office Building, which I think is what will likely happen, they're even more removed from the center of power. I mean, the East Wing has been called 'Siberia' as a joke inside the White House.
+
+President Barack Obama with Melissa Winter, an aide to first lady Michelle Obama, in the East Wing, March 2009. Source: National Archives
+
+"It was so, basically, vacant that her staff had it as a gift-wrapping room and had gifts put in there," she said.
+                    </div>
+                </div>
+            </div>
+
+            <div class="article">
+                <div class="article-header">
+                    <img src="../article_images/article_10_c565c35d5041.jpg" alt="Article 10" class="article-image">
+                    <div class="article-meta">
+                        <h2 class="article-title">Ontario premier says he’ll pull ad that upset Trump so U.S.-Canada trade talks can resume</h2>
+                        <div class="article-info">
+                            <div class="info-row">
+                                <div class="info-label">ID:</div>
+                                <div class="info-value"><span class="article-id">10</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Source:</div>
+                                <div class="info-value"><span class="source-badge">PBS NewsHour</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Status:</div>
+                                <div class="info-value"><span class="status-badge status-unprocessed">Unprocessed</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">URL:</div>
+                                <div class="info-value"><a href="https://www.pbs.org/newshour/world/ontario-premier-says-hell-pull-ad-that-upset-trump-so-u-s-canada-trade-talks-can-resume" target="_blank" class="url-link">https://www.pbs.org/newshour/world/ontario-premier-says-hell...</a></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Published:</div>
+                                <div class="info-value">Fri, 24 Oct 2025 16:06:17 -0400</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Crawled:</div>
+                                <div class="info-value">2025-10-24T17:50:03.808683</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="article-content">
+                    <div class="article-description">
+                        <strong>Description:</strong><br>
+                        The leader of Canada&rsquo;s most populous province said Friday he&rsquo;ll pull the anti-tariff ad that prompted U.S. President Donald Trump to&nbsp;end trade talks&nbsp;with Canada.
+                    </div>
+                    <div class="article-body">
+                        <strong>Full Content:</strong><br><br>
+Rob Gillies, Associated Press Rob Gillies, Associated Press
+
+TORONTO (AP) - The leader of Canada's most populous province said Friday he'll pull the anti-tariff ad that prompted U.S. President Donald Trump to end trade talks with Canada.
+
+Ontario Premier Doug Ford said after talking with Prime Minister Mark Carney he's decided to pause the advertising campaign effective Monday so that trade talks can resume.
+
+"We've achieved our goal, having reached U.S. audiences at the highest levels," Ford said in a statement.
+
+"Our intention was always to initiate a conversation about the kind of economy that Americans want to build and the impact of tariffs on workers and businesses."
+
+Ford said the commercials will continue to run this weekend including during the first World Series games between the Toronto Blue Jays and Los Angeles Dodgers.
+
+"I've directed my team to keep putting our message in front of Americans over the weekend so that we can air our commercial during the first two World Series games," he said.
+
+On Thursday Trump posted, "The Ronald Reagan Foundation has just announced that Canada has fraudulently used an advertisement, which is FAKE, featuring Ronald Reagan speaking negatively about Tariffs."
+
+Trump doubled down on his criticism of the Ontario ads Friday and accused Canada of trying to influence an upcoming U.S. Supreme Court ruling on his global tariff regime.
+
+Trump's call for an abrupt end to negotiations has further inflamed trade tensions between the neighbors and longtime allies.
+
+Carney said this week he aims to double his country's exports to countries outside the U.S. because of the threat posed by Trump's tariffs. Canadian officials remain ready to continue talks to reduce tariffs in certain sectors, he said.
+
+"We can't control the trade policy of the United States. We recognize that that policy has fundamentally changed from the 1980s," Carney said Friday morning before boarding a flight to Asia. "We have to focus on what we can control and realize what we can't control."
+
+Carney is trying to secure a trade deal with Trump, but tariffs are taking a toll in the aluminum, steel, auto and lumber sectors.
+
+Carney spoke to Ford Thursday night and again Friday.
+
+White House spokesman Kush Desai said talks with Canada have not led to any constructive progress.
+                    </div>
+                </div>
+            </div>
+
+            <div class="article">
+                <div class="article-header">
+                    <img src="../article_images/article_9_6fff657ed9a9.jpg" alt="Article 9" class="article-image">
+                    <div class="article-meta">
+                        <h2 class="article-title">Saudi Arabia to host new ATP tournament from 2028</h2>
+                        <div class="article-info">
+                            <div class="info-row">
+                                <div class="info-label">ID:</div>
+                                <div class="info-value"><span class="article-id">9</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Source:</div>
+                                <div class="info-value"><span class="source-badge">BBC Tennis</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Status:</div>
+                                <div class="info-value"><span class="status-badge status-unprocessed">Unprocessed</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">URL:</div>
+                                <div class="info-value"><a href="https://www.bbc.com/sport/tennis/articles/cx24yg4pk7eo?at_medium=RSS&at_campaign=rss" target="_blank" class="url-link">https://www.bbc.com/sport/tennis/articles/cx24yg4pk7eo?at_me...</a></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Published:</div>
+                                <div class="info-value">Thu, 23 Oct 2025 14:53:02 GMT</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Crawled:</div>
+                                <div class="info-value">2025-10-24T17:49:58.443928</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="article-content">
+                    <div class="article-description">
+                        <strong>Description:</strong><br>
+                        A new ATP Masters 1000 tournament will be added to the tennis calendar from 2028 - and staged in Saudi Arabia.
+                    </div>
+                    <div class="article-body">
+                        <strong>Full Content:</strong><br><br>
+Jannik Sinner won the 2025 Six Kings Slam, held in Riyadh, Saudi Arabia, earlier this month
+
+A new ATP Masters 1000 tournament will be added to the tennis calendar from 2028 - and staged in Saudi Arabia.
+
+A 56-man field will contest a one week event, most likely in February, in another sign of the increasing pulling power of the Gulf state.
+
+However, with players expressing so much concern about the length of the season and the number of events they play, the new tournament will not be mandatory.
+
+"We are dealing with players who are independent contractors, so ultimately they are free to choose their own schedule," said ATP chairman Andrea Gaudenzi.
+
+"They also play outside of the system and we saw this last week with the Six Kings Slam exhibition [in Saudi Arabia].
+
+This is the first time the Masters 1000 category has been expanded since the birth of the concept in 1990.
+
+The Saudi Arabia event will join existing 1000 tournaments in Indian Wells, Miami, Monte Carlo, Madrid, Rome, Canada (which is rotated between Toronto and Montreal), Cincinnati, Shanghai and Paris.
+
+Saudi Arabia and Sport - The Explainer
+
+Monte Carlo is currently the only Masters 1000 which is not mandatory for the players.
+
+If a player skips the new Saudi event, his share of the annual bonus pool would not be affected and, under the current rules, he would have the opportunity to make up some of the ranking points conceded at another tournament.
+
+Seven of the existing nine Masters events are now staged over 12 days, which has proved unpopular with many players.
+
+The new Saudi tournament - at a venue still to be announced - will last just a week.
+
+It will form part of a 2028 schedule which will have a slightly different look and possibly finish at least a week earlier as the ATP tries to streamline the end of season tournaments.
+
+âI also have to notice that in today's world there's a lot more money, which means there is a lot more opportunity - and there is a lot more temptation of playing more and elsewhere.
+                    </div>
+                </div>
+            </div>
+
+            <div class="article">
+                <div class="article-header">
+                    <img src="../article_images/article_8_611097495846.jpg" alt="Article 8" class="article-image">
+                    <div class="article-meta">
+                        <h2 class="article-title">Rybakina clinches last spot in WTA Finals</h2>
+                        <div class="article-info">
+                            <div class="info-row">
+                                <div class="info-label">ID:</div>
+                                <div class="info-value"><span class="article-id">8</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Source:</div>
+                                <div class="info-value"><span class="source-badge">BBC Tennis</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Status:</div>
+                                <div class="info-value"><span class="status-badge status-unprocessed">Unprocessed</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">URL:</div>
+                                <div class="info-value"><a href="https://www.bbc.com/sport/tennis/articles/c1d0r2x05e4o?at_medium=RSS&at_campaign=rss" target="_blank" class="url-link">https://www.bbc.com/sport/tennis/articles/c1d0r2x05e4o?at_me...</a></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Published:</div>
+                                <div class="info-value">Fri, 24 Oct 2025 07:13:49 GMT</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Crawled:</div>
+                                <div class="info-value">2025-10-24T17:49:58.106299</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="article-content">
+                    <div class="article-description">
+                        <strong>Description:</strong><br>
+                        Elena Rybakina clinches the last spot for next month's WTA Finals by reaching the semi-finals of the Pan Pacific Open.
+                    </div>
+                    <div class="article-body">
+                        <strong>Full Content:</strong><br><br>
+Rybakina has failed to advance past the round robin stage in her two previous appearances at the WTA Finals
+
+Elena Rybakina has clinched the last spot for next month's WTA Finals by beating Victoria Mboko to reach the Pan Pacific Open semi-finals.
+
+The 2022 Wimbledon champion, who has won two WTA 500 titles this year, beat 19-year-old Mboko 6-3 7-6 (7-4) to seal her place in the end-of-season event.
+
+The WTA Finals, which features the top eight singles players and doubles teams of the year, starts on 1 November in Saudi Arabia.
+
+Kazakhstan's Rybakina needed to reach at least the semi-finals in Tokyo to pass Russian 18-year-old Mirra Andreeva in the race for the eighth and final spot.
+
+Her victory over Mboko means she will join Aryna Sabalenka, Iga Swiatek, Coco Gauff, Amanda Anisimova, Madison Keys, Jessica Pegula and Jasmine Paolini in Riyadh.
+
+"It's great to qualify and play some more matches, especially against top players," Rybakina said.
+
+"Last week I was focusing one match at a time and I knew that to qualify it's going to take a long road."
+
+Andreeva and fellow Russian Ekaterina Alexandrova, 30, are the first and second alternates for the Finals.
+
+Rybakina won her second title of the season at the Ningbo Open in China on Sunday to boost her chances of reaching the WTA Finals for a third successive year.
+
+The 26-year-old, who will rise to world number six when the rankings are updated on Monday, will face sixth seed Linda Noskova of the Czech Republic in the Tokyo semi-finals on Saturday.
+
+Live scores, results and order of play
+
+Get tennis news sent straight to your phone
+
+Premier League: Leeds earn big win as West Ham make worst start in 52 years
+
+Leclerc fastest as rookies dominate first practice in Mexico
+                    </div>
+                </div>
+            </div>
+
+            <div class="article">
+                <div class="article-header">
+                    <img src="../article_images/article_7_d19b0f3f98ab.jpg" alt="Article 7" class="article-image">
+                    <div class="article-meta">
+                        <h2 class="article-title">Sinner wins but host of players retire in Basel</h2>
+                        <div class="article-info">
+                            <div class="info-row">
+                                <div class="info-label">ID:</div>
+                                <div class="info-value"><span class="article-id">7</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Source:</div>
+                                <div class="info-value"><span class="source-badge">BBC Tennis</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Status:</div>
+                                <div class="info-value"><span class="status-badge status-unprocessed">Unprocessed</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">URL:</div>
+                                <div class="info-value"><a href="https://www.bbc.com/sport/tennis/articles/ce8zgl03p00o?at_medium=RSS&at_campaign=rss" target="_blank" class="url-link">https://www.bbc.com/sport/tennis/articles/ce8zgl03p00o?at_me...</a></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Published:</div>
+                                <div class="info-value">Fri, 24 Oct 2025 19:54:10 GMT</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Crawled:</div>
+                                <div class="info-value">2025-10-24T17:49:57.840683</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="article-content">
+                    <div class="article-description">
+                        <strong>Description:</strong><br>
+                        World number two Jannik Sinner progresses to the semi-finals of the Vienna Open with a dominant straight-set win over Alexander Bublik.
+                    </div>
+                    <div class="article-body">
+                        <strong>Full Content:</strong><br><br>
+Jannik Sinner reached all four Grand Slam singles finals in 2025
+
+Jannik Sinner progressed to the semi-finals of the Vienna Open with a dominant straight-set win over Alexander Bublik.
+
+A single break of serve in both sets was enough for Italian world number two Sinner to maintain his pursuit of his fourth title of the year.
+
+Four-time Grand Slam champion Sinner, who lost only five points on serve during the entire match, will face Australia's Alex de Minaur for a place in the final.
+
+The 24-year-old, dethroned as the top-ranked men's player by Carlos Alcaraz following defeat by his rival in the US Open final, has won 60 of his past 66 matches.
+
+World number 16 Bublik beat Sinner in Halle in June, but the Kazakh was no match for the Australian Open and Wimbledon champion on Friday.
+
+Sinner never conceded more than one point in any of his service games, while applying consistent pressure on Bublik and managing to take two of his eight break points.
+
+Sinner is on a 19-match winning streak on indoor hard courts and a seven-match winning streak in Vienna, having won this title on his previous appearance in 2023.
+
+Semi-final opponent De Minaur progressed by defeating Italian Matteo Berrettini 6-1 7-6 (7-4).
+
+That was his 53rd win of the season - second only to world number one Alcaraz on the ATP Tour in 2025.
+
+German world number three Alexander Zverev is also through to the last four in Vienna after Dutchman Tallon Griekspoor withdrew from their quarter-final match.
+
+With that result, Zverev, seeded second in Vienna, joined Alcaraz, Sinner and Novak Djokovic as the first four players to qualify for the season-ending ATP Finals in November.
+
+Zverev will play Italian fourth seed Lorenzo Musetti or Frenchman Corentin Moutet in the other semi-final on Saturday.
+
+Meanwhile, at the Swiss Indoors, three of the four quarter-finals scheduled for Friday ended as walkovers.
+
+Norway's Casper Ruud decided he could not continue after losing a first-set tie-break against Spain's Alejandro Davidovich Fokina, and Canada's Felix Auger-Aliassime retired after Spaniard Jaume Munar won the first set 6-3.
+                    </div>
+                </div>
+            </div>
+
+            <div class="article">
+                <div class="article-header">
+                    <img src="../article_images/article_6_1bebd4e7c893.jpg" alt="Article 6" class="article-image">
+                    <div class="article-meta">
+                        <h2 class="article-title">Prince Andrew's banner removed from chapel at Windsor Castle</h2>
+                        <div class="article-info">
+                            <div class="info-row">
+                                <div class="info-label">ID:</div>
+                                <div class="info-value"><span class="article-id">6</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Source:</div>
+                                <div class="info-value"><span class="source-badge">BBC News</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Status:</div>
+                                <div class="info-value"><span class="status-badge status-unprocessed">Unprocessed</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">URL:</div>
+                                <div class="info-value"><a href="https://www.bbc.com/news/articles/c867j2wyxj0o?at_medium=RSS&at_campaign=rss" target="_blank" class="url-link">https://www.bbc.com/news/articles/c867j2wyxj0o?at_medium=RSS...</a></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Published:</div>
+                                <div class="info-value">Fri, 24 Oct 2025 16:08:34 GMT</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Crawled:</div>
+                                <div class="info-value">2025-10-24T17:49:53.125064</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="article-content">
+                    <div class="article-description">
+                        <strong>Description:</strong><br>
+                        The flag is linked to his role as Knight of the Garter, which he recently gave up. 
+                    </div>
+                    <div class="article-body">
+                        <strong>Full Content:</strong><br><br>
+The flag, linked to his membership of the Order of the Garter, which the prince gave up last week, was on display inside St George's Chapel but is no longer hanging there.
+
+Last Friday, Andrew announced he would also no longer use his royal titles, including Duke of York, after the publication of a posthumous memoir by Virginia Giuffre revived claims about his ties to Epstein.
+
+The prince is under increasing pressure to lose further privileges, including the formal removal of his titles and his residence at Royal Lodge in Windsor.
+
+The book, Nobody's Girl, was written by Ms Giuffre before she died earlier this year. She accused the prince of sexually assaulting her - allegations Prince Andrew has strenuously denied.
+
+Prince Andrew's banner, which he was given when he became a Knight of the Garter (KG) in 2006, had been hanging in the quire - the area where clergy and the choir sit for services.
+
+A virtual tour of the area available on the website for St George's Chapel shows it still hanging near the door leading into the quire. It is not known when the tour was created.
+
+However, the banner has now been removed and only three now hang in the space. It is thought it was taken down earlier in the week.
+
+The Order of the Garter is the oldest and most senior order of chivalry in Britain and includes other senior members of the royal family and those said to have contributed notably to public life.
+
+Current non-royal members include former prime ministers Sir Tony Blair and Sir John Major.
+
+Prince Andrew is facing scrutiny over his Royal Lodge home in Windsor Great Park, where he has paid a "peppercorn rent" for more than 20 years.
+
+The government this week refused to give MPs time to debate Prince Andrew's titles or taxpayer-funded home, despite growing pressure for scrutiny.
+
+The Metropolitan Police has said it is "actively" looking into media reports that Prince Andrew tried to obtain personal information about Ms Giuffre through his police protection.
+
+Prince Andrew has also removed his royal titles from Companies House, changing his name from "HRH the Duke of York KG" to "Prince Andrew." A document was filed listing a change of his details for his start up venture Pitch@Palace.
+
+On 17 October, Andrew said he would stop using the titles because the "continued accusations about me distract from the work of His Majesty and the Royal Family".
+
+"I vigorously deny the accusations against me," he said.
+                    </div>
+                </div>
+            </div>
+
+            <div class="article">
+                <div class="article-header">
+                    <img src="../article_images/article_5_8cb53b0f409c.jpg" alt="Article 5" class="article-image">
+                    <div class="article-meta">
+                        <h2 class="article-title">US sends world's largest warship towards Caribbean as it ramps up military presence</h2>
+                        <div class="article-info">
+                            <div class="info-row">
+                                <div class="info-label">ID:</div>
+                                <div class="info-value"><span class="article-id">5</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Source:</div>
+                                <div class="info-value"><span class="source-badge">BBC News</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Status:</div>
+                                <div class="info-value"><span class="status-badge status-unprocessed">Unprocessed</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">URL:</div>
+                                <div class="info-value"><a href="https://www.bbc.com/news/articles/c891gzx7xn4o?at_medium=RSS&at_campaign=rss" target="_blank" class="url-link">https://www.bbc.com/news/articles/c891gzx7xn4o?at_medium=RSS...</a></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Published:</div>
+                                <div class="info-value">Fri, 24 Oct 2025 21:05:42 GMT</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Crawled:</div>
+                                <div class="info-value">2025-10-24T17:49:52.837899</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="article-content">
+                    <div class="article-description">
+                        <strong>Description:</strong><br>
+                        The deployment of the USS Gerald R Ford marks a major escalation in what the US says is a campaign to target drug traffickers.
+                    </div>
+                    <div class="article-body">
+                        <strong>Full Content:</strong><br><br>
+The US is deploying the world's largest warship towards the Caribbean, marking a major escalation in what it says is a campaign to target drug traffickers.
+
+Defence Secretary Pete Hegseth ordered the USS Gerald R Ford aircraft carrier, which can carry up to 90 aircraft, to move from the Mediterranean on Friday.
+
+The US has been increasing its military presence in the Caribbean in recent weeks, and it now includes eight other warships, a nuclear submarine as well as F-35 aircraft.
+
+It has carried out airstrikes on boats it says belong to drug traffickers, including on Friday when Hegseth said "six male narco-terrorists" had been killed.
+
+That operation took place in the Caribbean Sea, against a ship Hegseth said belonged to the Tren de Aragua criminal organisation.
+
+The strikes have drawn condemnation in the region and experts have questioned their legality. The Trump administration says it is conducting a war on drug trafficking, but it has also been accused by experts and members of Congress of launching an intimidation campaign that seeks to destabilise the government of Venezuela's President Nicolás Maduro.
+
+Maduro is a longtime foe of Trump, and the US president has accused him of being the leader of a drug-trafficking organisation, which he denies.
+
+"This is about regime change.
+
+He argued the military build-up is intended to "strike fear" in the hearts of the Venezuelan military and Maduro's inner circle so that they move against him.
+
+In its Friday announcement, the Pentagon said the USS Gerald R Ford carrier would deploy to the US Southern Command area of responsibility, which includes Central America and South America as well as the Caribbean.
+
+The additional forces "will enhance and augment existing capabilities to disrupt narcotics trafficking and degrade and dismantle TCOs", or transnational criminal organisations, spokesman Sean Parnell said.
+
+The carrier's deployment would provide the resources to start conducting strikes against targets on the ground. Trump has repeatedly raised the possibility of what he called "land action" in Venezuela.
+
+"We are certainly looking at land now, because we've got the sea very well under control," he said earlier this week.
+
+It comes as CNN reports Trump is considering targeting cocaine facilities and drug trafficking routes inside Venezuela, but is yet to make a final decision.
+
+Its deployment marks a significant escalation in the US military buildup in the region. It is also likely to increase tensions with Venezuela, whose government Washington has long accused of harbouring drug traffickers.
+                    </div>
+                </div>
+            </div>
+
+            <div class="article">
+                <div class="article-header">
+                    <img src="../article_images/article_4_d3220d184bd8.jpg" alt="Article 4" class="article-image">
+                    <div class="article-meta">
+                        <h2 class="article-title">Ukraine allies pledge to take Russian oil and gas off global market</h2>
+                        <div class="article-info">
+                            <div class="info-row">
+                                <div class="info-label">ID:</div>
+                                <div class="info-value"><span class="article-id">4</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Source:</div>
+                                <div class="info-value"><span class="source-badge">BBC News</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Status:</div>
+                                <div class="info-value"><span class="status-badge status-unprocessed">Unprocessed</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">URL:</div>
+                                <div class="info-value"><a href="https://www.bbc.com/news/articles/c17p54edxljo?at_medium=RSS&at_campaign=rss" target="_blank" class="url-link">https://www.bbc.com/news/articles/c17p54edxljo?at_medium=RSS...</a></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Published:</div>
+                                <div class="info-value">Fri, 24 Oct 2025 19:10:15 GMT</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Crawled:</div>
+                                <div class="info-value">2025-10-24T17:49:52.546501</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="article-content">
+                    <div class="article-description">
+                        <strong>Description:</strong><br>
+                        A "coalition of the willing" meeting in London seeks to increase pressure on Russia to end its war in Ukraine.
+                    </div>
+                    <div class="article-body">
+                        <strong>Full Content:</strong><br><br>
+The UK and US have in recent days sanctioned Russia's two biggest oil companies, while the EU targeted Moscow's liquefied natural gas (LNG) exports.
+
+Ukrainian President Volodymyr Zelensky, who was also in London, said "pressure" on Russia was the only way to stop the fighting. However, no long-range missile deliveries to Ukraine were announced at the summit.
+
+Zelensky has long argued that US-made Tomahawks and European missiles would help make the war costs heavier for Moscow by hitting key military targets - including oil refineries and weapons depots - deep inside Russia.
+
+But during last week's talks in Washington, US President Donald Trump indicated to Zelensky that he was not ready to supply Tomahawks.
+
+On Thursday, President Putin warned that if "such weapons are used to strike Russian Federation territory the response will be... overwhelming".
+
+Russia launched a full-scale invasion of Ukraine in February 2022.
+
+Speaking at a joint press conference after the London summit, Starmer said Putin was "not serious about peace", and therefore Ukraine's allies agreed a "clear plan for the rest of the year" on supporting Ukraine.
+
+The UK prime minister said this also included targeting Russia's sovereign assets to "unlock billions to help finance Ukraine's defence". He gave no further details.
+
+On Thursday, EU leaders agreed to help support Ukraine's "financial needs" for the next two years - but stopped short of agreeing to use frozen Russian assets worth €140bn (£122bn).
+
+Asked about a so-called "reparations loan" for Ukraine funded by the Russian assets, Danish Prime Minister Mette Frederiksen said she hoped a decision would be made by Christmas Eve
+
+In London, the "coalition of the willing" also pledged to strengthen Ukraine's air defences" amid almost daily Russian air assaults on Ukrainian civilians and energy infrastructure.
+
+Zelensky warned that Russia "wants to make the winter cold a tool of torment", adding that "they want to break us".
+
+Comments by the leaders in London will be disappointing for those who were hoping to hear specific examples of how Kyiv's allies were planning to make Russia stop attacking Ukraine.
+
+No doubt, a lot of the words said will be pleasing to the Ukrainian ear. For example, Starmer said the UK and Ukraine's other allies were prepared to ratchet up pressure on Moscow.
+
+But there were no concrete examples of how exactly the allies were planning to force a change on the battlefield or make Putin come to the negotiating table.
+                    </div>
+                </div>
+            </div>
+
+            <div class="article">
+                <div class="article-header">
+                    <img src="../article_images/article_3_9c57c9f63595.jpg" alt="Article 3" class="article-image">
+                    <div class="article-meta">
+                        <h2 class="article-title">Sabotage, Claudia's ire and the chess board is back as things heat up on The Traitors</h2>
+                        <div class="article-info">
+                            <div class="info-row">
+                                <div class="info-label">ID:</div>
+                                <div class="info-value"><span class="article-id">3</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Source:</div>
+                                <div class="info-value"><span class="source-badge">BBC Entertainment</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Status:</div>
+                                <div class="info-value"><span class="status-badge status-unprocessed">Unprocessed</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">URL:</div>
+                                <div class="info-value"><a href="https://www.bbc.com/news/articles/c1m3epre5d9o?at_medium=RSS&at_campaign=rss" target="_blank" class="url-link">https://www.bbc.com/news/articles/c1m3epre5d9o?at_medium=RSS...</a></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Published:</div>
+                                <div class="info-value">Thu, 23 Oct 2025 23:27:30 GMT</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Crawled:</div>
+                                <div class="info-value">2025-10-24T17:49:44.688663</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="article-content">
+                    <div class="article-description">
+                        <strong>Description:</strong><br>
+                        It was another night of mounting tension as the faithfuls hoped to finally catch a traitor.
+                    </div>
+                    <div class="article-body">
+                        <strong>Full Content:</strong><br><br>
+Spoiler warning: This article reveals details from the sixth episode of The Celebrity Traitors.
+
+It started with a cliffhanger and ended with a cliffhanger.
+
+And host Claudia Winkleman was in no mood for messing around.
+
+"Silence please," she barked at the contestants seated at the round table as the banishment vote was split and had to be decided for the first time by chance - or should we say, the Chest of Chance. A dramatic version of flipping a coin, if you will.
+
+Poor Mark Bonnar - an actor punished for overacting - took the high road (perhaps he shouldn't have sung The Bonnie Banks of Loch Lomond on Wednesday's episode) after the chest he picked was empty. Historian David Olusoga luckily found a protective shield in his.
+
+One fan on X was clearly amused. "Imagine the first time they do this chest's of chance thing and it's over 2 faithfuls," they mused, later joking: "They've literally just made this up behind the cameras."
+
+In the first series of The Traitors, it took the faithfuls six episodes to get a traitor. And the game was new. This lot are still on the hunt going into episode seven, with only nine players now left from the original 19. And three of those are traitors. The faithfuls have just three episodes left to catch them.
+
+Once again, the faithfuls were left to mull over another failure.
+
+Claudia sounded genuinely distraught, her voice breaking as she told the group: "You are breaking my heart, you are not getting it, what are you not seeing? You have to open your eyes please."
+
+"I feel that we are disastrously losing this game. And I think it's going to get worse," David added gloomily.
+
+On a lighter note, while we all know someone who fast forwards the challenges when watching on catch-up, there was some real excitement on Thursday night thanks to the return of last season's life-size chessboard and larger-than-life traitor figures. Think Darth Vader after a growth spurt.
+
+Sir Stephen Fry lived up to his brainy reputation over breakfast, by predicting the chessboard was back: "I could be a knight - oh, I already am," he joked. Comic Alan Carr was predictably quick to prick any potential pomposity: "Or an old queen," he quipped.
+
+In fact, Alan continues to relish his role as a traitor with increasing enthusiasm.
+
+When in the turret discussing who to murder next, he asked fellow traitors singer Cat Burns and presenter Jonathan Ross: "Stephen Fry: Shall we just get on with it and kill him? What's a knighthood when you're dead?"
+
+"Brutal," Jonathan replied, and he wasn't wrong.
+                    </div>
+                </div>
+            </div>
+
+            <div class="article">
+                <div class="article-header">
+                    <img src="../article_images/article_2_6d1da0c14cff.jpg" alt="Article 2" class="article-image">
+                    <div class="article-meta">
+                        <h2 class="article-title">Huge noise then I yelled to get out - Louvre attendant recalls shock of heist</h2>
+                        <div class="article-info">
+                            <div class="info-row">
+                                <div class="info-label">ID:</div>
+                                <div class="info-value"><span class="article-id">2</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Source:</div>
+                                <div class="info-value"><span class="source-badge">BBC Entertainment</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Status:</div>
+                                <div class="info-value"><span class="status-badge status-unprocessed">Unprocessed</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">URL:</div>
+                                <div class="info-value"><a href="https://www.bbc.com/news/articles/ckgk2ppvl5wo?at_medium=RSS&at_campaign=rss" target="_blank" class="url-link">https://www.bbc.com/news/articles/ckgk2ppvl5wo?at_medium=RSS...</a></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Published:</div>
+                                <div class="info-value">Fri, 24 Oct 2025 10:29:01 GMT</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Crawled:</div>
+                                <div class="info-value">2025-10-24T17:49:44.255016</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="article-content">
+                    <div class="article-description">
+                        <strong>Description:</strong><br>
+                        The attendant describes the moment thieves used an angle grinder to burst into the Gallery of Apollo.
+                    </div>
+                    <div class="article-body">
+                        <strong>Full Content:</strong><br><br>
+A gallery attendant on duty at the Louvre when thieves broke in and stole eight of France's crown jewels has said "no-one could have been prepared" for what unfolded as visitors began to arrive on Sunday morning.
+
+"All of a sudden we heard an huge noise," she told radio station France Inter, in the first account given by an attendant at the scene.
+
+The unnamed attendant and two colleagues initially thought the noise to be an angry visitor, but it was not a normal sound: "It was a dull, slightly metallic noise."
+
+It was, in fact, the moment thieves had used an angle grinder to burst through a reinforced window into the Gallery of Apollo, where the Louvre's collection of historic jewelry is kept.
+
+Within eight minutes, the gang seized treasures, including a necklace that belonged to Napoleon's wife Empress Marie-Louise and a diadem of Napoleon III's wife Empress Eugenie, worth an estimated total of €88m (£77m).
+
+The thieves used a mechanical ladder on the back of a lorry to lift them to a first-floor balcony to gain entry to the gallery.
+
+Two tourists ran towards them in panic, she said.
+
+"I saw one of the criminals turn around with something that looked to me like a chainsaw, then I yelled at my colleagues to get out," she recalled. She shouted a second time that it was a robbery and that they should run.
+
+One of her colleagues raised the alarm over a walkie-talkie and then "we finished evacuating the visits without quite realising really what was going on". They shut all the doors as they left to protect the neighbouring galleries.
+
+On reflection, the attendant said "for us it was unbelievable the display cases could have been broken... never for a moment did we think there was such a risk... nobody can be prepared for that".
+
+Another Louvre employee came forward to describe the moments after the gang escaped.
+
+The anonymous security guard spoke of a very strong smell of petrol as he arrived at the scene outside the Louvre where the gang had parked their lorry.
+
+"I ran outside through the [glass] pyramid and across the courtyard... I got there at the very moment the criminals got away by scooter," he told BFMTV.
+
+The gang had ruptured the lorry's fuel tank and there was a blowtorch near by, he said. "It's clear they intended to set fire to their vehicle. I genuinely think we thwarted their plan because they would never have left behind so much evidence."
+
+"They even lost one of the pieces they'd meant to steal, because they'd lost [Empress] Eugenie's crown, which they'd just stolen and it had fallen on the ground."
+                    </div>
+                </div>
+            </div>
+
+            <div class="article">
+                <div class="article-header">
+                    <img src="../article_images/article_1_eb0787e930ba.jpg" alt="Article 1" class="article-image">
+                    <div class="article-meta">
+                        <h2 class="article-title">Booker Prize launches new award for children's fiction including young judges</h2>
+                        <div class="article-info">
+                            <div class="info-row">
+                                <div class="info-label">ID:</div>
+                                <div class="info-value"><span class="article-id">1</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Source:</div>
+                                <div class="info-value"><span class="source-badge">BBC Entertainment</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Status:</div>
+                                <div class="info-value"><span class="status-badge status-unprocessed">Unprocessed</span></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">URL:</div>
+                                <div class="info-value"><a href="https://www.bbc.com/news/articles/c5ydgg1lzdgo?at_medium=RSS&at_campaign=rss" target="_blank" class="url-link">https://www.bbc.com/news/articles/c5ydgg1lzdgo?at_medium=RSS...</a></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Published:</div>
+                                <div class="info-value">Fri, 24 Oct 2025 08:46:37 GMT</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Crawled:</div>
+                                <div class="info-value">2025-10-24T17:49:43.915138</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="article-content">
+                    <div class="article-description">
+                        <strong>Description:</strong><br>
+                        The prize will be judged by both adults and children, with the first award to be announced in 2027.
+                    </div>
+                    <div class="article-body">
+                        <strong>Full Content:</strong><br><br>
+The prestigious Booker Prize organisers have launched a new prize for children's fiction, featuring a panel of child and adult judges.
+
+The Children's Booker Prize, which will launch in 2026 and be awarded annually from 2027, will celebrate the best contemporary fiction for children between the ages of eight and 12.
+
+UK Children's Laureate Frank Cottrell-Boyce, whose books include the hugely popular Millions, published in 2004, will be the inaugural chair of judges for 2027.
+
+He said: "I am absolutely buzzing about the news that I'm going to be chairing the judging panel. It's going to be - as they say - absolute scenes in there. Let the yelling commence."
+
+Cottrell-Boyce and two other adult judges will select a shortlist of eight books, with three children then joining to help choose the winning book.
+
+Gaby Wood, chief executive of the Booker Prize Foundation, said: "The Children's Booker Prize is the most ambitious endeavour we've embarked on in 20 years - and we hope its impact will resonate for decades to come."
+
+At least 30,000 copies of the shortlisted and winning books will be gifted to children.
+
+Wood said the award aimed to "champion future classics" and was also designed "to inspire more young people to read".
+
+"This prize will make books more available for a lot of kids," he said, adding it was also "going to really ignite a conversation".
+
+Other authors and previous Children's Laureates who have welcomed the announcement included Dame Jacqueline Wilson, who said it was "a marvellous idea".
+
+Fellow children's author Anne Fine said: "When it comes to book prizes, we all say, The More The Merrier [in a nod to her book of the same name], and especially when it comes to writing for children, which has all too often been the overlooked Cinderella of the book world."
+
+As with the Booker Prize and International Booker Prize, the shortlisted authors will each receive £2,500 and the winning author £50,000.
+
+The prize will accept submissions from publishers in spring 2026, when the remaining two adult judges will be announced.
+
+The shortlist of eight books - and the three child judges - will be revealed in November next year, while the winner will be announced at an event for young readers in February 2027.
+
+The prize will be open to global authors for books written originally in English and for those translated into English, as long as they are published in the UK or Ireland between 1 November 2025 and 31 October 2026.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>Mining Pipeline Report | All articles and images verified</p>
+        <p style="font-size: 0.9em; margin-top: 10px; opacity: 0.8;">Database location: articles.db | Images: mining/article_images/</p>
+    </div>
+</body>
+</html>

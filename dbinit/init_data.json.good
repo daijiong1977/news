@@ -1,0 +1,195 @@
+{
+  "apikey": [
+    {
+      "name": "DeepSeek",
+      "value": "sk-ffdd5d8d83eb4885be34fa86d4dba417"
+    },
+    {
+      "name": "buttondown",
+      "value": "743996df-1545-4127-9f94-d35114ce00b4"
+    }
+  ],
+  "categories": [
+    {
+      "category_id": 1,
+      "category_name": "News",
+      "description": "News feed items",
+      "prompt_name": "default",
+      "created_at": "2025-10-21T22:09:23.176350"
+    },
+    {
+      "category_id": 2,
+      "category_name": "Science",
+      "description": "Science feed items",
+      "prompt_name": "science",
+      "created_at": "2025-10-21T22:09:23.176350"
+    },
+    {
+      "category_id": 3,
+      "category_name": "Fun",
+      "description": "Fun feed",
+      "prompt_name": "Fun",
+      "created_at": "2025-10-21T22:09:23.176350"
+    },
+    {
+      "category_id": 7,
+      "category_name": "Technology",
+      "description": "Technology feed items",
+      "prompt_name": "tech",
+      "created_at": "2025-10-21T22:09:23.176350"
+    },
+    {
+      "category_id": 4,
+      "category_name": "Business",
+      "description": "Business feed items",
+      "prompt_name": "business",
+      "created_at": "2025-10-21T22:09:23.176350"
+    },
+    {
+      "category_id": 5,
+      "category_name": "Sports",
+      "description": "Sports feed items",
+      "prompt_name": "sports",
+      "created_at": "2025-10-21T22:09:23.176350"
+    },
+    {
+      "category_id": 6,
+      "category_name": "Entertainment",
+      "description": "Entertainment feed items",
+      "prompt_name": "default",
+      "created_at": "2025-10-21T22:09:23.176350"
+    }
+  ],
+  "difficulty_levels": [
+    {
+      "difficulty_id": 1,
+      "difficulty": "Relax",
+      "meaning": "Relax Reading for elementary school students",
+      "grade": "3-5"
+    },
+    {
+      "difficulty_id": 2,
+      "difficulty": "Enjoy",
+      "meaning": "Enjoy Reading for middle school students",
+      "grade": "6-8"
+    },
+    {
+      "difficulty_id": 3,
+      "difficulty": "Research",
+      "meaning": "Research Reading for high school students",
+      "grade": "9-12"
+    },
+    {
+      "difficulty_id": 4,
+      "difficulty": "Chinese",
+      "meaning": "Chinese - suitable for Chinese Reader",
+      "grade": "9-12"
+    }
+  ],
+  "feeds": [
+    {
+      "feed_id": 1,
+      "feed_name": "PBS NewsHour",
+      "feed_url": "https://www.pbs.org/newshour/feeds/rss/headlines",
+      "category_id": 1,
+      "enable": 1,
+      "created_at": "2025-10-21T22:09:23.176350"
+    },
+    {
+      "feed_id": 2,
+      "feed_name": "BBC News",
+      "feed_url": "http://feeds.bbci.co.uk/news/rss.xml",
+      "category_id": 1,
+      "enable": 1,
+      "created_at": "2025-10-21T22:09:23.176350"
+    },
+    {
+      "feed_id": 3,
+      "feed_name": "Science Daily",
+      "feed_url": "https://www.sciencedaily.com/rss/top.xml",
+      "category_id": 2,
+      "enable": 1,
+      "created_at": "2025-10-21T22:09:23.176350"
+    },
+    {
+      "feed_id": 4,
+      "feed_name": "BBC Science",
+      "feed_url": "http://feeds.bbci.co.uk/news/science_and_environment/rss.xml",
+      "category_id": 2,
+      "enable": 0,
+      "created_at": "2025-10-21T22:09:23.176350"
+    },
+    {
+      "feed_id": 5,
+      "feed_name": "Ars Science",
+      "feed_url": "https://feeds.arstechnica.com/arstechnica/science",
+      "category_id": 2,
+      "enable": 0,
+      "created_at": "2025-10-21T22:09:23.176350"
+    },
+    {
+      "feed_id": 6,
+      "feed_name": "Science Daily - Technology",
+      "feed_url": "https://www.sciencedaily.com/rss/top/technology.xml",
+      "category_id": 3,
+      "enable": 0,
+      "created_at": "2025-10-21T22:09:23.176350"
+    },
+    {
+      "feed_id": 7,
+      "feed_name": "TechRadar",
+      "feed_url": "https://www.techradar.com/feeds.xml",
+      "category_id": 2,
+      "enable": 1,
+      "created_at": "2025-10-21T22:09:23.176350"
+    },
+    {
+      "feed_id": 8,
+      "feed_name": "Ars Technology Lab",
+      "feed_url": "https://feeds.arstechnica.com/arstechnica/technology-lab",
+      "category_id": 3,
+      "enable": 0,
+      "created_at": "2025-10-21T22:09:23.176350"
+    },
+    {
+      "feed_id": 9,
+      "feed_name": "BBC Business",
+      "feed_url": "http://feeds.bbci.co.uk/news/business/rss.xml",
+      "category_id": 4,
+      "enable": 1,
+      "created_at": "2025-10-21T22:09:23.176350"
+    },
+    {
+      "feed_id": 10,
+      "feed_name": "The Street",
+      "feed_url": "https://www.thestreet.com/.rss/feed/a386f542-9b65-4245-9e22-e3cfd33d7d34.xml",
+      "category_id": 4,
+      "enable": 0,
+      "created_at": "2025-10-21T22:09:23.176350"
+    },
+    {
+      "feed_id": 11,
+      "feed_name": "BBC Tennis",
+      "feed_url": "https://feeds.bbci.co.uk/sport/tennis/rss.xml",
+      "category_id": 3,
+      "enable": 1,
+      "created_at": "2025-10-21T22:09:23.176350"
+    },
+    {
+      "feed_id": 12,
+      "feed_name": "BBC Athletics",
+      "feed_url": "https://feeds.bbci.co.uk/sport/athletics/rss.xml",
+      "category_id": 5,
+      "enable": 0,
+      "created_at": "2025-10-21T22:09:23.176350"
+    },
+    {
+      "feed_id": 13,
+      "feed_name": "BBC Entertainment",
+      "feed_url": "https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml",
+      "category_id": 3,
+      "enable": 1,
+      "created_at": "2025-10-21T22:09:23.176350"
+    }
+  ]
+}

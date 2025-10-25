@@ -1,0 +1,38 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                        DATABASE INITIALIZATION                            ║
+║                            QUICK START GUIDE                              ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+📁 AUTHORITATIVE FILES (All in dbinit/ directory):
+  • init_schema.md    — Master schema (18 tables, modify here to change tables)
+  • init_data.json    — Seed data (modify here to change initial data)
+  • initdb.py         — Initializer script (no need to modify)
+  • DB_INIT_README.md — Full documentation (read this for detailed guide)
+
+🚀 INITIALIZE DATABASE:
+  cd /Users/jidai/news/dbinit
+  python3 initdb.py --db ../articles.db --force
+
+⚠️  WARNING: --force flag will BACKUP and DELETE existing database!
+
+✅ TEST SAFELY (doesn't touch real DB):
+  python3 initdb.py --db test_articles.sqlite --schema init_schema.md --data init_data.json
+
+📝 TO MODIFY SCHEMA:
+  1. Edit init_schema.md (add/modify/remove CREATE TABLE sections)
+  2. Test: python3 initdb.py --db test_articles.sqlite ...
+  3. Apply: python3 initdb.py --db ../articles.db --force
+
+📊 TO MODIFY SEED DATA:
+  1. Edit init_data.json (add/modify rows in arrays)
+  2. Test: python3 initdb.py --db test_articles.sqlite ...
+  3. Apply: python3 initdb.py --db ../articles.db --force
+
+💾 BACKUPS:
+  Automatic backups created in: /Users/jidai/news/backups/
+  Format: articles.db.backup_<timestamp>.sqlite
+
+📞 SUPPORT:
+  See DB_INIT_README.md for detailed documentation, troubleshooting, and workflows.
+
+═══════════════════════════════════════════════════════════════════════════════

@@ -1,6 +1,0 @@
-{
-  "sample_rate": 10,
-  "random_seed": 42,
-  "responses_dir": "./responses",
-  "dry_run": true
-}

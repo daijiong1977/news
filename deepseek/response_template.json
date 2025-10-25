@@ -1,0 +1,40 @@
+{
+  "meta": {
+    "article_id": 1
+  },
+  "article_analysis": {
+    "levels": {
+      "easy": {
+        "title": "",
+        "summary": "",
+        "keywords": [],
+        "questions": [],
+        "background_read": [],
+        "Article_Structure": [],
+        "perspectives": []
+      },
+      "middle": {
+        "title": "",
+        "summary": "",
+        "keywords": [],
+        "questions": [],
+        "background_read": [],
+        "Article_Structure": [],
+        "perspectives": []
+      },
+      "high": {
+        "title": "",
+        "summary": "",
+        "keywords": [],
+        "questions": [],
+        "background_read": [],
+        "Article_Structure": [],
+        "perspectives": []
+      },
+      "zh": {
+        "title": "",
+        "summary": ""
+      }
+    }
+  }
+}
