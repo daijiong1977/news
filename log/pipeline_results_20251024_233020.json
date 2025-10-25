@@ -1,0 +1,30 @@
+{
+  "start_time": "2025-10-24T23:29:46.864537",
+  "phases": [
+    {
+      "phase": "mining",
+      "start_time": "2025-10-24T23:29:46.864869",
+      "steps": [
+        {
+          "step": "mining_cycle",
+          "success": true
+        }
+      ],
+      "articles_per_seed": 1,
+      "log_file": "/Users/jidai/news/log/phase_mining_20251024_232946.log",
+      "articles_collected": 31,
+      "articles_by_source": {
+        "Science Daily": 6,
+        "PBS NewsHour": 6,
+        "BBC Tennis": 6,
+        "TechRadar": 5,
+        "BBC News": 5,
+        "BBC Entertainment": 3
+      },
+      "articles_with_images": 0
+    }
+  ],
+  "dry_run": false,
+  "verbose": true,
+  "articles_per_seed": 1
+}

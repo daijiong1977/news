@@ -1,0 +1,69 @@
+{
+  "start_time": "2025-10-24T23:11:16.077692",
+  "phases": [
+    {
+      "phase": "mining",
+      "start_time": "2025-10-24T23:11:16.077700",
+      "steps": [
+        {
+          "step": "mining_cycle",
+          "success": true
+        }
+      ],
+      "articles_per_seed": 2,
+      "articles_collected": 36
+    },
+    {
+      "phase": "image_handling",
+      "start_time": "2025-10-24T23:11:47.985075",
+      "steps": [
+        {
+          "step": "image_optimization",
+          "success": true,
+          "images_processed": 36
+        }
+      ]
+    },
+    {
+      "phase": "deepseek",
+      "start_time": "2025-10-24T23:11:51.008472",
+      "steps": [
+        {
+          "step": "deepseek_processing",
+          "status": "pending",
+          "articles_to_process": 36
+        }
+      ],
+      "articles_to_process": 36
+    },
+    {
+      "phase": "verification",
+      "start_time": "2025-10-24T23:11:51.009254",
+      "checks": [
+        {
+          "check": "articles",
+          "count": 36,
+          "status": "OK"
+        },
+        {
+          "check": "article_images",
+          "count": 36,
+          "status": "OK"
+        },
+        {
+          "check": "mobile_versions",
+          "count": 36,
+          "status": "OK"
+        },
+        {
+          "check": "deepseek_processed",
+          "count": 0,
+          "status": "PENDING"
+        }
+      ]
+    }
+  ],
+  "dry_run": false,
+  "verbose": true,
+  "articles_per_seed": 2
+}

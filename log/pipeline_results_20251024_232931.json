@@ -1,0 +1,20 @@
+{
+  "start_time": "2025-10-24T23:28:50.647539",
+  "phases": [
+    {
+      "phase": "mining",
+      "start_time": "2025-10-24T23:28:50.647749",
+      "steps": [
+        {
+          "step": "mining_cycle",
+          "success": true
+        }
+      ],
+      "articles_per_seed": 1,
+      "log_file": "/Users/jidai/news/log/phase_mining_20251024_232850.log"
+    }
+  ],
+  "dry_run": false,
+  "verbose": true,
+  "articles_per_seed": 1
+}
