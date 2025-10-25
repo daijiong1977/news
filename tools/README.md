@@ -2,6 +2,65 @@
 
 This directory contains utility scripts for managing the news database and website files.
 
+## Quick Start Guide
+
+### **3-Tool Ecosystem for News Pipeline**
+
+The tools directory provides three complementary utilities for complete article lifecycle management:
+
+| Tool | Purpose | Scope | Safety |
+|------|---------|-------|--------|
+| **datapurge.py** | Delete articles & metadata | Database only | Atomic, cascade delete |
+| **pagepurge.py** | Delete webpage files | Files only | Independent, no DB |
+| **imgcompress.py** | Generate web/mobile images | Image processing | In-place resize, WebP compression |
+
+### **Common Workflows**
+
+#### **1. Reset Everything (Before New Pipeline Run)**
+```bash
+# Step 1: Purge all database records
+python3 tools/datapurge.py --all --force
+
+# Step 2: Delete all website files
+python3 tools/pagepurge.py --all --force
+
+# Result: Clean slate for pipeline testing
+```
+
+#### **2. Quick Test Run**
+```bash
+# Purge test data only
+python3 tools/datapurge.py --date 2025-10-24 --force
+python3 tools/pagepurge.py --date 2025-10-24 --force
+
+# Run pipeline on fresh data
+python3 pipeline.py --test
+
+# Review results, analyze images
+ls -lh website/article_image/
+```
+
+#### **3. Image Optimization (After Data Collection)**
+```bash
+# Generate web and mobile versions
+python3 tools/imgcompress.py --auto --dir website/article_image/ --web --mobile
+
+# Verify all images optimized
+find website/article_image/ -type f | wc -l
+```
+
+#### **4. Complete Cleanup & Archive**
+```bash
+# Backup before cleanup
+tar czf backups/archive_$(date +%Y%m%d_%H%M%S).tar.gz website/ articles.db
+
+# Full purge
+python3 tools/datapurge.py --all --force
+python3 tools/pagepurge.py --all --force
+```
+
+---
+
 ## Included Tools
 
 ### 1. datapurge.py - Database Purging Utility
