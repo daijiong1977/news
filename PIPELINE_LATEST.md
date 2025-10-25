@@ -455,9 +455,12 @@ small_location (TEXT) - Mobile version path
 ### Output Files
 
 **After Each Run**:
-- `articles.db` - Updated database
-- `website/article_image/` - Resized images
-- `pipeline_results_YYYYMMDD_HHMMSS.json` - Execution log
+- `articles.db` - Updated database (synced to git)
+- `website/article_image/` - Resized images (synced to git)
+- `log/pipeline_results_YYYYMMDD_HHMMSS.json` - Execution log (not synced to git)
+- `log/*.txt`, `log/*.log` - Intermediate logs and reports (not synced to git)
+
+See [log/README.md](log/README.md) for details on intermediate files.
 
 ---
 
@@ -466,8 +469,8 @@ small_location (TEXT) - Mobile version path
 ### Check Pipeline Results
 
 ```bash
-# View last results
-cat pipeline_results_*.json | jq .
+# View last results (in log directory)
+cat log/pipeline_results_*.json | jq .
 
 # Article count
 sqlite3 articles.db "SELECT COUNT(*) FROM articles;"
@@ -485,8 +488,11 @@ sqlite3 articles.db "SELECT COUNT(*) FROM articles WHERE deepseek_processed=1;"
 ### Monitoring Verbose Output
 
 ```bash
-python3 pipeline.py --full -v > pipeline.log 2>&1
-tail -f pipeline.log
+# Save output to log directory
+python3 pipeline.py --full -v > log/pipeline_$(date +%Y%m%d_%H%M%S).log 2>&1
+
+# Monitor in real-time
+tail -f log/pipeline_*.log
 ```
 
 ---

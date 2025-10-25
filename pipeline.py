@@ -556,8 +556,10 @@ Examples:
     print_success("Pipeline execution complete!")
     print_info(f"End time: {datetime.now().isoformat()}")
     
-    # Save results
-    results_file = PROJECT_ROOT / f"pipeline_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+    # Save results to log directory
+    log_dir = PROJECT_ROOT / "log"
+    log_dir.mkdir(exist_ok=True)
+    results_file = log_dir / f"pipeline_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
     try:
         with open(results_file, 'w') as f:
             json.dump(pipeline_results, f, indent=2)
