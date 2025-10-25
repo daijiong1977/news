@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 """
-Image Optimizer Tool - Generate web and mobile versions of images
+Image Optimizer Tool - Generate optimized image versions
 
 Workflow:
-1. WEB VERSION: Resize to fit within 1024×768 (keep aspect ratio), keep original name/format
-2. MOBILE VERSION: Create _mobile.webp, resize to fit 600×450, compress to <50KB
+1. ALL VERSIONS: Compress to <60KB WebP (resize to fit 1024×768, keep aspect ratio)
+2. Same compression applied for web, mobile, email, and all channels
+3. Single optimized image used across all platforms
 
 Supported formats:
-- JPG / JPEG → JPG
-- PNG → WebP for mobile
-- WebP → WebP (or optimized WebP for mobile)
+- JPG / JPEG → WebP (<60KB)
+- PNG → WebP (<60KB)
+- WebP → WebP optimized (<60KB)
 
 Usage:
     python3 imgcompress.py --input image.jpg --web
@@ -34,10 +35,9 @@ WEBSITE_DIR = SCRIPT_DIR / "website"
 DB_PATH = SCRIPT_DIR / "articles.db"
 CHECKPOINT_FILE = SCRIPT_DIR / ".imgcompress_checkpoint.json"
 
-# Image dimensions
-WEB_MAX_DIMENSIONS = (1024, 768)  # Web version (no compression, just resize)
-MOBILE_MAX_DIMENSIONS = (600, 450)  # Mobile version (compress to <50KB)
-MOBILE_TARGET_SIZE = 50000  # 50KB for mobile
+# Image dimensions - unified for all versions
+IMAGE_MAX_DIMENSIONS = (1024, 768)  # All versions: 1024×768, compress to <60KB
+TARGET_SIZE = 60000  # 60KB for all channels (web, mobile, email)
 
 
 def load_checkpoint():
@@ -89,70 +89,16 @@ def update_database_mobile_location(article_id, image_name, mobile_location):
 
 def resize_image_web(input_path, output_path=None, verbose=False):
     """
-    Resize image for web: fit within 1024×768, keep aspect ratio, keep original format
+    Deprecated - use compress_image_mobile instead (unified compression)
     
     Returns: (success, original_size, new_size)
     """
-    try:
-        input_file = Path(input_path)
-        if output_path is None:
-            output_file = input_file
-        else:
-            output_file = Path(output_path)
-        
-        # Ensure output directory exists
-        output_file.parent.mkdir(parents=True, exist_ok=True)
-        
-        original_size = input_file.stat().st_size
-        
-        if verbose:
-            print(f"  Web: {input_file.name} ({original_size / 1024:.1f} KB)")
-        
-        # Open image
-        img = Image.open(input_file)
-        original_width, original_height = img.size
-        
-        # Calculate scale to fit within 1024×768
-        max_width, max_height = WEB_MAX_DIMENSIONS
-        width_ratio = max_width / original_width
-        height_ratio = max_height / original_height
-        scale_ratio = min(width_ratio, height_ratio, 1.0)  # Don't upscale
-        
-        if scale_ratio < 1.0:
-            new_width = int(original_width * scale_ratio)
-            new_height = int(original_height * scale_ratio)
-            img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
-            
-            if verbose:
-                print(f"    Resized: {original_width}x{original_height} → {new_width}x{new_height}")
-        else:
-            if verbose:
-                print(f"    Already fits {original_width}x{original_height} within {max_width}x{max_height}")
-            return True, original_size, original_size
-        
-        # Save with original format
-        if input_file.suffix.lower() in ['.png']:
-            img.save(output_file, format='PNG', optimize=True)
-        elif input_file.suffix.lower() in ['.webp']:
-            img.save(output_file, format='WEBP', quality=90)
-        else:  # JPG/JPEG
-            img.save(output_file, format='JPEG', quality=95, optimize=True)
-        
-        new_size = output_file.stat().st_size
-        
-        if verbose:
-            print(f"    ✓ Web version: {new_size / 1024:.1f} KB")
-        
-        return True, original_size, new_size
-        
-    except Exception as e:
-        print(f"  ✗ Error resizing web {input_path}: {e}", file=sys.stderr)
-        return False, 0, 0
+    return compress_image_mobile(input_path, output_path, verbose)[:3]
 
 
 def compress_image_mobile(input_path, output_path, verbose=False):
     """
-    Create mobile version: fit within 600×450, compress to <50KB, save as WebP
+    Compress image: fit within 1024×768, compress to <60KB, save as WebP
     
     Returns: (success, original_size, compressed_size, quality_used)
     """
@@ -166,7 +112,7 @@ def compress_image_mobile(input_path, output_path, verbose=False):
         original_size = input_file.stat().st_size
         
         if verbose:
-            print(f"  Mobile: {input_file.name} → {output_file.name}")
+            print(f"  {input_file.name} → {output_file.name}")
         
         # Open image
         img = Image.open(input_file)
@@ -178,8 +124,8 @@ def compress_image_mobile(input_path, output_path, verbose=False):
             rgb_img.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
             img = rgb_img
         
-        # Calculate scale to fit within 600×450
-        max_width, max_height = MOBILE_MAX_DIMENSIONS
+        # Calculate scale to fit within 1024×768
+        max_width, max_height = IMAGE_MAX_DIMENSIONS
         width_ratio = max_width / original_width
         height_ratio = max_height / original_height
         scale_ratio = min(width_ratio, height_ratio, 1.0)  # Don't upscale
@@ -230,9 +176,9 @@ def compress_image_mobile(input_path, output_path, verbose=False):
                 print(f"    Iteration {iteration}: {compressed_size / 1024:.1f} KB (quality={current_quality})")
             
             # Check if we're within target
-            if compressed_size <= MOBILE_TARGET_SIZE:
+            if compressed_size <= TARGET_SIZE:
                 if verbose:
-                    print(f"    ✓ Mobile version: {compressed_size / 1024:.1f} KB (quality={current_quality})")
+                    print(f"    ✓ {output_file.name}: {compressed_size / 1024:.1f} KB (quality={current_quality})")
                 
                 return True, original_size, compressed_size, current_quality
             
@@ -257,12 +203,12 @@ def compress_image_mobile(input_path, output_path, verbose=False):
         compressed_size = output_file.stat().st_size
         
         if verbose:
-            print(f"    ✓ Mobile version: {compressed_size / 1024:.1f} KB (quality={current_quality})")
+            print(f"    ✓ {output_file.name}: {compressed_size / 1024:.1f} KB (quality={current_quality})")
         
         return True, original_size, compressed_size, current_quality
         
     except Exception as e:
-        print(f"  ✗ Error compressing mobile {input_path}: {e}", file=sys.stderr)
+        print(f"  ✗ Error compressing {input_path}: {e}", file=sys.stderr)
         return False, 0, 0, 0
 
 
@@ -288,13 +234,18 @@ def process_directory(input_dir, web=False, mobile=False, dry_run=False, verbose
             if verbose:
                 print(f"Resuming from: {resume_from}")
     
-    # Find all image files
-    image_extensions = ('.jpg', '.jpeg', '.png', '.webp')
+    # Find all image files (only JPG/PNG/original WebP, skip _mobile files)
+    image_extensions = ('.jpg', '.jpeg', '.png')
     image_files = []
     
     for ext in image_extensions:
         image_files.extend(input_path.glob(f'*{ext}'))
         image_files.extend(input_path.glob(f'*{ext.upper()}'))
+    
+    # Also include original WebP files (those without _mobile in name)
+    for webp_file in input_path.glob('*.webp'):
+        if '_mobile' not in webp_file.name:
+            image_files.append(webp_file)
     
     if not image_files:
         print(f"No image files found in {input_dir}")
@@ -351,6 +302,17 @@ def process_directory(input_dir, web=False, mobile=False, dry_run=False, verbose
             # Create mobile filename: article_1.jpg → article_1_mobile.webp
             mobile_filename = f"{img_file.stem}_mobile.webp"
             mobile_path = img_file.parent / mobile_filename
+            
+            # Check if _mobile version already exists and is under 60KB
+            if mobile_path.exists():
+                mobile_size = mobile_path.stat().st_size
+                if mobile_size <= TARGET_SIZE:
+                    if verbose:
+                        print(f"  ✓ Skipping: {mobile_path.name} already {mobile_size / 1024:.1f} KB (under {TARGET_SIZE/1024:.0f}KB)")
+                    continue
+                else:
+                    if verbose:
+                        print(f"  ⚠ Reprocessing: {mobile_path.name} is {mobile_size / 1024:.1f} KB (over {TARGET_SIZE/1024:.0f}KB)")
             
             if dry_run:
                 print(f"  [DRY-RUN] Would create: {img_file} → {mobile_path}")
@@ -420,9 +382,9 @@ Examples:
     input_group.add_argument("--dir", type=str, help="Directory containing images")
     
     parser.add_argument("--web", action="store_true", 
-                       help=f"Generate web version (fit within {WEB_MAX_DIMENSIONS[0]}×{WEB_MAX_DIMENSIONS[1]})")
+                       help=f"Generate web version (<{TARGET_SIZE/1024:.0f}KB WebP, 1024×768)")
     parser.add_argument("--mobile", action="store_true", 
-                       help=f"Generate mobile version (fit within {MOBILE_MAX_DIMENSIONS[0]}×{MOBILE_MAX_DIMENSIONS[1]}, <{MOBILE_TARGET_SIZE/1024:.0f}KB WebP)")
+                       help=f"Generate mobile version (<{TARGET_SIZE/1024:.0f}KB WebP, 1024×768)")
     parser.add_argument("--auto", action="store_true", 
                        help="Auto-mode: process only images that don't have versions yet, track progress")
     parser.add_argument("--resume", action="store_true", 

@@ -61,17 +61,19 @@ class ArticleLoader:
             return None
     
     def get_article_image(self, article_id) -> Optional[str]:
-        """Get image path for an article - try jpg first, then webp."""
+        """Get optimized _mobile.webp image for an article (1024×768, <60KB)."""
         try:
-            # Try jpg first
+            # Look for _mobile.webp version (optimized, 1024×768, <60KB)
+            for img_file in Path(self.images_dir).glob(f'article_{article_id}_*_mobile.webp'):
+                return f"../article_image/{img_file.name}"
+            
+            # Fallback to original jpg if _mobile.webp not found
             for img_file in Path(self.images_dir).glob(f'article_{article_id}_*.jpg'):
-                # Return relative path without mobile version
                 if '_mobile' not in img_file.name:
                     return f"../article_image/{img_file.name}"
             
-            # If no jpg, try webp
+            # Fallback to any webp without _mobile
             for img_file in Path(self.images_dir).glob(f'article_{article_id}_*.webp'):
-                # Return relative path without mobile version
                 if '_mobile' not in img_file.name:
                     return f"../article_image/{img_file.name}"
             
@@ -134,10 +136,19 @@ class ArticleLoader:
         if not response or 'article_analysis' not in response:
             return '', ''
         
+        # Map our level names to the actual keys in the response
+        level_map = {
+            'easy': 'easy',
+            'mid': 'middle',
+            'hard': 'high',
+            'cn': 'zh'
+        }
+        
+        response_level = level_map.get(level, level)
         levels = response.get('article_analysis', {}).get('levels', {})
         
-        if level in levels:
-            content = levels[level]
+        if response_level in levels:
+            content = levels[response_level]
             title = content.get('title', '')
             summary = content.get('summary', '')
             return title, summary
@@ -153,7 +164,7 @@ class ArticleLoader:
             return '', ''
         
         levels = response.get('article_analysis', {}).get('levels', {})
-        cn_data = levels.get('cn', {})
+        cn_data = levels.get('zh', {})
         
         title_zh = cn_data.get('title', '')
         summary_zh = cn_data.get('summary', '')
@@ -207,9 +218,35 @@ class HTMLGenerator:
         if not summary_level:
             summary_level = article.get('description', '')[:100]
         
-        # Shorten summaries
-        summary_short = (summary_level[:100] + "...") if len(summary_level) > 100 else summary_level
-        summary_cn_short = (summary_cn[:100] + "...") if len(summary_cn) > 100 else summary_cn
+        # Shorten summaries for data attributes (for backward compatibility)
+        summary_short = (summary_level[:500] + "...") if len(summary_level) > 500 else summary_level
+        summary_cn_short = (summary_cn[:500] + "...") if len(summary_cn) > 500 else summary_cn
+        
+        # ALSO extract content for ALL levels (for switching)
+        level_data = {}
+        for lv in ['easy', 'mid', 'hard']:
+            title, summary = loader.extract_content(response, lv)
+            if not title:
+                title = article.get('title', '')
+            if not summary:
+                summary = article.get('description', '')[:500]
+            level_data[lv] = {
+                'title': title,
+                'summary': summary  # Store FULL summary, no truncation
+            }
+        # Add CN data
+        level_data['cn'] = {
+            'title': title_cn,
+            'summary': summary_cn  # Store FULL summary, no truncation
+        }
+        
+        # Build data attributes for all levels
+        level_attrs = ''
+        for lv, data in level_data.items():
+            # Escape quotes for HTML attributes
+            escaped_title = data['title'].replace('"', '&quot;').replace("'", "&#39;")
+            escaped_summary = data['summary'].replace('"', '&quot;').replace("'", "&#39;")
+            level_attrs += f' data-title-{lv}="{escaped_title}" data-summary-{lv}="{escaped_summary}"'
         
         # Image styling - use relative path or background color
         if image_url:
@@ -218,7 +255,7 @@ class HTMLGenerator:
         else:
             image_style = 'background-color: #e4e4e7;'
         
-        return f'''<div class="flex flex-col gap-3 bg-card-light dark:bg-card-dark rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1" data-article-id="{article_id}" data-category="{category}" data-level="{level}" data-title-en="{title_level}" data-title-zh="{title_cn}" data-summary-en="{summary_short}" data-summary-zh="{summary_cn_short}">
+        return f'''<div class="flex flex-col gap-3 bg-card-light dark:bg-card-dark rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1" data-article-id="{article_id}" data-category="{category}" data-level="{level}"{level_attrs}>
 <div class="w-full bg-center bg-no-repeat aspect-video bg-cover" style='{image_style}'></div>
 <div class="flex flex-col gap-2 p-4 pt-2">
 <h3 class="text-lg font-bold leading-snug tracking-tight article-title">{title_level}</h3>
@@ -227,10 +264,7 @@ class HTMLGenerator:
 <span class="font-bold">·</span>
 <p>{source}</p>
 </div>
-<p class="text-subtle-light dark:text-subtle-dark text-sm font-normal leading-relaxed flex-grow article-summary">{summary_short}</p>
-<button class="mt-auto flex w-full items-center justify-center rounded-md h-10 px-4 bg-primary/20 text-primary text-sm font-bold leading-normal tracking-wide hover:bg-primary/30 transition-colors" data-article-id="{article_id}" data-level="{level}">
-<span class="truncate">Read More</span>
-</button>
+<p class="text-subtle-light dark:text-subtle-dark text-sm font-normal leading-relaxed article-summary" style="overflow-wrap: break-word; word-break: break-word;">{summary_level}</p>
 </div>
 </div>'''
 
@@ -332,10 +366,36 @@ const categoryMap = {
 };
 
 let currentLanguage = 'en';
-let currentLevel = 'mid';
+let currentLevel = 'easy';
 let currentCategory = 'News';
 
+// Read URL parameters on page load
 document.addEventListener('DOMContentLoaded', function() {
+    // Check for level parameter in URL
+    const params = new URLSearchParams(window.location.search);
+    const urlLevel = params.get('level');
+    if (urlLevel && ['easy', 'mid', 'hard', 'cn'].includes(urlLevel)) {
+        currentLevel = urlLevel;
+        // Update dropdown to match URL level
+        const dropdown = document.querySelector('select');
+        if (dropdown) {
+            const levelMap = {
+                'easy': 'Relax',
+                'mid': 'Enjoy',
+                'hard': 'Research',
+                'cn': 'CN'
+            };
+            dropdown.value = levelMap[urlLevel] || 'Enjoy';
+        }
+        // Update CN button state
+        const cnButton = Array.from(document.querySelectorAll('button')).find(btn => btn.textContent.trim() === 'CN');
+        if (cnButton && urlLevel === 'cn') {
+            cnButton.classList.add('bg-primary', 'text-white');
+            cnButton.classList.remove('bg-subtle-light', 'text-subtle-light', 'dark:bg-subtle-dark', 'dark:text-subtle-dark');
+        }
+        filterAndUpdateCards();
+    }
+    
     // Tab navigation for News/Science/Fun
     const tabLinks = document.querySelectorAll('a[href="#"]');
     tabLinks.forEach((link, index) => {
@@ -415,7 +475,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 // Switch back to English
                 currentLanguage = 'en';
-                currentLevel = 'mid';
+                currentLevel = 'easy';
                 
                 // Show dropdown again
                 if (dropdown) dropdown.style.display = '';
@@ -485,27 +545,35 @@ function filterAndUpdateCards() {
         cards = cards.filter(card => card.dataset.category === currentCategory);
     }
     
-    // Update visible content based on current language
-    cards.forEach(card => {
-        const titleEl = card.querySelector('.article-title');
-        const summaryEl = card.querySelector('.article-summary');
-        
-        if (titleEl) {
-            const titleEn = card.dataset.titleEn;
-            const titleZh = card.dataset.titleZh;
-            titleEl.textContent = currentLanguage === 'zh' ? (titleZh || titleEn) : titleEn;
-        }
-        
-        if (summaryEl) {
-            const summaryEn = card.dataset.summaryEn;
-            const summaryZh = card.dataset.summaryZh;
-            summaryEl.textContent = currentLanguage === 'zh' ? (summaryZh || summaryEn) : summaryEn;
-        }
-    });
-    
     // Replace grid content with filtered cards
+    // The HTML from levelCards already has the correct titles/summaries baked in
     const newGridContent = cards.map(card => card.outerHTML).join('\\n');
     gridDiv.innerHTML = newGridContent;
+    
+    // Update title and summary from data attributes to show full content
+    gridDiv.querySelectorAll('[data-article-id]').forEach(card => {
+        // Update title
+        const titleAttr = `data-title-${currentLevel}`;
+        const title = card.getAttribute(titleAttr);
+        if (title) {
+            const titleEl = card.querySelector('.article-title');
+            if (titleEl) titleEl.textContent = title;
+        }
+        
+        // Update summary
+        const summaryAttr = `data-summary-${currentLevel}`;
+        const summary = card.getAttribute(summaryAttr);
+        if (summary) {
+            const summaryEl = card.querySelector('.article-summary');
+            if (summaryEl) {
+                summaryEl.textContent = summary;
+                // Remove any max-height or line-clamp restrictions for full display
+                summaryEl.style.maxHeight = 'none';
+                summaryEl.style.overflow = 'visible';
+                summaryEl.classList.remove('line-clamp-3');
+            }
+        }
+    });
 }
 </script>
     '''
