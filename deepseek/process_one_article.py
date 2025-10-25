@@ -22,8 +22,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB_PATH = os.path.join(BASE_DIR, "articles.db")
 PROMPT_FILE = os.path.join(BASE_DIR, "deepseek", "prompts.md")
 RESPONSE_TEMPLATE = os.path.join(BASE_DIR, "deepseek", "response_template.json")
-OUTPUT_DIR = os.path.join(BASE_DIR, "deepseek", "responses")
-WEBSITE_RESPONSE_DIR = os.path.join(BASE_DIR, "website", "article_response")
+OUTPUT_DIR = os.path.join(BASE_DIR, "website", "responses")
+WEBSITE_RESPONSE_DIR = os.path.join(BASE_DIR, "website", "responses")
 
 # Create output directories if needed
 Path(OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
@@ -254,34 +254,22 @@ def update_database_on_success(article_id, response_file):
 
 
 def move_response_file(article_id, response_file):
-    """Move response file to website/article_response directory."""
+    """Verify response file exists in website/responses directory."""
     try:
-        print(f"  🗂️  Moving response file...")
-        source_path = Path(response_file)
+        print(f"  🗂️  Verifying response file location...")
+        response_path = Path(response_file)
         
-        # Check if source file exists
-        if not source_path.exists():
+        # Check if file exists
+        if not response_path.exists():
             print(f"    ❌ ERROR: Response file not found: {response_file}")
             return False
         
-        print(f"    ✓ Source file exists: {source_path}")
-        
-        # Create destination directory if needed
-        dest_dir = Path(WEBSITE_RESPONSE_DIR)
-        dest_dir.mkdir(parents=True, exist_ok=True)
-        
-        # Create destination filename
-        dest_filename = f"article_{article_id}_response.json"
-        dest_path = dest_dir / dest_filename
-        
-        # Move file
-        shutil.move(str(source_path), str(dest_path))
-        
-        print(f"    ✓ File moved to: {dest_path}")
+        print(f"    ✓ Response file verified: {response_path}")
+        print(f"    ✓ Location: /var/www/news/website/responses/")
         return True
         
     except Exception as e:
-        print(f"    ❌ ERROR: Failed to move response file: {e}")
+        print(f"    ❌ ERROR: Failed to verify response file: {e}")
         return False
 
 
