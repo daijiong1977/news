@@ -1,0 +1,3 @@
+# This directory holds intermediate pipeline results, logs, and temporary outputs
+# Contents are NOT synced to git
+# Examples: pipeline_results_*.json, *.txt logs, temporary processing files
