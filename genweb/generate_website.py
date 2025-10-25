@@ -80,34 +80,48 @@ class ArticleLoader:
             print(f"⚠️  Error finding image for {article_id}: {e}", file=sys.stderr)
             return None
     
-    def get_articles_by_category(self, category_id: int, limit: int = 6) -> List[Dict]:
-        """Get articles by category_id, randomly pick 6 if more than 6 available."""
+    def get_articles_by_category(self, category_id: int, per_source_limit: int = 3) -> List[Dict]:
+        """Get latest 3 articles from each source in a category (balanced source representation)."""
         try:
             conn = sqlite3.connect(self.db_path)
             conn.row_factory = sqlite3.Row
             cur = conn.cursor()
             
-            # Get all processed articles in category
+            # Get all unique sources in this category
             cur.execute("""
-                SELECT id, title, description, source, 
-                       deepseek_processed, crawled_at, processed_at, zh_title, pub_date
-                FROM articles 
+                SELECT DISTINCT source FROM articles 
                 WHERE deepseek_processed = 1 AND category_id = ?
-                ORDER BY pub_date DESC
+                ORDER BY source
             """, (category_id,))
             
-            all_articles = [dict(row) for row in cur.fetchall()]
+            sources = [row['source'] for row in cur.fetchall()]
+            all_articles = []
+            
+            # For each source, get latest N articles
+            for source in sources:
+                cur.execute("""
+                    SELECT id, title, description, source, 
+                           deepseek_processed, crawled_at, processed_at, zh_title, pub_date
+                    FROM articles 
+                    WHERE deepseek_processed = 1 AND category_id = ? AND source = ?
+                    ORDER BY pub_date DESC
+                    LIMIT ?
+                """, (category_id, source, per_source_limit))
+                
+                articles = [dict(row) for row in cur.fetchall()]
+                all_articles.extend(articles)
+            
             conn.close()
             
-            # Pick latest 6 (already ordered by processed_at DESC)
-            articles = all_articles[:limit]
+            # Re-sort by pub_date DESC to get chronological order
+            all_articles.sort(key=lambda x: x['pub_date'], reverse=True)
             
             # Enrich with response data and images
-            for article in articles:
+            for article in all_articles:
                 article['response'] = self.get_response_data(article['id'])
                 article['image'] = self.get_article_image(article['id'])
             
-            return articles
+            return all_articles
         except Exception as e:
             print(f"❌ Error loading articles by category: {e}", file=sys.stderr)
             return []
@@ -254,7 +268,7 @@ def generate_website():
     total_articles = 0
     
     for cat_id, cat_name in categories:
-        articles = loader.get_articles_by_category(cat_id, limit=6)
+        articles = loader.get_articles_by_category(cat_id, per_source_limit=3)
         articles_by_category[cat_name] = articles
         total_articles += len(articles)
         print(f"  - {cat_name} (ID: {cat_id}): {len(articles)} articles")
