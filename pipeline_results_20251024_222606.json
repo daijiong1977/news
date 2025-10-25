@@ -1,0 +1,80 @@
+{
+  "start_time": "2025-10-24T22:26:06.482861",
+  "phases": [
+    {
+      "phase": "purge",
+      "start_time": "2025-10-24T22:26:06.482871",
+      "steps": [
+        {
+          "step": "database_purge",
+          "success": true
+        },
+        {
+          "step": "website_purge",
+          "success": true
+        }
+      ]
+    },
+    {
+      "phase": "mining",
+      "start_time": "2025-10-24T22:26:06.482891",
+      "steps": [
+        {
+          "step": "mining_cycle",
+          "success": true
+        }
+      ]
+    },
+    {
+      "phase": "image_handling",
+      "start_time": "2025-10-24T22:26:06.482909",
+      "steps": [
+        {
+          "step": "image_optimization",
+          "success": true,
+          "images_processed": 7
+        }
+      ]
+    },
+    {
+      "phase": "deepseek",
+      "start_time": "2025-10-24T22:26:06.483212",
+      "steps": [
+        {
+          "step": "deepseek_processing",
+          "status": "pending",
+          "articles_to_process": 13
+        }
+      ],
+      "articles_to_process": 13
+    },
+    {
+      "phase": "verification",
+      "start_time": "2025-10-24T22:26:06.491673",
+      "checks": [
+        {
+          "check": "articles",
+          "count": 18,
+          "status": "OK"
+        },
+        {
+          "check": "article_images",
+          "count": 18,
+          "status": "OK"
+        },
+        {
+          "check": "mobile_versions",
+          "count": 0,
+          "status": "PENDING"
+        },
+        {
+          "check": "deepseek_processed",
+          "count": 5,
+          "status": "OK"
+        }
+      ]
+    }
+  ],
+  "dry_run": true,
+  "verbose": false
+}

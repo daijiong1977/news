@@ -177,28 +177,34 @@ def phase_purge(dry_run=False, verbose=False):
     return True, results
 
 
-def phase_mining(dry_run=False, verbose=False):
+def phase_mining(dry_run=False, verbose=False, articles_per_seed=2):
     """
     PHASE 2: Mining - Collect articles from RSS feeds
     
     Runs mining cycle to populate database with new articles
+    
+    Args:
+        dry_run: Preview without making changes
+        verbose: Detailed output
+        articles_per_seed: Number of articles to collect per feed seed (default: 2)
     """
     print_header("PHASE 2: MINING")
     
     results = {
         'phase': 'mining',
         'start_time': datetime.now().isoformat(),
-        'steps': []
+        'steps': [],
+        'articles_per_seed': articles_per_seed
     }
     
-    print_info("Starting mining cycle...")
+    print_info(f"Starting mining cycle (articles per seed: {articles_per_seed})...")
     
     mining_script = MINING_DIR / 'run_mining_cycle.py'
     if not mining_script.exists():
         print_error(f"Mining script not found: {mining_script}")
         return False, results
     
-    cmd = ['python3', str(mining_script)]
+    cmd = ['python3', str(mining_script), '--articles-per-seed', str(articles_per_seed)]
     if verbose:
         cmd.append('-v')
     
@@ -434,14 +440,17 @@ Pipeline Phases:
   4. DEEPSEEK    - AI analysis and enrichment (--deepseek)
 
 Examples:
-  # Full pipeline with cleanup
+  # Full pipeline with cleanup (default 2 articles per seed)
   python3 pipeline.py --full
+
+  # Full pipeline with 5 articles per seed
+  python3 pipeline.py --full --articles-per-seed 5
 
   # Purge everything before new run
   python3 pipeline.py --purge
 
-  # Mining only
-  python3 pipeline.py --mine
+  # Mining only with custom articles per seed
+  python3 pipeline.py --mine --articles-per-seed 3
 
   # Image optimization after manual mining
   python3 pipeline.py --images
@@ -451,6 +460,9 @@ Examples:
 
   # Verbose output all phases
   python3 pipeline.py --full -v
+
+  # Complete pipeline with 10 articles per seed and verbose output
+  python3 pipeline.py --full --articles-per-seed 10 -v
         """
     )
     
@@ -466,6 +478,8 @@ Examples:
                        help="Run complete pipeline: purge → mine → images → deepseek")
     parser.add_argument("--verify", action="store_true",
                        help="Verify pipeline results")
+    parser.add_argument("--articles-per-seed", type=int, default=2,
+                       help="Number of articles to collect per feed seed (default: 2)")
     parser.add_argument("--dry-run", action="store_true",
                        help="Preview without making changes")
     parser.add_argument("-v", "--verbose", action="store_true",
@@ -479,11 +493,16 @@ Examples:
         parser.print_help()
         sys.exit(1)
     
+    if args.articles_per_seed < 1:
+        print_error("--articles-per-seed must be >= 1")
+        sys.exit(1)
+    
     # Summary
     print_header("NEWS PIPELINE ORCHESTRATION")
     print(f"Project Root: {PROJECT_ROOT}")
     print(f"Database: {DB_PATH}")
     print(f"Website Directory: {WEBSITE_DIR}")
+    print(f"Articles per seed: {args.articles_per_seed}")
     if args.dry_run:
         print_warning("DRY-RUN MODE - No changes will be made")
     print()
@@ -493,7 +512,8 @@ Examples:
         'start_time': datetime.now().isoformat(),
         'phases': [],
         'dry_run': args.dry_run,
-        'verbose': args.verbose
+        'verbose': args.verbose,
+        'articles_per_seed': args.articles_per_seed
     }
     
     # Execute phases
@@ -505,7 +525,7 @@ Examples:
             sys.exit(1)
     
     if args.full or args.mine:
-        success, results = phase_mining(dry_run=args.dry_run, verbose=args.verbose)
+        success, results = phase_mining(dry_run=args.dry_run, verbose=args.verbose, articles_per_seed=args.articles_per_seed)
         pipeline_results['phases'].append(results)
         if not success and args.full:
             print_error("Pipeline aborted: Mining phase failed")
