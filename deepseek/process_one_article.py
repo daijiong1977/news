@@ -10,7 +10,9 @@ import os
 import sys
 import sqlite3
 import requests
+import shutil
 from pathlib import Path
+from datetime import datetime
 
 # Configuration
 API_URL = "https://api.deepseek.com/chat/completions"
@@ -203,6 +205,74 @@ def save_response(article_id, response_json):
         return None
 
 
+def update_database_on_success(article_id, response_file):
+    """Update database immediately after processing succeeds."""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        now = datetime.now().isoformat()
+        
+        # Insert into response table
+        cursor.execute("""
+            INSERT INTO response (article_id, respons_file)
+            VALUES (?, ?)
+        """, (article_id, response_file))
+        
+        # Update articles table
+        cursor.execute("""
+            UPDATE articles
+            SET deepseek_processed = 1,
+                processed_at = ?,
+                deepseek_failed = 0,
+                deepseek_last_error = NULL
+            WHERE id = ?
+        """, (now, article_id))
+        
+        conn.commit()
+        conn.close()
+        
+        print(f"  ✓ Database updated successfully")
+        print(f"    - Inserted response record")
+        print(f"    - Updated articles.deepseek_processed = 1")
+        
+        # Move response file to website/article_response
+        return move_response_file(article_id, response_file)
+        
+    except Exception as e:
+        print(f"  ERROR: Database update failed: {e}")
+        return False
+
+
+def move_response_file(article_id, response_file):
+    """Move response file to website/article_response directory."""
+    try:
+        source_path = Path(response_file)
+        
+        # Check if source file exists
+        if not source_path.exists():
+            print(f"  ERROR: Response file not found: {response_file}")
+            return False
+        
+        # Create destination directory if needed
+        dest_dir = Path(WEBSITE_RESPONSE_DIR)
+        dest_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Create destination filename
+        dest_filename = f"article_{article_id}_response.json"
+        dest_path = dest_dir / dest_filename
+        
+        # Move file
+        shutil.move(str(source_path), str(dest_path))
+        
+        print(f"  ✓ Response file moved to website directory")
+        return True
+        
+    except Exception as e:
+        print(f"  ERROR: Failed to move response file: {e}")
+        return False
+
+
 def validate_response_structure(response_json, template):
     """Validate that response matches expected structure."""
     try:
@@ -331,10 +401,15 @@ def process_single_article(article_id):
     if not output_file:
         sys.exit(1)
     
-    # Step 8: Show completion summary
+    # Step 8: Update database immediately
+    print("\nStep 8: Updating database...")
+    if not update_database_on_success(article_id, output_file):
+        print("  ⚠ Warning: Database update had issues, but processing complete")
+    
+    # Step 9: Show completion summary
     try:
         file_size = os.path.getsize(output_file)
-        print(f"\nStep 8: Completion summary")
+        print(f"\nStep 9: Completion summary")
         print(f"  ✓ Response file: {output_file}")
         print(f"  ✓ File size: {file_size} bytes")
     except Exception as e:
@@ -345,15 +420,25 @@ def process_single_article(article_id):
 
 def main():
     """Main entry point - supports batch or single article mode."""
-    if len(sys.argv) < 2:
-        # No arguments: run batch processing
-        print("\n⏳ No article_id provided - running in BATCH MODE")
-        print("Checking for unprocessed articles...\n")
-        process_batch()
-    else:
-        # Argument provided: process single article
-        article_id = sys.argv[1]
-        process_single_article(article_id)
+    try:
+        if len(sys.argv) < 2:
+            # No arguments: run batch processing
+            print("\n⏳ No article_id provided - running in BATCH MODE")
+            print("Checking for unprocessed articles...\n")
+            process_batch()
+            print("✓ Batch processing completed successfully")
+            sys.exit(0)
+        else:
+            # Argument provided: process single article
+            article_id = sys.argv[1]
+            process_single_article(article_id)
+            print("✓ Single article processing completed successfully")
+            sys.exit(0)
+    except Exception as e:
+        print(f"✗ Fatal error: {e}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
 
 
 if __name__ == '__main__':
