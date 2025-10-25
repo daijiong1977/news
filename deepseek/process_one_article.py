@@ -123,6 +123,9 @@ Analyze this article and output ONLY the JSON matching the structure above."""
 
 def call_deepseek_api(user_prompt, api_key):
     """Call Deepseek API and return response."""
+    print(f"  ℹ️  API Key available: {bool(api_key)}")
+    print(f"  ℹ️  API URL: {API_URL}")
+    
     headers = {
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {api_key}'
@@ -144,7 +147,8 @@ def call_deepseek_api(user_prompt, api_key):
     }
     
     try:
-        print("Sending request to Deepseek API...")
+        print("  ⏳ Sending request to Deepseek API (this may take time)...")
+        print(f"  ℹ️  Payload size: {len(str(payload))} characters")
         response = requests.post(
             API_URL,
             headers=headers,
@@ -159,16 +163,19 @@ def call_deepseek_api(user_prompt, api_key):
             print(f"Response: {response.text[:500]}")
             return None
         
+        print("  ✓ API response received successfully")
         api_response = response.json()
         
         if 'choices' not in api_response or len(api_response['choices']) == 0:
             print("ERROR: No choices in API response")
             return None
         
+        print("  ✓ Extracting content from response...")
         # Extract the JSON from the response
         content = api_response['choices'][0]['message']['content']
         try:
             response_json = json.loads(content)
+            print("  ✓ Successfully parsed API response as JSON")
             return response_json
         except json.JSONDecodeError as e:
             print(f"ERROR: Could not parse API response as JSON: {e}")
