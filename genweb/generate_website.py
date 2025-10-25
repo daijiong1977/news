@@ -151,12 +151,13 @@ class HTMLGenerator:
         source = article.get('source', 'News Source')
         image_url = article.get('image', '')
         response = article.get('response', {})
-        processed_at = article.get('processed_at', '')
+        # Use crawled_at (original time) instead of processed_at
+        crawled_at = article.get('crawled_at', '')
         
-        # Time formatting
+        # Time formatting - use crawled_at
         try:
-            if processed_at:
-                dt = datetime.fromisoformat(processed_at)
+            if crawled_at:
+                dt = datetime.fromisoformat(crawled_at)
                 hours_ago = (datetime.now() - dt).total_seconds() // 3600
                 time_ago = f"{int(hours_ago)} hours ago" if hours_ago > 0 else "Just now"
             else:
@@ -273,7 +274,7 @@ def generate_website():
     replacement = f'<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">\n{default_cards}\n</div>\n</main>'
     output_html = re.sub(pattern, replacement, template, flags=re.DOTALL, count=1)
     
-    # Add comprehensive script for difficulty level switching and language toggle
+    # Add comprehensive script for difficulty level switching, tab navigation, and language toggle
     script = '''
 <script>
 const levelCards = {
@@ -289,10 +290,40 @@ const levelMapping = {
     'Research': 'hard'
 };
 
+const categoryMap = {
+    'News': 1,
+    'Science': 2,
+    'Fun': 3
+};
+
 let currentLanguage = 'en';
 let currentLevel = 'easy';
+let currentCategory = 'all';
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Tab navigation for News/Science/Fun
+    const tabLinks = document.querySelectorAll('a[href="#"]');
+    tabLinks.forEach((link, index) => {
+        const tabText = link.textContent.trim();
+        if (tabText === 'News' || tabText === 'Science' || tabText === 'Fun') {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Update active tab styling
+                tabLinks.forEach(tl => {
+                    tl.classList.remove('border-b-primary', 'text-primary');
+                    tl.classList.add('border-b-transparent', 'text-subtle-light', 'dark:text-subtle-dark');
+                });
+                this.classList.add('border-b-primary', 'text-primary');
+                this.classList.remove('border-b-transparent', 'text-subtle-light', 'dark:text-subtle-dark');
+                
+                // Update current category
+                currentCategory = tabText;
+                filterAndUpdateCards();
+            });
+        }
+    });
+    
     // Difficulty level dropdown handler
     const dropdown = document.querySelector('select');
     if (dropdown) {
@@ -303,10 +334,15 @@ document.addEventListener('DOMContentLoaded', function() {
             // Special case for CN
             if (this.value === 'CN' || selectedText.includes('CN')) {
                 levelKey = 'cn';
+                // Hide dropdown when CN is selected
+                dropdown.style.display = 'none';
+            } else {
+                // Show dropdown for other selections
+                dropdown.style.display = '';
             }
             
             currentLevel = levelKey;
-            updateCards();
+            filterAndUpdateCards();
         });
     }
     
@@ -321,22 +357,56 @@ document.addEventListener('DOMContentLoaded', function() {
     if (cnButton) {
         cnButton.addEventListener('click', function(e) {
             e.preventDefault();
-            currentLanguage = currentLanguage === 'en' ? 'zh' : 'en';
-            updateCards();
-            cnButton.textContent = currentLanguage === 'zh' ? 'EN' : 'CN';
+            
+            if (currentLanguage === 'en') {
+                // Switch to Chinese - show CN dropdown selection
+                currentLanguage = 'zh';
+                currentLevel = 'cn';
+                
+                // Hide the dropdown when in CN mode
+                if (dropdown) dropdown.style.display = 'none';
+                
+                cnButton.textContent = 'EN';
+            } else {
+                // Switch back to English
+                currentLanguage = 'en';
+                currentLevel = 'easy';
+                
+                // Show dropdown again
+                if (dropdown) dropdown.style.display = '';
+                
+                cnButton.textContent = 'CN';
+            }
+            
+            filterAndUpdateCards();
         });
+    }
+    
+    // Initialize first tab as active
+    if (tabLinks.length > 0) {
+        for (let link of tabLinks) {
+            if (link.textContent.trim() === 'News') {
+                link.click();
+                break;
+            }
+        }
     }
 });
 
-function updateCards() {
+function filterAndUpdateCards() {
     const gridDiv = document.querySelector('.grid');
     if (!gridDiv || !levelCards[currentLevel]) return;
     
-    // Parse and update cards
+    // Get all cards from the current level
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = levelCards[currentLevel];
+    let cards = Array.from(tempDiv.querySelectorAll('[data-article-id]'));
     
-    const cards = tempDiv.querySelectorAll('[data-article-id]');
+    // Filter by category if not 'all'
+    if (currentCategory !== 'all' && categoryMap[currentCategory]) {
+        // For now, show all cards (category filtering would need article IDs to category mapping)
+        // This is a simplified version
+    }
     
     // Update visible content based on current language
     cards.forEach(card => {
@@ -356,8 +426,8 @@ function updateCards() {
         }
     });
     
-    // Replace grid content
-    const newGridContent = tempDiv.innerHTML;
+    // Replace grid content with filtered cards
+    const newGridContent = cards.map(card => card.outerHTML).join('\\n');
     gridDiv.innerHTML = newGridContent;
 }
 </script>
