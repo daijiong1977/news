@@ -4,43 +4,65 @@ This directory contains utility scripts for managing the news database and websi
 
 ## Quick Start Guide
 
-### **3-Tool Ecosystem for News Pipeline**
+### **4-Tool Ecosystem for News Pipeline**
 
-The tools directory provides three complementary utilities for complete article lifecycle management:
+The tools directory provides four complementary utilities for complete article lifecycle management:
 
-| Tool | Purpose | Scope | Safety |
-|------|---------|-------|--------|
-| **datapurge.py** | Delete articles & metadata | Database only | Atomic, cascade delete |
+| Tool | Purpose | Scope | Mode |
+|------|---------|-------|------|
+| **reset_all.py** | ONE-COMMAND complete purge | All data + files | ✓ Dry-run safe |
+| **datapurge.py** | Delete articles & metadata | Database only | Selective per filter |
 | **pagepurge.py** | Delete webpage files | Files only | Independent, no DB |
-| **imgcompress.py** | Generate web/mobile images | Image processing | In-place resize, WebP compression |
+| **imgcompress.py** | Generate web/mobile images | Image processing | In-place processing |
 
 ### **Common Workflows**
 
-#### **1. Reset Everything (Before New Pipeline Run)**
+#### **1. Complete Fresh Start (RECOMMENDED)**
 ```bash
-# Step 1: Purge all database records
-python3 tools/datapurge.py --all --force
+# ONE COMMAND: Reset everything (with preview)
+python3 tools/reset_all.py
 
-# Step 2: Delete all website files
-python3 tools/pagepurge.py --all --force
+# Actually execute (CAUTION!)
+python3 tools/reset_all.py --force
 
-# Result: Clean slate for pipeline testing
+# Result: Clean database + deleted all files
+# Ready to run: python3 pipeline.py --full
 ```
 
-#### **2. Quick Test Run**
+#### **2. Selective Purge (Database Only)**
 ```bash
-# Purge test data only
-python3 tools/datapurge.py --date 2025-10-24 --force
-python3 tools/pagepurge.py --date 2025-10-24 --force
+# Delete specific date (keep files)
+python3 tools/reset_all.py --db-only --force
 
-# Run pipeline on fresh data
+# OR use datapurge for fine-grained control
+python3 tools/datapurge.py --date 2025-10-24 --force
+```
+
+#### **3. Keep Database, Clean Files**
+```bash
+# Delete all website files but keep articles
+python3 tools/reset_all.py --keep-db --force
+
+# OR delete just specific files
+python3 tools/pagepurge.py --date 2025-10-24 --force
+```
+
+#### **4. Quick Test Run**
+```bash
+# Step 1: Preview what will be deleted
+python3 tools/reset_all.py
+
+# Step 2: Actually purge
+python3 tools/reset_all.py --force
+
+# Step 3: Run pipeline on fresh data
 python3 pipeline.py --test
 
-# Review results, analyze images
+# Step 4: Review results, analyze images
 ls -lh website/article_image/
 ```
 
-#### **3. Image Optimization (After Data Collection)**
+#### **5. Image Optimization (After Data Collection)**
 ```bash
 # Generate web and mobile versions
 python3 tools/imgcompress.py --auto --dir website/article_image/ --web --mobile
@@ -63,7 +85,108 @@ python3 tools/pagepurge.py --all --force
 
 ## Included Tools
 
-### 1. datapurge.py - Database Purging Utility
+### 1. reset_all.py - ONE-COMMAND Complete Purge (NEW)
+
+**Purpose**: Complete system reset - delete everything in one command with safe dry-run preview.
+
+🎯 **USE THIS FOR FRESH STARTS** - Recommended for resetting the entire system before pipeline runs.
+
+#### What Gets Deleted
+
+```
+✓ Database: All articles (18 tables, cascading deletes)
+✓ Website Files: article_page/, article_image/, article_response/
+✓ Deepseek Responses: deepseek/responses/*.json
+✓ Mining Responses: mining/responses/*.json
+✓ Log Results: Optionally clean log/ directory
+```
+
+#### Key Features
+
+- **Safe by Default**: Always shows dry-run preview first
+- **Flexible Purging**: Selective options (database-only, files-only, etc.)
+- **Progress Reporting**: Shows exactly what will/was deleted
+- **Atomic Operations**: Foreign key handling for data integrity
+- **Fast**: Deletes all data in seconds
+
+#### Usage Examples
+
+```bash
+# Preview (DRY-RUN): Shows what will be deleted, nothing is removed
+python3 tools/reset_all.py
+
+# Execute full purge: Delete everything (CAUTION!)
+python3 tools/reset_all.py --force
+
+# Database only (keep website files)
+python3 tools/reset_all.py --db-only --force
+
+# Website files only (keep database)
+python3 tools/reset_all.py --files-only --force
+
+# Everything except database
+python3 tools/reset_all.py --keep-db --force
+
+# Deepseek responses only
+python3 tools/reset_all.py --deepseek-only --force
+
+# Mining responses only
+python3 tools/reset_all.py --mining-only --force
+
+# Verbose output
+python3 tools/reset_all.py --force -v
+```
+
+#### Purge Options
+
+| Option | Effect |
+|--------|--------|
+| (none) | Full purge with dry-run preview |
+| `--force` | Actually execute the purge |
+| `--db-only` | Delete database records only |
+| `--files-only` | Delete website files only |
+| `--deepseek-only` | Delete deepseek responses only |
+| `--mining-only` | Delete mining responses only |
+| `--keep-db` | Delete everything except database |
+| `-v, --verbose` | Detailed progress output |
+
+#### Example Workflow: Complete Fresh Start
+
+```bash
+# Step 1: Preview what will be deleted
+$ python3 tools/reset_all.py
+⚠️  DRY RUN MODE (no data will be deleted)
+📊 Summary:
+  • Database: 41 records
+  • Website files: 11 files
+  • Deepseek responses: 6 files
+  • Mining responses: 1 files
+
+# Step 2: Review and confirm, then execute
+$ python3 tools/reset_all.py --force
+✅ PURGE COMPLETE
+📊 Summary:
+  • Database: 41 records deleted
+  • Website files: 11 files deleted
+  • Deepseek responses: 6 files deleted
+  • Mining responses: 1 files deleted
+
+# Step 3: Now ready for fresh pipeline run
+$ python3 pipeline.py --full --articles-per-seed 5
+```
+
+#### Comparison: reset_all.py vs datapurge.py vs pagepurge.py
+
+| Task | Tool | Command |
+|------|------|---------|
+| Complete reset | reset_all.py | `reset_all.py --force` |
+| Delete specific date (DB only) | datapurge.py | `datapurge.py --date 2025-10-24 --force` |
+| Delete specific date (files) | pagepurge.py | `pagepurge.py --date 2025-10-24 --force` |
+| Keep database, clean everything else | reset_all.py | `reset_all.py --keep-db --force` |
+
+---
+
+### 2. datapurge.py - Database Purging Utility
 
 **Purpose**: Remove articles and all related data from the database ONLY.
 
@@ -162,13 +285,13 @@ cp articles.db.backup_<timestamp>.sqlite articles.db
 
 ---
 
-### 2. pagepurge.py - Webpage File Purging Utility
+### 3. pagepurge.py - Webpage File Purging Utility
 
 **Purpose**: Remove webpage files from website/ directory by article_id or date.
 
 ---
 
-### 3. imgcompress.py - Image Compression Utility
+### 4. imgcompress.py - Image Compression Utility
 
 **Purpose**: Optimize images to under 50KB for email newsletters.
 
@@ -252,7 +375,7 @@ python3 tools/pagepurge.py --date 2025-10-24 --force
 
 ---
 
-### 3. imgcompress.py - Image Optimization Utility
+### 4. imgcompress.py - Image Optimization Utility
 
 **Purpose**: Generate web and mobile versions of images with automatic optimization.
 
