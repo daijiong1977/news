@@ -437,7 +437,7 @@ def phase_deepseek(dry_run=False, verbose=False):
         return False, results
     
     # Get list of response files to insert
-    responses_dir = PROJECT_ROOT / 'deepseek' / 'responses'
+    responses_dir = PROJECT_ROOT / 'website' / 'responses'
     response_files = sorted(responses_dir.glob('article_*_response.json'))
     
     if not response_files:
