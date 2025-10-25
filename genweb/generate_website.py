@@ -63,7 +63,8 @@ class ArticleLoader:
         """Get image path for an article."""
         try:
             for img_file in Path(self.images_dir).glob(f'article_{article_id}_*.jpg'):
-                return str(img_file)
+                # Return relative path instead of absolute path
+                return f"../article_image/{img_file.name}"
             return None
         except Exception as e:
             print(f"⚠️  Error finding image for {article_id}: {e}", file=sys.stderr)
@@ -79,22 +80,17 @@ class ArticleLoader:
             # Get all processed articles in category
             cur.execute("""
                 SELECT id, title, description, source, 
-                       deepseek_processed, crawled_at, processed_at, zh_title
+                       deepseek_processed, crawled_at, processed_at, zh_title, pub_date
                 FROM articles 
                 WHERE deepseek_processed = 1 AND category_id = ?
-                ORDER BY processed_at DESC
+                ORDER BY pub_date DESC
             """, (category_id,))
             
             all_articles = [dict(row) for row in cur.fetchall()]
             conn.close()
             
-            # Randomly pick 6 if more than 6
-            if len(all_articles) > limit:
-                articles = random.sample(all_articles, limit)
-                # Re-sort by processed_at after random selection
-                articles.sort(key=lambda x: x['processed_at'], reverse=True)
-            else:
-                articles = all_articles
+            # Pick latest 6 (already ordered by processed_at DESC)
+            articles = all_articles[:limit]
             
             # Enrich with response data and images
             for article in articles:
@@ -151,13 +147,13 @@ class HTMLGenerator:
         source = article.get('source', 'News Source')
         image_url = article.get('image', '')
         response = article.get('response', {})
-        # Use crawled_at (original time) instead of processed_at
-        crawled_at = article.get('crawled_at', '')
+        # Use pub_date (original article publication date)
+        pub_date = article.get('pub_date', '')
         
-        # Time formatting - use crawled_at
+        # Time formatting - use pub_date
         try:
-            if crawled_at:
-                dt = datetime.fromisoformat(crawled_at)
+            if pub_date:
+                dt = datetime.fromisoformat(pub_date)
                 hours_ago = (datetime.now() - dt).total_seconds() // 3600
                 time_ago = f"{int(hours_ago)} hours ago" if hours_ago > 0 else "Just now"
             else:
@@ -180,8 +176,12 @@ class HTMLGenerator:
         summary_short = (summary_level[:100] + "...") if len(summary_level) > 100 else summary_level
         summary_cn_short = (summary_cn[:100] + "...") if len(summary_cn) > 100 else summary_cn
         
-        # Image styling
-        image_style = f'background-image: url("file://{image_url}");' if image_url else 'background-color: #e4e4e7;'
+        # Image styling - use relative path or background color
+        if image_url:
+            # Use relative path without file:// prefix for HTTP compatibility
+            image_style = f'background-image: url("{image_url}");'
+        else:
+            image_style = 'background-color: #e4e4e7;'
         
         return f'''<div class="flex flex-col gap-3 bg-card-light dark:bg-card-dark rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1" data-article-id="{article_id}" data-level="{level}" data-title-en="{title_level}" data-title-zh="{title_cn}" data-summary-en="{summary_short}" data-summary-zh="{summary_cn_short}">
 <div class="w-full bg-center bg-no-repeat aspect-video bg-cover" style='{image_style}'></div>
@@ -266,8 +266,8 @@ def generate_website():
         level_display = DIFFICULTY_MAPPING.get(level_key, level_key)
         print(f"  - {level_display} ({level_key}): {len(all_cards)} cards")
     
-    # Start with 'easy' (Relax) as default
-    default_cards = cards_by_level['easy']
+    # Start with 'mid' (Enjoy) as default
+    default_cards = cards_by_level['mid']
     
     # Replace the grid content in template
     pattern = r'<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">(.*?)</div>\s*</main>'
@@ -297,7 +297,7 @@ const categoryMap = {
 };
 
 let currentLanguage = 'en';
-let currentLevel = 'easy';
+let currentLevel = 'mid';
 let currentCategory = 'all';
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -376,7 +376,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 // Switch back to English
                 currentLanguage = 'en';
-                currentLevel = 'easy';
+                currentLevel = 'mid';
                 
                 // Show dropdown again
                 if (dropdown) dropdown.style.display = '';
