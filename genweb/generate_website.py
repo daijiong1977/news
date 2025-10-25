@@ -165,7 +165,7 @@ class HTMLGenerator:
     """Generate HTML article cards with difficulty levels."""
     
     @staticmethod
-    def generate_article_card(article: Dict, level: str = 'easy') -> str:
+    def generate_article_card(article: Dict, level: str = 'easy', category: str = '') -> str:
         """Generate HTML for a single article card with difficulty level content."""
         article_id = article['id']
         source = article.get('source', 'News Source')
@@ -218,7 +218,7 @@ class HTMLGenerator:
         else:
             image_style = 'background-color: #e4e4e7;'
         
-        return f'''<div class="flex flex-col gap-3 bg-card-light dark:bg-card-dark rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1" data-article-id="{article_id}" data-level="{level}" data-title-en="{title_level}" data-title-zh="{title_cn}" data-summary-en="{summary_short}" data-summary-zh="{summary_cn_short}">
+        return f'''<div class="flex flex-col gap-3 bg-card-light dark:bg-card-dark rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1" data-article-id="{article_id}" data-category="{category}" data-level="{level}" data-title-en="{title_level}" data-title-zh="{title_cn}" data-summary-en="{summary_short}" data-summary-zh="{summary_cn_short}">
 <div class="w-full bg-center bg-no-repeat aspect-video bg-cover" style='{image_style}'></div>
 <div class="flex flex-col gap-2 p-4 pt-2">
 <h3 class="text-lg font-bold leading-snug tracking-tight article-title">{title_level}</h3>
@@ -294,7 +294,7 @@ def generate_website():
         for cat_name in ['News', 'Science', 'Fun']:
             cat_articles = articles_by_category.get(cat_name, [])
             if cat_articles:
-                cards = [HTMLGenerator.generate_article_card(article, level_key) for article in cat_articles]
+                cards = [HTMLGenerator.generate_article_card(article, level_key, cat_name) for article in cat_articles]
                 all_cards.extend(cards)
         
         cards_by_level[level_key] = "\n".join(all_cards)
@@ -333,7 +333,7 @@ const categoryMap = {
 
 let currentLanguage = 'en';
 let currentLevel = 'mid';
-let currentCategory = 'all';
+let currentCategory = 'News';
 
 document.addEventListener('DOMContentLoaded', function() {
     // Tab navigation for News/Science/Fun
@@ -453,9 +453,8 @@ function filterAndUpdateCards() {
     let cards = Array.from(tempDiv.querySelectorAll('[data-article-id]'));
     
     // Filter by category if not 'all'
-    if (currentCategory !== 'all' && categoryMap[currentCategory]) {
-        // For now, show all cards (category filtering would need article IDs to category mapping)
-        // This is a simplified version
+    if (currentCategory !== 'all') {
+        cards = cards.filter(card => card.dataset.category === currentCategory);
     }
     
     // Update visible content based on current language
