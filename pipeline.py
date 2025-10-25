@@ -92,7 +92,7 @@ def log_to_file(log_file, message):
         print_warning(f"Could not write to log: {e}")
 
 
-def run_command(cmd, description, dry_run=False, verbose=False, log_file=None):
+def run_command(cmd, description, dry_run=False, verbose=False, log_file=None, timeout=3600):
     """
     Run a shell command and track result
     
@@ -115,7 +115,7 @@ def run_command(cmd, description, dry_run=False, verbose=False, log_file=None):
             cmd,
             capture_output=True,
             text=True,
-            timeout=3600
+            timeout=timeout
         )
         
         if log_file:
@@ -383,22 +383,39 @@ def phase_deepseek(dry_run=False, verbose=False):
         })
         return True, results
     
-    # Process articles with Deepseek batch mode
+    # Process articles with Deepseek batch mode (with retry)
     print_info(f"Processing {unprocessed} article(s) with Deepseek API...")
     log_to_file(log_file, f"Starting batch processing of {unprocessed} articles")
     
     cmd = ['python3', str(deepseek_script)]
     
-    success, stdout, stderr = run_command(
-        cmd,
-        "Deepseek batch processing complete",
-        dry_run=dry_run,
-        verbose=verbose,
-        log_file=log_file
-    )
+    # Try twice if it fails (timeout or error)
+    max_attempts = 2
+    for attempt in range(1, max_attempts + 1):
+        print_info(f"Deepseek processing attempt {attempt}/{max_attempts}...")
+        log_to_file(log_file, f"Deepseek processing attempt {attempt}/{max_attempts}")
+        
+        success, stdout, stderr = run_command(
+            cmd,
+            "Deepseek batch processing complete",
+            dry_run=dry_run,
+            verbose=verbose,
+            log_file=log_file,
+            timeout=7200  # 2 hours for deepseek (takes longer)
+        )
+        
+        if success:
+            print_info(f"✓ Deepseek processing successful on attempt {attempt}")
+            break
+        else:
+            if attempt < max_attempts:
+                print_warning(f"Deepseek attempt {attempt} failed, retrying...")
+                log_to_file(log_file, f"⚠ Attempt {attempt} failed, retrying...")
+            else:
+                print_error("Deepseek processing failed after all retries")
     
     if not success:
-        log_to_file(log_file, "✗ Deepseek batch processing failed")
+        log_to_file(log_file, "✗ Deepseek batch processing failed after retries")
         print_warning("Deepseek batch processing had issues, skipping insertion")
         results['steps'].append({
             'step': 'deepseek_api_processing',
