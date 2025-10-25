@@ -1,0 +1,10 @@
+Script started on Mon Oct 20 17:16:49 2025
+
+The default interactive shell is now zsh.
+To update your account to use zsh, please run `chsh -s /bin/zsh`.
+For more details, please visit https://support.apple.com/kb/HT208050.
+[?1034hbash-3.2$ 
+bash-3.2$ scp -o StrictHostKeyChecking=no -i ~/Downloads/web1.pem /Users/jidai/news/ run_backend.sh ec2-user@18.223.121.227:/var/www/news/ && echo "✓ Script uploaded"
+run_backend.sh                                      0%    0     0.0KB/s   --:-- ETArun_backend.sh                                    100%  234     4.6KB/s   00:00    
+✓ Script uploaded
+bash-3.2$ 

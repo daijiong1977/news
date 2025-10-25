@@ -79,6 +79,7 @@ CREATE TABLE article_images (
                 image_name TEXT,
                 original_url TEXT,
                 local_location TEXT,
+                small_location TEXT,
                 new_url TEXT,
                 FOREIGN KEY (article_id) REFERENCES articles(id)
             )

@@ -1,0 +1,17 @@
+{
+  "id": 2,
+  "title": "Tech bosses could stop mobile phone theft, say MPs",
+  "source": "BBC Business",
+  "url": "https://www.bbc.com/news/articles/cx2y037pg41o?at_medium=RSS&at_campaign=rss",
+  "description": "The chair of the Science, Innovation and Technology Committee says \"robust technical measures\" could help reduce phone thefts. ",
+  "pub_date": "Fri, 24 Oct 2025 13:14:09 GMT",
+  "content": "Tech giants including Apple, Samsung and Google are not doing enough to stop mobile phone thefts, MPs on the Science, Innovation and Technology Committee have said.\n\nIn a letter to the Home Secretary Shabana Mahmood, committee chair Chi Onwurah accused the companies of failing to put in place technical measures that would make stolen phones less valuable.\n\nThe letter follows a stormy committee hearing, where MPs accused tech bosses of profiting from phone thefts.\n\nResponding to the letter, Google said it had \"invested in advanced theft protection features\" including the theft detection lock after \"listening to victims and partnering closely with law enforcement and industry\".\n\nApple and Samsung have also been contacted for comment.\n\nWriting to Mahmood, Onwurah said that during the hearing in June, the committee had sought to \"answer the question: Is there a way to design out phone theft?\"\n\n\"The answer, in the view of the committee, is yes.\"\n\nThe problem of mobile phone thefts is particularly prevalent in London where, in 2024, 80,000 smartphones were reported as stolen - up from 64,000 in 2023.\n\nStolen devices are blocked from being used in the UK by phone networks by using the phone's unique identifying number - known as an IMEI - but this is not the case globally.\n\nOnwurah argued that \"robust technical measures\" such as blocking stolen phones taken overseas from accessing cloud services could make devices \"far less valuable\".\n\nShe also pointed to comments by Mobile UK, the trade association of the UK's mobile network operators, who said blocking IMEI in other countries was a \"necessary step to dismantle the business model of organised crime\".\n\nHowever, she said when giving evidence, Apple, Google and Samsung had avoided saying why they would not implement the technology.\n\n\"Their repeated pivots to answering questions about data security rather than devices, and insistence that the phones were broken down and sold for parts, without any evidence to support this assertion, was telling,\" she said.\n\n\"Technology to deter phone theft is available, and we have yet to hear a convincing reason why, with co-operation on all sides, the available solutions shouldn't be used to disincentivise phone theft and disrupt the market in stolen devices.\"\n\nOnwurah asked the home secretary if she would push the tech giants to implement cloud-based blocking and also pressed the minister to provide a data for the next phone theft summit.",
+  "crawled_at": "2025-10-24T16:18:38.565742",
+  "deepseek_processed": 0,
+  "processed_at": null,
+  "category_id": 4,
+  "image_id": null,
+  "deepseek_failed": 0,
+  "deepseek_last_error": null,
+  "deepseek_in_progress": 0
+}

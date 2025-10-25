@@ -768,8 +768,8 @@ def download_and_record_image(conn, article_id, article_url, html_text):
     cur = conn.cursor()
     try:
         cur.execute(
-            "INSERT INTO article_images (article_id, image_name, original_url, local_location) VALUES (?, ?, ?, ?)",
-            (article_id, fname, img_url, local_path)
+            "INSERT INTO article_images (article_id, image_name, original_url, local_location, small_location) VALUES (?, ?, ?, ?, ?)",
+            (article_id, fname, img_url, local_path, None)  # small_location populated by imgcompress.py
         )
         conn.commit()
         return local_path
