@@ -195,12 +195,21 @@ def call_deepseek_api(user_prompt, api_key, article_id=None):
         try:
             response_json = json.loads(content)
             print("  ✓ Successfully parsed API response as JSON")
+            
+            # Clean up raw response file on successful parse
+            if raw_response_file and os.path.exists(raw_response_file):
+                try:
+                    os.remove(raw_response_file)
+                    print(f"  ✓ Cleaned up raw response file")
+                except Exception as e:
+                    print(f"  ⚠ Warning: Could not delete raw response file: {e}")
+            
             return response_json
         except json.JSONDecodeError as e:
             print(f"  ❌ ERROR: Could not parse API response as JSON: {e}")
             print(f"  ℹ️  Malformed JSON at character position {e.pos}")
             if raw_response_file:
-                print(f"  ℹ️  Raw response saved to: {raw_response_file}")
+                print(f"  ℹ️  Raw response kept for debugging: {raw_response_file}")
             print(f"  Raw content (chars 0-200): {content[0:200]}")
             if e.pos:
                 start = max(0, e.pos - 100)
