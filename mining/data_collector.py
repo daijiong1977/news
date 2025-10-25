@@ -772,6 +772,20 @@ def download_and_record_image(conn, article_id, article_url, html_text):
             (article_id, fname, img_url, local_path, None)  # small_location populated by imgcompress.py
         )
         conn.commit()
+        
+        # Get the image_id that was just created
+        image_id = cur.lastrowid
+        
+        # Update articles table to link to this image
+        try:
+            cur.execute(
+                "UPDATE articles SET image_id = ? WHERE id = ?",
+                (image_id, article_id)
+            )
+            conn.commit()
+        except Exception as e:
+            pass  # Image recorded but not linked - not fatal
+        
         return local_path
     except Exception:
         return None

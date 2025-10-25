@@ -2,18 +2,19 @@
 """
 Complete News Pipeline
 
-Orchestrates the complete data pipeline:
-1. PURGE (optional): Clean database and website files
-2. MINING: Collect articles from RSS feeds
-3. IMAGE HANDLING: Generate web and mobile versions
-4. DEEPSEEK: AI analysis and enrichment
+Orchestrates the complete data pipeline (NO PURGE - run manually via cron):
+1. MINING: Collect articles from RSS feeds
+2. IMAGE HANDLING: Generate web and mobile versions
+3. DEEPSEEK: AI analysis and enrichment
+4. VERIFY: Validate results
+
+Note: Purge/reset is separate (python3 tools/reset_all.py --force)
 
 Usage:
-    python3 pipeline.py --purge                      # Full purge: database + files
     python3 pipeline.py --mine                       # Mining only
     python3 pipeline.py --images                     # Image optimization only
     python3 pipeline.py --deepseek                   # Deepseek processing only
-    python3 pipeline.py --full                       # Complete pipeline: purge + mine + images + deepseek
+    python3 pipeline.py --full                       # Complete pipeline: mine + images + deepseek + verify
     python3 pipeline.py --full --dry-run             # Preview without making changes
     python3 pipeline.py --full -v                    # Verbose output all phases
 """
@@ -68,16 +69,45 @@ def print_info(text):
     print(f"{BLUE}→ {text}{RESET}")
 
 
-def run_command(cmd, description, dry_run=False, verbose=False):
+def setup_logging(phase_name):
+    """Setup logging for a pipeline phase
+    
+    Returns: (log_file_path, log_file_handle)
+    """
+    log_dir = PROJECT_ROOT / "log"
+    log_dir.mkdir(exist_ok=True)
+    
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    log_file = log_dir / f"phase_{phase_name}_{timestamp}.log"
+    
+    return log_file
+
+
+def log_to_file(log_file, message):
+    """Append message to log file"""
+    try:
+        with open(log_file, 'a') as f:
+            f.write(f"[{datetime.now().isoformat()}] {message}\n")
+    except Exception as e:
+        print_warning(f"Could not write to log: {e}")
+
+
+def run_command(cmd, description, dry_run=False, verbose=False, log_file=None):
     """
     Run a shell command and track result
     
     Returns: (success, stdout, stderr)
     """
     print_info(description)
+    if log_file:
+        log_to_file(log_file, f"→ {description}")
+        log_to_file(log_file, f"Command: {' '.join(cmd)}")
     
     if dry_run:
-        print(f"  [DRY-RUN] {' '.join(cmd)}")
+        msg = f"  [DRY-RUN] {' '.join(cmd)}"
+        print(msg)
+        if log_file:
+            log_to_file(log_file, f"[DRY-RUN] {' '.join(cmd)}")
         return True, "", ""
     
     try:
@@ -87,6 +117,13 @@ def run_command(cmd, description, dry_run=False, verbose=False):
             text=True,
             timeout=3600
         )
+        
+        if log_file:
+            log_to_file(log_file, f"Exit code: {result.returncode}")
+            if result.stdout:
+                log_to_file(log_file, f"STDOUT:\n{result.stdout}")
+            if result.stderr:
+                log_to_file(log_file, f"STDERR:\n{result.stderr}")
         
         if result.returncode == 0:
             print_success(description)
@@ -100,86 +137,22 @@ def run_command(cmd, description, dry_run=False, verbose=False):
             return False, result.stdout, result.stderr
     
     except subprocess.TimeoutExpired:
-        print_error(f"{description} (timeout)")
+        msg = f"{description} (timeout)"
+        print_error(msg)
+        if log_file:
+            log_to_file(log_file, f"✗ {msg}")
         return False, "", "Timeout"
     except Exception as e:
-        print_error(f"{description}: {e}")
+        msg = f"{description}: {e}"
+        print_error(msg)
+        if log_file:
+            log_to_file(log_file, f"✗ {msg}")
         return False, "", str(e)
-
-
-def phase_purge(dry_run=False, verbose=False):
-    """
-    PHASE 1: Purge existing data
-    
-    Cleans database and website files for fresh pipeline run
-    """
-    print_header("PHASE 1: DATA PURGE")
-    
-    results = {
-        'phase': 'purge',
-        'start_time': datetime.now().isoformat(),
-        'steps': []
-    }
-    
-    # Step 1: Purge database
-    print_info("Purging database...")
-    cmd = [
-        'python3',
-        str(TOOLS_DIR / 'datapurge.py'),
-        '--all',
-        '--force'
-    ]
-    if verbose:
-        cmd.append('-v')
-    
-    success, stdout, stderr = run_command(
-        cmd,
-        "Database purge complete",
-        dry_run=dry_run,
-        verbose=verbose
-    )
-    results['steps'].append({
-        'step': 'database_purge',
-        'success': success
-    })
-    
-    if not success:
-        print_error("Database purge failed")
-        return False, results
-    
-    # Step 2: Purge website files
-    print_info("Purging website files...")
-    cmd = [
-        'python3',
-        str(TOOLS_DIR / 'pagepurge.py'),
-        '--all',
-        '--force'
-    ]
-    if verbose:
-        cmd.append('-v')
-    
-    success, stdout, stderr = run_command(
-        cmd,
-        "Website file purge complete",
-        dry_run=dry_run,
-        verbose=verbose
-    )
-    results['steps'].append({
-        'step': 'website_purge',
-        'success': success
-    })
-    
-    if not success:
-        print_error("Website purge failed")
-        return False, results
-    
-    print_success("Data purge phase complete")
-    return True, results
 
 
 def phase_mining(dry_run=False, verbose=False, articles_per_seed=2):
     """
-    PHASE 2: Mining - Collect articles from RSS feeds
+    PHASE 1: Mining - Collect articles from RSS feeds
     
     Runs mining cycle to populate database with new articles
     
@@ -188,31 +161,38 @@ def phase_mining(dry_run=False, verbose=False, articles_per_seed=2):
         verbose: Detailed output
         articles_per_seed: Number of articles to collect per feed seed (default: 2)
     """
-    print_header("PHASE 2: MINING")
+    print_header("PHASE 1: MINING")
+    
+    log_file = setup_logging("mining")
+    log_to_file(log_file, f"Starting mining phase (articles per seed: {articles_per_seed})")
     
     results = {
         'phase': 'mining',
         'start_time': datetime.now().isoformat(),
         'steps': [],
-        'articles_per_seed': articles_per_seed
+        'articles_per_seed': articles_per_seed,
+        'log_file': str(log_file)
     }
     
     print_info(f"Starting mining cycle (articles per seed: {articles_per_seed})...")
+    print_info(f"Logging to: {log_file}")
     
     mining_script = MINING_DIR / 'run_mining_cycle.py'
     if not mining_script.exists():
-        print_error(f"Mining script not found: {mining_script}")
+        msg = f"Mining script not found: {mining_script}"
+        print_error(msg)
+        log_to_file(log_file, f"✗ {msg}")
         return False, results
     
-    cmd = ['python3', str(mining_script), '--articles-per-seed', str(articles_per_seed)]
-    if verbose:
-        cmd.append('-v')
+    # Build command - mining script only collects articles
+    cmd = ['python3', str(mining_script)]
     
     success, stdout, stderr = run_command(
         cmd,
         "Mining cycle complete",
         dry_run=dry_run,
-        verbose=verbose
+        verbose=verbose,
+        log_file=log_file
     )
     results['steps'].append({
         'step': 'mining_cycle',
@@ -220,6 +200,7 @@ def phase_mining(dry_run=False, verbose=False, articles_per_seed=2):
     })
     
     if not success:
+        log_to_file(log_file, "✗ Mining cycle failed")
         print_error("Mining cycle failed")
         return False, results
     
@@ -229,13 +210,44 @@ def phase_mining(dry_run=False, verbose=False, articles_per_seed=2):
             import sqlite3
             conn = sqlite3.connect(str(DB_PATH))
             cur = conn.cursor()
+            
+            # Get total article count
             cur.execute("SELECT COUNT(*) FROM articles")
-            count = cur.fetchone()[0]
+            total_count = cur.fetchone()[0]
+            
+            # Get articles by source
+            cur.execute("SELECT source, COUNT(*) as count FROM articles GROUP BY source ORDER BY count DESC")
+            source_counts = cur.fetchall()
+            
+            # Get articles with images
+            cur.execute("SELECT COUNT(*) FROM articles WHERE image_id IS NOT NULL")
+            images_count = cur.fetchone()[0]
+            
             conn.close()
-            print_info(f"Database now contains {count} articles")
-            results['articles_collected'] = count
+            
+            msg = f"Database now contains {total_count} articles"
+            print_info(msg)
+            log_to_file(log_file, msg)
+            
+            # Log details by source
+            log_to_file(log_file, "\nArticles by source:")
+            for source, count in source_counts:
+                msg = f"  {source}: {count} article(s)"
+                print_info(msg)
+                log_to_file(log_file, msg)
+            
+            # Log image status
+            msg = f"Articles with images: {images_count}/{total_count}"
+            print_info(msg)
+            log_to_file(log_file, msg)
+            
+            results['articles_collected'] = total_count
+            results['articles_by_source'] = {source: count for source, count in source_counts}
+            results['articles_with_images'] = images_count
         except Exception as e:
-            print_warning(f"Could not verify article count: {e}")
+            msg = f"Could not verify article count: {e}"
+            print_warning(msg)
+            log_to_file(log_file, f"⚠ {msg}")
     
     print_success("Mining phase complete")
     return True, results
@@ -243,21 +255,29 @@ def phase_mining(dry_run=False, verbose=False, articles_per_seed=2):
 
 def phase_image_handling(dry_run=False, verbose=False):
     """
-    PHASE 3: Image Handling - Generate web and mobile versions
+    PHASE 2: Image Handling - Generate web and mobile versions
     
     Resizes images and creates optimized mobile versions
     """
-    print_header("PHASE 3: IMAGE HANDLING")
+    print_header("PHASE 2: IMAGE HANDLING")
+    
+    log_file = setup_logging("image_handling")
+    log_to_file(log_file, "Starting image handling phase")
     
     results = {
         'phase': 'image_handling',
         'start_time': datetime.now().isoformat(),
-        'steps': []
+        'steps': [],
+        'log_file': str(log_file)
     }
+    
+    print_info(f"Logging to: {log_file}")
     
     # Check if any images exist
     if not ARTICLE_IMAGE_DIR.exists():
-        print_warning("Article image directory not found, skipping image processing")
+        msg = "Article image directory not found, skipping image processing"
+        print_warning(msg)
+        log_to_file(log_file, f"⚠ {msg}")
         return True, results
     
     image_count = len(list(ARTICLE_IMAGE_DIR.glob('article_*.jpg'))) + \
@@ -265,10 +285,13 @@ def phase_image_handling(dry_run=False, verbose=False):
                   len(list(ARTICLE_IMAGE_DIR.glob('article_*.webp')))
     
     if image_count == 0:
-        print_warning("No images found to process, skipping")
+        msg = "No images found to process, skipping"
+        print_warning(msg)
+        log_to_file(log_file, f"⚠ {msg}")
         return True, results
     
     print_info(f"Found {image_count} image(s) to process...")
+    log_to_file(log_file, f"Found {image_count} image(s) to process")
     
     cmd = [
         'python3',
@@ -285,7 +308,8 @@ def phase_image_handling(dry_run=False, verbose=False):
         cmd,
         f"Image optimization complete ({image_count} images)",
         dry_run=dry_run,
-        verbose=verbose
+        verbose=verbose,
+        log_file=log_file
     )
     results['steps'].append({
         'step': 'image_optimization',
@@ -294,33 +318,43 @@ def phase_image_handling(dry_run=False, verbose=False):
     })
     
     if not success:
+        log_to_file(log_file, "✗ Image optimization failed")
         print_error("Image optimization failed")
         return False, results
     
+    log_to_file(log_file, "✓ Image handling phase complete")
     print_success("Image handling phase complete")
     return True, results
 
 
 def phase_deepseek(dry_run=False, verbose=False):
     """
-    PHASE 4: Deepseek - AI analysis and enrichment
+    PHASE 3: Deepseek - AI analysis and enrichment
     
     Uses Deepseek API to analyze articles and generate summaries
+    Runs batch processing to handle all unprocessed articles
     """
-    print_header("PHASE 4: DEEPSEEK PROCESSING")
+    print_header("PHASE 3: DEEPSEEK PROCESSING")
+    
+    log_file = setup_logging("deepseek")
+    log_to_file(log_file, "Starting Deepseek processing phase")
     
     results = {
         'phase': 'deepseek',
         'start_time': datetime.now().isoformat(),
-        'steps': []
+        'steps': [],
+        'log_file': str(log_file)
     }
+    
+    print_info(f"Logging to: {log_file}")
     
     # Check if Deepseek processing script exists
     deepseek_script = PROJECT_ROOT / 'deepseek' / 'process_one_article.py'
     if not deepseek_script.exists():
-        print_warning(f"Deepseek script not found: {deepseek_script}")
-        print_warning("Skipping Deepseek processing")
-        return True, results
+        msg = f"Deepseek script not found: {deepseek_script}"
+        print_error(msg)
+        log_to_file(log_file, f"✗ {msg}")
+        return False, results
     
     # Count unprocessed articles
     try:
@@ -331,34 +365,142 @@ def phase_deepseek(dry_run=False, verbose=False):
         unprocessed = cur.fetchone()[0]
         conn.close()
         print_info(f"Found {unprocessed} unprocessed article(s)")
+        log_to_file(log_file, f"Found {unprocessed} unprocessed article(s)")
     except Exception as e:
-        print_warning(f"Could not count unprocessed articles: {e}")
-        unprocessed = 0
+        msg = f"Could not count unprocessed articles: {e}"
+        print_error(msg)
+        log_to_file(log_file, f"✗ {msg}")
+        return False, results
     
     if unprocessed == 0:
         print_info("All articles already processed, skipping Deepseek phase")
+        log_to_file(log_file, "All articles already processed, skipping")
+        results['steps'].append({
+            'step': 'deepseek_processing',
+            'status': 'skipped',
+            'reason': 'No unprocessed articles',
+            'articles_processed': 0
+        })
         return True, results
     
-    # Process articles with Deepseek
+    # Process articles with Deepseek batch mode
     print_info(f"Processing {unprocessed} article(s) with Deepseek API...")
+    log_to_file(log_file, f"Starting batch processing of {unprocessed} articles")
     
-    # This is a placeholder - actual implementation would iterate through articles
-    # and call the Deepseek API for each one
-    results['articles_to_process'] = unprocessed
+    cmd = ['python3', str(deepseek_script)]
+    
+    success, stdout, stderr = run_command(
+        cmd,
+        "Deepseek batch processing complete",
+        dry_run=dry_run,
+        verbose=verbose,
+        log_file=log_file
+    )
+    
+    if not success:
+        log_to_file(log_file, "✗ Deepseek batch processing failed")
+        print_warning("Deepseek batch processing had issues, skipping insertion")
+        results['steps'].append({
+            'step': 'deepseek_api_processing',
+            'status': 'failed',
+            'articles_target': unprocessed,
+            'articles_processed': 0
+        })
+        return False, results
+    
+    # Now insert all response files into database
+    print_info("Inserting Deepseek responses into database...")
+    log_to_file(log_file, "Starting response insertion into database")
+    
+    insert_script = PROJECT_ROOT / 'deepseek' / 'insert_from_response.py'
+    if not insert_script.exists():
+        msg = f"Insert script not found: {insert_script}"
+        print_error(msg)
+        log_to_file(log_file, f"✗ {msg}")
+        return False, results
+    
+    # Get list of response files to insert
+    responses_dir = PROJECT_ROOT / 'deepseek' / 'responses'
+    response_files = sorted(responses_dir.glob('article_*_response.json'))
+    
+    if not response_files:
+        print_warning("No response files found to insert")
+        log_to_file(log_file, "⚠ No response files found to insert")
+        results['articles_processed'] = 0
+        results['steps'].append({
+            'step': 'deepseek_insertion',
+            'status': 'no_files',
+            'articles_inserted': 0
+        })
+        return True, results
+    
+    inserted_count = 0
+    failed_count = 0
+    
+    for response_file in response_files:
+        # Extract article_id from filename (article_XXXXX_response.json)
+        try:
+            article_id = response_file.stem.split('_')[1]
+            
+            cmd = ['python3', str(insert_script), article_id, str(response_file)]
+            
+            success, _, _ = run_command(
+                cmd,
+                f"Inserting article {article_id}",
+                dry_run=dry_run,
+                verbose=False,  # Keep verbose=False to avoid spam
+                log_file=log_file
+            )
+            
+            if success:
+                inserted_count += 1
+            else:
+                failed_count += 1
+                log_to_file(log_file, f"⚠ Failed to insert article {article_id}")
+        except Exception as e:
+            failed_count += 1
+            log_to_file(log_file, f"✗ Error processing {response_file.name}: {e}")
+    
+    print_info(f"Insertion complete: {inserted_count} inserted, {failed_count} failed")
+    log_to_file(log_file, f"Insertion complete: {inserted_count} inserted, {failed_count} failed")
+    
+    # Count final processed articles
+    try:
+        import sqlite3
+        conn = sqlite3.connect(str(DB_PATH))
+        cur = conn.cursor()
+        cur.execute("SELECT COUNT(*) FROM articles WHERE deepseek_processed = 1")
+        processed = cur.fetchone()[0]
+        conn.close()
+        results['articles_processed'] = processed
+        print_info(f"Total processed in database: {processed} article(s)")
+        log_to_file(log_file, f"Total processed in database: {processed} article(s)")
+    except Exception as e:
+        msg = f"Could not verify final processed count: {e}"
+        print_warning(msg)
+        log_to_file(log_file, f"⚠ {msg}")
+        results['articles_processed'] = inserted_count
+    
     results['steps'].append({
-        'step': 'deepseek_processing',
-        'status': 'pending',
-        'articles_to_process': unprocessed
+        'step': 'deepseek_api_processing',
+        'status': 'completed',
+        'articles_target': unprocessed,
+        'articles_api_called': len(response_files)
     })
     
-    print_warning("Deepseek processing: MANUAL STEP REQUIRED")
-    print_warning("Run the following to process articles individually:")
-    print(f"  cd {PROJECT_ROOT}")
-    print(f"  python3 deepseek/process_one_article.py [article_id]")
-    print("  Or batch process all unprocessed articles")
+    results['steps'].append({
+        'step': 'deepseek_insertion',
+        'status': 'completed',
+        'articles_inserted': inserted_count,
+        'articles_failed': failed_count
+    })
     
-    print_success("Deepseek phase queued")
-    return True, results
+    if not success:
+        print_error("Deepseek processing encountered errors")
+    else:
+        print_success("Deepseek processing complete")
+    
+    return success, results
 
 
 def phase_verification(dry_run=False, verbose=False):
@@ -436,18 +578,19 @@ def main():
 Pipeline Phases:
   1. PURGE       - Clean database and website files (--purge)
   2. MINING      - Collect articles from RSS feeds (--mine)
-  3. IMAGE       - Generate web and mobile versions (--images)
-  4. DEEPSEEK    - AI analysis and enrichment (--deepseek)
+Pipeline Phases:
+  1. MINING      - Collect articles from RSS feeds (--mine)
+  2. IMAGE       - Generate web and mobile versions (--images)
+  3. DEEPSEEK    - AI analysis and enrichment (--deepseek)
+
+Note: Purge/reset is separate (run manually: python3 tools/reset_all.py --force)
 
 Examples:
-  # Full pipeline with cleanup (default 2 articles per seed)
+  # Full pipeline (default 2 articles per seed)
   python3 pipeline.py --full
 
   # Full pipeline with 5 articles per seed
   python3 pipeline.py --full --articles-per-seed 5
-
-  # Purge everything before new run
-  python3 pipeline.py --purge
 
   # Mining only with custom articles per seed
   python3 pipeline.py --mine --articles-per-seed 3
@@ -466,8 +609,6 @@ Examples:
         """
     )
     
-    parser.add_argument("--purge", action="store_true",
-                       help="Purge database and website files")
     parser.add_argument("--mine", action="store_true",
                        help="Run mining cycle")
     parser.add_argument("--images", action="store_true",
@@ -475,7 +616,7 @@ Examples:
     parser.add_argument("--deepseek", action="store_true",
                        help="Process articles with Deepseek API")
     parser.add_argument("--full", action="store_true",
-                       help="Run complete pipeline: purge → mine → images → deepseek")
+                       help="Run complete pipeline: mine → images → deepseek → verify")
     parser.add_argument("--verify", action="store_true",
                        help="Verify pipeline results")
     parser.add_argument("--articles-per-seed", type=int, default=2,
@@ -488,8 +629,8 @@ Examples:
     args = parser.parse_args()
     
     # Validate arguments
-    if not any([args.purge, args.mine, args.images, args.deepseek, args.full, args.verify]):
-        print_error("Please specify at least one phase: --purge, --mine, --images, --deepseek, --full, or --verify")
+    if not any([args.mine, args.images, args.deepseek, args.full, args.verify]):
+        print_error("Please specify at least one phase: --mine, --images, --deepseek, --full, or --verify")
         parser.print_help()
         sys.exit(1)
     
@@ -516,14 +657,7 @@ Examples:
         'articles_per_seed': args.articles_per_seed
     }
     
-    # Execute phases
-    if args.full or args.purge:
-        success, results = phase_purge(dry_run=args.dry_run, verbose=args.verbose)
-        pipeline_results['phases'].append(results)
-        if not success and args.full:
-            print_error("Pipeline aborted: Purge phase failed")
-            sys.exit(1)
-    
+    # Execute phases (NO PURGE - run separately)
     if args.full or args.mine:
         success, results = phase_mining(dry_run=args.dry_run, verbose=args.verbose, articles_per_seed=args.articles_per_seed)
         pipeline_results['phases'].append(results)

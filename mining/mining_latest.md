@@ -76,35 +76,30 @@ Image & Content Processing
 
 ### 2. `run_mining_cycle.py` - Mining Orchestrator (Active)
 
-**Purpose**: Main entry point for the mining pipeline
+**Purpose**: Main entry point for the mining pipeline - collects articles from RSS feeds
 
 **Features**:
 - Loads source-specific thresholds from `thresholds.json`
 - Integrates with `data_collector.py`
-- Groups articles by feed/source
-- Selects top N articles per source using sampling
-- Dry-run mode (preview only)
-- Live mode with optional Deepseek API calls
-- Database updating via `insert_from_response.py`
+- Collects up to N articles per feed/source (configurable)
+- Simple and straightforward - no Deepseek processing here
+- All processing is done by separate pipeline phases
 
 **Usage**:
 
 ```bash
-# Dry-run mode (preview only, no changes)
+# Collect articles from RSS feeds
 python3 run_mining_cycle.py
-
-# Live mode (process and update database)
-python3 run_mining_cycle.py --apply
 ```
+
+**Important**: This script ONLY handles article collection. Deepseek API processing is handled by a separate pipeline phase (`deepseek/process_one_article.py`).
 
 **Workflow**:
 1. Calls `data_collector.collect_articles()`
-2. Queries unprocessed articles grouped by source
-3. Samples N articles per source (configurable)
-4. For each article:
-   - Claims article (marks as in_progress)
-   - Dry-run: saves placeholder, releases claim
-   - Live: calls Deepseek API, runs inserter, updates DB
+2. Stores articles in the database
+3. Returns control to the pipeline
+
+**Note**: No sampling or article selection happens here - that's part of the Deepseek processing pipeline phase.
 
 ## Configuration
 
@@ -121,17 +116,15 @@ python3 run_mining_cycle.py --apply
   "batch_min_image_bytes": 70000,                // Batch threshold: 70 KB
   "quick_min_image_bytes": 2000,                 // Quick threshold: 2 KB
   "per_feed_timeout": 240,                       // Timeout per feed (seconds)
-  "num_per_source": 5,                           // Articles to mine per source
-  "sample_rate": 10,                             // 1-in-N sampling rate
-  "random_seed": 42                              // For reproducible selection
+  "num_per_source": 3,                           // Articles to collect per source
+  "responses_dir": "./responses"                 // For API responses (Deepseek phase)
 }
 ```
 
 **Key Settings**:
 - `cleaned_chars_min_global` / `cleaned_chars_max_global`: Content quality range
-- `num_per_source`: How many articles to select per feed
+- `num_per_source`: How many articles to collect per feed (mining phase)
 - `per_feed_timeout`: Prevents long-running feeds from blocking pipeline
-- `sample_rate`: 1-in-N articles selected (1/10 = 10% selected)
 - Image byte thresholds: Adjust based on desired image quality
 
 ### `age13_banned.txt` - Content Filter
