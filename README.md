@@ -1,19 +1,38 @@
-# News Pipeline - Main README
+# News Pipeline - Complete System Documentation
 
-**Project**: Automated News Content Pipeline  
+**Project**: Automated News Content Pipeline with AI Analysis  
 **Status**: ✅ Production Ready  
-**Last Updated**: October 25, 2025
+**Last Updated**: October 25, 2025  
+**Backend**: Flask API at https://news.6ray.com  
+**Repository**: https://github.com/daijiong1977/news
 
-## What This Project Does
+---
 
-The News Pipeline is a complete automation system that:
+## 🚀 Quick Start
 
-1. **Collects** articles from 6 RSS feeds daily
-2. **Processes** images (creates web and mobile versions)
-3. **Analyzes** articles using Deepseek AI (generates summaries, questions, keywords)
-4. **Stores** everything in a database with full tracking
+### Run Complete Pipeline
+```bash
+# Collect 1 article per feed (6 total) with AI analysis
+python3 pipeline.py --full --articles-per-seed 1
 
-The entire process is orchestrated by `pipeline.py` and runs with zero manual intervention.
+# Or 3 articles per feed (18 total)
+python3 pipeline.py --full --articles-per-seed 3
+
+# Or use defaults (2 per feed = 12 total)
+python3 pipeline.py --full
+```
+
+## What This System Does
+
+The News Pipeline is a **fully automated end-to-end system** that:
+
+1. **Collects articles** from 6 RSS feeds daily
+2. **Downloads & optimizes images** (web + mobile versions)
+3. **Analyzes content** using Deepseek AI API
+4. **Stores everything** in SQLite database
+5. **Serves via REST API** at https://news.6ray.com
+
+**Zero manual intervention required** - all four phases run automatically with error handling and retry logic.
 
 ## Quick Start
 
@@ -93,9 +112,13 @@ sqlite3 articles.db "SELECT COUNT(*) FROM articles; SELECT COUNT(*) FROM article
 
 ## Key Improvements (Oct 2025)
 
+✅ **Real-Time Database Updates** - DB updates immediately per article (not at end)  
+✅ **Retry Logic** - Deepseek will retry once if timeout occurs  
+✅ **Extended Timeout** - 2-hour timeout for Deepseek processing (up from 1 hour)  
+✅ **Enhanced Logging** - Detailed debug output before API calls  
+✅ **Timezone-Aware DateTime** - Modern Python 3.12+ compatible (no deprecation warnings)  
+✅ **Image Processing Verified** - Pillow/PIL working on EC2 production server  
 ✅ **Automated Image Linking** - Articles automatically linked to images  
-✅ **Automated Response Insertion** - No manual steps needed  
-✅ **Comprehensive Logging** - Every phase creates timestamped logs  
 ✅ **Simplified Mining** - No API key requirement in phase 1  
 
 ## Recent Test Results
@@ -326,12 +349,32 @@ python3 tools/reset_all.py --force
 - Ready for optimizations
 - Scalable architecture
 
+## Production Deployment
+
+### Production Server Details
+- **URL**: https://news.6ray.com
+- **Server**: AWS EC2 (RHEL 10.0)
+- **Service**: Flask API (subscription_service_enhanced.py)
+- **Process**: Python 3 on port 5001 (proxied via Nginx)
+- **SSL**: Let's Encrypt (valid until Jan 18, 2026)
+- **Status**: ✅ HEALTHY & OPERATIONAL
+
+### Health Check
+```bash
+# API health endpoint
+curl https://news.6ray.com/health
+
+# Expected response
+{"status": "ok", "service": "enhanced-subscription-service", ...}
+```
+
 ## Version History
 
-| Version | Date | Status |
-|---------|------|--------|
-| 2.0 | Oct 25, 2025 | Current - Full automation + logging |
-| 1.0 | Oct 23, 2025 | Initial release |
+| Version | Date | Status | Key Changes |
+|---------|------|--------|-------------|
+| 2.1 | Oct 25, 2025 | Current | Real-time DB updates, retry logic, 2-hour timeout, cleanup |
+| 2.0 | Oct 25, 2025 | Active | Full automation + logging |
+| 1.0 | Oct 23, 2025 | Initial | First complete version |
 
 ## License
 
