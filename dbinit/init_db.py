@@ -22,7 +22,7 @@ import re
 import shutil
 import sqlite3
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -36,7 +36,7 @@ DATA_PATH = SCRIPT_DIR / "init_data.json"
 def backup_db(db_path: Path, backup_dir: Path) -> Path:
     """Create timestamped backup of database"""
     backup_dir.mkdir(parents=True, exist_ok=True)
-    ts = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+    ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     dst = backup_dir / f"articles.db.backup_{ts}.sqlite"
     if db_path.exists():
         shutil.copy(db_path, dst)
