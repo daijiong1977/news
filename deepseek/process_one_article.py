@@ -158,11 +158,14 @@ def call_deepseek_api(user_prompt, api_key):
             timeout=(30, 300)
         )
         
-        print(f"Response Status: {response.status_code}")
+        print(f"  📊 Response Status Code: {response.status_code}")
         
-        if response.status_code != 200:
-            print(f"ERROR: API returned {response.status_code}")
-            print(f"Response: {response.text[:500]}")
+        if response.status_code == 200:
+            print(f"  ✅ SUCCESS: API returned 200 OK")
+            print(f"  📄 Response size: {len(response.text)} bytes")
+        else:
+            print(f"  ❌ ERROR: API returned {response.status_code}")
+            print(f"  Response: {response.text[:500]}")
             return None
         
         print("  ✓ API response received successfully")
@@ -198,28 +201,34 @@ def save_response(article_id, response_json):
         output_file = os.path.join(OUTPUT_DIR, f"article_{article_id}_response.json")
         with open(output_file, 'w') as f:
             json.dump(response_json, f, indent=2, ensure_ascii=False)
-        print(f"Response saved to: {output_file}")
+        file_size = os.path.getsize(output_file)
+        print(f"  ✓ Response file created: {output_file}")
+        print(f"    File size: {file_size} bytes")
         return output_file
     except Exception as e:
-        print(f"ERROR saving response: {e}")
+        print(f"  ❌ ERROR saving response: {e}")
         return None
 
 
 def update_database_on_success(article_id, response_file):
     """Update database immediately after processing succeeds."""
     try:
+        print(f"  📝 Updating database for article {article_id}...")
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         
         now = datetime.now().isoformat()
         
         # Insert into response table
+        print(f"    - Inserting response record...")
         cursor.execute("""
             INSERT INTO response (article_id, respons_file)
             VALUES (?, ?)
         """, (article_id, response_file))
+        print(f"      ✓ Response record inserted")
         
         # Update articles table
+        print(f"    - Updating articles table...")
         cursor.execute("""
             UPDATE articles
             SET deepseek_processed = 1,
@@ -228,31 +237,34 @@ def update_database_on_success(article_id, response_file):
                 deepseek_last_error = NULL
             WHERE id = ?
         """, (now, article_id))
+        rows_updated = cursor.rowcount
+        print(f"      ✓ Articles table updated ({rows_updated} rows)")
         
         conn.commit()
         conn.close()
         
-        print(f"  ✓ Database updated successfully")
-        print(f"    - Inserted response record")
-        print(f"    - Updated articles.deepseek_processed = 1")
+        print(f"  ✅ Database update successful")
         
         # Move response file to website/article_response
         return move_response_file(article_id, response_file)
         
     except Exception as e:
-        print(f"  ERROR: Database update failed: {e}")
+        print(f"  ❌ ERROR: Database update failed: {e}")
         return False
 
 
 def move_response_file(article_id, response_file):
     """Move response file to website/article_response directory."""
     try:
+        print(f"  🗂️  Moving response file...")
         source_path = Path(response_file)
         
         # Check if source file exists
         if not source_path.exists():
-            print(f"  ERROR: Response file not found: {response_file}")
+            print(f"    ❌ ERROR: Response file not found: {response_file}")
             return False
+        
+        print(f"    ✓ Source file exists: {source_path}")
         
         # Create destination directory if needed
         dest_dir = Path(WEBSITE_RESPONSE_DIR)
@@ -265,11 +277,11 @@ def move_response_file(article_id, response_file):
         # Move file
         shutil.move(str(source_path), str(dest_path))
         
-        print(f"  ✓ Response file moved to website directory")
+        print(f"    ✓ File moved to: {dest_path}")
         return True
         
     except Exception as e:
-        print(f"  ERROR: Failed to move response file: {e}")
+        print(f"    ❌ ERROR: Failed to move response file: {e}")
         return False
 
 
@@ -388,8 +400,9 @@ def process_single_article(article_id):
     print("\nStep 5: Calling Deepseek API...")
     response_json = call_deepseek_api(user_prompt, api_key)
     if not response_json:
+        print("  ❌ API call failed - no response received")
         sys.exit(1)
-    print(f"  ✓ API call successful")
+    print(f"  ✅ API call successful - received response")
     
     # Step 6: Validate response structure
     print("\nStep 6: Validating response structure...")
