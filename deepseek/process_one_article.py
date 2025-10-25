@@ -183,8 +183,9 @@ def call_deepseek_api(user_prompt, api_key):
             print("  ✓ Successfully parsed API response as JSON")
             return response_json
         except json.JSONDecodeError as e:
-            print(f"ERROR: Could not parse API response as JSON: {e}")
-            print(f"Raw content: {content[:500]}")
+            print(f"  ❌ ERROR: Could not parse API response as JSON: {e}")
+            print(f"  ℹ️  Malformed JSON at position {e.pos}")
+            print(f"  Raw content (first 500 chars): {content[:500]}")
             return None
             
     except requests.exceptions.RequestException as e:
@@ -388,8 +389,9 @@ def process_single_article(article_id):
     print("\nStep 5: Calling Deepseek API...")
     response_json = call_deepseek_api(user_prompt, api_key)
     if not response_json:
-        print("  ❌ API call failed - no response received")
-        sys.exit(1)
+        print("  ❌ API call failed - skipping this article")
+        print("  ℹ️  Next run will retry this article")
+        sys.exit(0)  # Exit 0 (success) so batch continues
     print(f"  ✅ API call successful - received response")
     
     # Step 6: Validate response structure
@@ -400,7 +402,9 @@ def process_single_article(article_id):
     print("\nStep 7: Saving response...")
     output_file = save_response(article_id, response_json)
     if not output_file:
-        sys.exit(1)
+        print("  ❌ Failed to save response - skipping this article")
+        print("  ℹ️  Next run will retry this article")
+        sys.exit(0)  # Exit 0 so batch continues
     
     # Step 8: Update database immediately
     print("\nStep 8: Updating database...")
