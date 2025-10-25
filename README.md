@@ -22,6 +22,18 @@ python3 pipeline.py --full --articles-per-seed 3
 python3 pipeline.py --full
 ```
 
+## EC2 Server Access
+
+**Production Server**: 18.223.121.227
+
+```bash
+ssh -i ~/Downloads/web1.pem ec2-user@18.223.121.227
+```
+
+**Key File**: `~/Downloads/web1.pem`
+
+---
+
 ## What This System Does
 
 The News Pipeline is a **fully automated end-to-end system** that:

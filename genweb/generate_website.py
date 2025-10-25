@@ -23,9 +23,13 @@ DB_PATH = os.path.join(BASE_DIR, 'articles.db')
 RESPONSES_DIR = os.path.join(BASE_DIR, 'website', 'responses')
 IMAGES_DIR = os.path.join(BASE_DIR, 'website', 'article_image')
 OUTPUT_DIR = os.path.join(BASE_DIR, 'website', 'generated')
-TEMPLATE_PATH = os.path.join(BASE_DIR, 'website', 'main', 'main_template.html')
+MAIN_DIR = os.path.join(BASE_DIR, 'website', 'main')
+WEBSITE_DIR = os.path.join(BASE_DIR, 'website')
+TEMPLATE_PATH = os.path.join(MAIN_DIR, 'main_template.html')
 
 Path(OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
+Path(MAIN_DIR).mkdir(parents=True, exist_ok=True)
+Path(WEBSITE_DIR).mkdir(parents=True, exist_ok=True)
 
 # Difficulty level mapping
 DIFFICULTY_MAPPING = {
@@ -581,21 +585,56 @@ function filterAndUpdateCards() {
     # Inject script before closing body
     output_html = output_html.replace('</body>', f'{script}\n</body>')
     
-    # Write output
+    # Generate timestamped filename
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    timestamped_file = os.path.join(MAIN_DIR, f'index_{timestamp}.html')
+    main_index_file = os.path.join(MAIN_DIR, 'index.html')
+    generated_index_file = os.path.join(OUTPUT_DIR, 'index.html')
+    
+    # Write timestamped version (archive)
     print("\n✍️  Writing HTML...")
-    output_file = os.path.join(OUTPUT_DIR, 'index.html')
     try:
-        with open(output_file, 'w', encoding='utf-8') as f:
+        with open(timestamped_file, 'w', encoding='utf-8') as f:
             f.write(output_html)
-        print(f"  ✓ Written to: {output_file}")
+        print(f"  ✓ Timestamped archive: {timestamped_file}")
     except Exception as e:
-        print(f"❌ Error writing HTML: {e}")
+        print(f"❌ Error writing timestamped file: {e}")
+        return False
+    
+    # Check if we should update website/main/index.html (main location)
+    should_update_main = True
+    if os.path.exists(main_index_file):
+        main_mtime = os.path.getmtime(main_index_file)
+        timestamped_mtime = os.path.getmtime(timestamped_file)
+        if timestamped_mtime <= main_mtime:
+            should_update_main = False
+            print(f"  ℹ️  Existing website/main/index.html is newer, keeping it")
+    
+    if should_update_main:
+        try:
+            with open(main_index_file, 'w', encoding='utf-8') as f:
+                f.write(output_html)
+            print(f"  ✓ Updated main: {main_index_file}")
+        except Exception as e:
+            print(f"❌ Error updating main index: {e}")
+            return False
+    
+    # Also update website/generated/index.html for backward compatibility
+    try:
+        with open(generated_index_file, 'w', encoding='utf-8') as f:
+            f.write(output_html)
+        print(f"  ✓ Updated generated: {generated_index_file}")
+    except Exception as e:
+        print(f"❌ Error writing generated file: {e}")
         return False
     
     print("\n" + "=" * 70)
     print("✅ Website Generation Complete!")
     print("=" * 70)
-    print(f"\n📍 Output: {output_file}")
+    print(f"\n📍 Output:")
+    print(f"   - Main: {main_index_file}")
+    print(f"   - Archive: {timestamped_file}")
+    print(f"   - Generated: {generated_index_file}")
     print(f"📊 Statistics:")
     print(f"   - Categories: {len(categories)}")
     print(f"   - Total articles: {total_articles} (randomly selected 6 per category if > 6)")
