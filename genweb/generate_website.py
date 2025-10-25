@@ -15,6 +15,7 @@ import re
 import random
 from pathlib import Path
 from datetime import datetime
+from email.utils import parsedate_to_datetime
 from typing import List, Dict, Optional
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -60,11 +61,20 @@ class ArticleLoader:
             return None
     
     def get_article_image(self, article_id) -> Optional[str]:
-        """Get image path for an article."""
+        """Get image path for an article - try jpg first, then webp."""
         try:
+            # Try jpg first
             for img_file in Path(self.images_dir).glob(f'article_{article_id}_*.jpg'):
-                # Return relative path instead of absolute path
-                return f"../article_image/{img_file.name}"
+                # Return relative path without mobile version
+                if '_mobile' not in img_file.name:
+                    return f"../article_image/{img_file.name}"
+            
+            # If no jpg, try webp
+            for img_file in Path(self.images_dir).glob(f'article_{article_id}_*.webp'):
+                # Return relative path without mobile version
+                if '_mobile' not in img_file.name:
+                    return f"../article_image/{img_file.name}"
+            
             return None
         except Exception as e:
             print(f"⚠️  Error finding image for {article_id}: {e}", file=sys.stderr)
@@ -150,15 +160,26 @@ class HTMLGenerator:
         # Use pub_date (original article publication date)
         pub_date = article.get('pub_date', '')
         
-        # Time formatting - use pub_date
+        # Time formatting - use pub_date (RFC 2822 format)
         try:
             if pub_date:
-                dt = datetime.fromisoformat(pub_date)
-                hours_ago = (datetime.now() - dt).total_seconds() // 3600
-                time_ago = f"{int(hours_ago)} hours ago" if hours_ago > 0 else "Just now"
+                # Parse RFC 2822 format: "Fri, 24 Oct 2025 08:46:37 GMT"
+                dt = parsedate_to_datetime(pub_date.strip())
+                hours_ago = (datetime.now(dt.tzinfo) - dt).total_seconds() // 3600
+                if hours_ago > 0:
+                    if hours_ago == 1:
+                        time_ago = "1 hour ago"
+                    elif hours_ago < 24:
+                        time_ago = f"{int(hours_ago)} hours ago"
+                    else:
+                        days_ago = hours_ago // 24
+                        time_ago = f"{int(days_ago)} days ago" if days_ago > 1 else "1 day ago"
+                else:
+                    time_ago = "Just now"
             else:
                 time_ago = "Recently"
-        except:
+        except Exception as e:
+            print(f"⚠️  Error parsing date '{pub_date}': {e}", file=sys.stderr)
             time_ago = "Recently"
         
         # Extract content by difficulty level
