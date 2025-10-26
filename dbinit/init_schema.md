@@ -252,8 +252,16 @@ CREATE TABLE response (
                 response_id INTEGER PRIMARY KEY AUTOINCREMENT,
                 article_id TEXT NOT NULL,
                 respons_file TEXT,
+                payload_generated INTEGER DEFAULT 0,
+                payload_generated_at TEXT,
+                payload_directory TEXT,
                 FOREIGN KEY (article_id) REFERENCES articles(id)
             )
 ```
+
+**Migration Notes (2025-10-26):**
+- Added `payload_generated` - Flag to track if JSON payloads have been generated (0=not generated, 1=generated)
+- Added `payload_generated_at` - Timestamp when payloads were last generated
+- Added `payload_directory` - Path to the payload directory (e.g., 'payload_2025102501')
 
 ````

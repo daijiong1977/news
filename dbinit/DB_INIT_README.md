@@ -7,6 +7,7 @@ This directory contains the database schema and initialization scripts for the `
 - **`init_schema.md`** — Master schema file containing all CREATE TABLE statements in markdown format
 - **`init_data.json`** — Seed data in JSON format for lookup tables (categories, difficulty_levels, feeds, apikey, etc.)
 - **`initdb.py`** — Python script that reads the schema and data files and initializes the database
+- **`migration_20251026_payload_tracking.sql`** — Migration to add payload tracking fields to response table
 
 ## Article ID Format
 
