@@ -13,6 +13,9 @@ from datetime import datetime
 import argparse
 import os
 
+# Directory configuration - must match where Deepseek saves responses
+BASE_DIR = Path(__file__).parent.parent
+RESPONSE_DIR = BASE_DIR / 'website' / 'article_responses'
 
 def get_db_connection():
     """Get database connection."""
