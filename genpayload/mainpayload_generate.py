@@ -88,41 +88,34 @@ class ArticleLoader:
             print(f"⚠️  Error finding image for {article_id}: {e}", file=sys.stderr)
             return None
     
-    def get_articles_by_category(self, category_id: int, per_source_limit: int = 3) -> List[Dict]:
-        """Get latest 3 articles from each source in a category (balanced source representation)."""
+    def get_articles_by_category(self, category_id: int, limit: int = 6, max_per_source: int = 4) -> List[Dict]:
+        """Get latest N articles with balanced source representation.
+        
+        Args:
+            category_id: Category ID to fetch
+            limit: Total articles to return (default 6)
+            max_per_source: Max articles from a single source (default 4)
+            
+        Strategy: Get articles sorted by pub_date DESC, but ensure no source exceeds max_per_source.
+        """
         try:
             conn = sqlite3.connect(self.db_path)
             conn.row_factory = sqlite3.Row
             cur = conn.cursor()
             
-            # Get all unique sources in this category
+            # Get ALL processed articles in this category, sorted by pub_date DESC
             cur.execute("""
-                SELECT DISTINCT source FROM articles 
+                SELECT id, title, description, source, 
+                       deepseek_processed, crawled_at, processed_at, zh_title, pub_date
+                FROM articles 
                 WHERE deepseek_processed = 1 AND category_id = ?
-                ORDER BY source
+                ORDER BY pub_date DESC
             """, (category_id,))
             
-            sources = [row['source'] for row in cur.fetchall()]
-            all_articles = []
-            
-            # For each source, get latest N articles
-            for source in sources:
-                cur.execute("""
-                    SELECT id, title, description, source, 
-                           deepseek_processed, crawled_at, processed_at, zh_title, pub_date
-                    FROM articles 
-                    WHERE deepseek_processed = 1 AND category_id = ? AND source = ?
-                    ORDER BY pub_date DESC
-                    LIMIT ?
-                """, (category_id, source, per_source_limit))
-                
-                articles = [dict(row) for row in cur.fetchall()]
-                all_articles.extend(articles)
-            
+            all_articles = [dict(row) for row in cur.fetchall()]
             conn.close()
             
-            # Re-sort by pub_date DESC with proper date parsing
-            # pub_date is in RFC format like "Fri, 24 Oct 2025 08:46:37 GMT"
+            # Helper function to parse RFC dates
             def parse_pub_date(article):
                 try:
                     pub_date_str = article.get('pub_date', '')
@@ -132,7 +125,27 @@ class ArticleLoader:
                 except:
                     return datetime.min  # If parsing fails, treat as oldest
             
+            # Ensure sorted by pub_date DESC
             all_articles.sort(key=parse_pub_date, reverse=True)
+            
+            # Apply max-per-source limit: take top articles but cap each source at max_per_source
+            selected_articles = []
+            source_count = {}
+            
+            for article in all_articles:
+                source = article['source']
+                source_count[source] = source_count.get(source, 0)
+                
+                # Only add if this source hasn't hit the max
+                if source_count[source] < max_per_source:
+                    selected_articles.append(article)
+                    source_count[source] += 1
+                    
+                    # Stop once we have enough articles
+                    if len(selected_articles) >= limit:
+                        break
+            
+            all_articles = selected_articles
             
             # Enrich with response data and images
             for article in all_articles:
