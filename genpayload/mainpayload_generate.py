@@ -125,7 +125,9 @@ class ArticleLoader:
                 except:
                     return datetime.min  # If parsing fails, treat as oldest
             
-            # Ensure sorted by pub_date DESC
+            # CRITICAL: Re-sort by parsed pub_date DESC (database string sort is wrong)
+            # pub_date stored as RFC strings like "Fri, 24 Oct 2025 08:46:37 GMT"
+            # String comparison is alphabetical, not chronological!
             all_articles.sort(key=parse_pub_date, reverse=True)
             
             # Apply max-per-source limit: take top articles but cap each source at max_per_source
