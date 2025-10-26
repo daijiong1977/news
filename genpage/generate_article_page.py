@@ -18,8 +18,9 @@ def build_keywords_html(keywords: List[str]) -> str:
     html_parts = []
     for keyword in keywords:
         if isinstance(keyword, dict):
-            title = keyword.get('title', 'Keyword')
-            description = keyword.get('description', '')
+            # Handle both 'title'/'description' and 'term'/'explanation' formats
+            title = keyword.get('title', keyword.get('term', 'Keyword'))
+            description = keyword.get('description', keyword.get('explanation', ''))
         else:
             title = str(keyword)
             description = ''
@@ -81,9 +82,10 @@ def build_perspectives_html(perspectives: List[Dict[str, Any]]) -> str:
     html_parts = []
     
     for perspective in perspectives:
-        viewpoint = perspective.get('viewpoint', 'Neutral')
-        content = perspective.get('content', '')
-        source = perspective.get('source', 'Unknown Source')
+        # Handle both 'viewpoint'/'content' and 'perspective'/'description' formats
+        viewpoint = perspective.get('viewpoint', perspective.get('perspective', 'Neutral'))
+        content = perspective.get('content', perspective.get('description', ''))
+        source = perspective.get('source', '')
         
         # Map viewpoint to icon and color
         icon_map = {
@@ -93,21 +95,26 @@ def build_perspectives_html(perspectives: List[Dict[str, Any]]) -> str:
             'Positive': ('thumb_up', 'positive'),
             'Neutral': ('horizontal_rule', 'neutral'),
             'Negative': ('thumb_down', 'negative'),
+            "Organizer's view": ('business', 'primary'),
+            "Author's view": ('edit', 'primary'),
+            "Children's view": ('child_care', 'primary'),
         }
         
         icon, color = icon_map.get(viewpoint, ('info', 'primary'))
+        
+        source_html = f"<p class='text-slate-500 dark:text-slate-400 text-xs font-normal leading-normal mt-auto pt-2'>Source: {source}</p>" if source else ""
         
         html_parts.append(f"""            <div class="flex flex-col gap-4 p-5 rounded-xl bg-white dark:bg-background-dark/50 shadow-sm border border-slate-200 dark:border-white/10">
                 <div class="flex items-center gap-3">
                     <div class="flex items-center justify-center size-10 rounded-full bg-{color}/10 text-{color}">
                         <span class="material-symbols-outlined">{icon}</span>
                     </div>
-                    <p class="text-slate-900 dark:text-white text-lg font-bold leading-normal font-display">{viewpoint} Viewpoint</p>
+                    <p class="text-slate-900 dark:text-white text-lg font-bold leading-normal font-display">{viewpoint}</p>
                 </div>
                 <p class="text-slate-600 dark:text-slate-300 text-sm font-normal leading-relaxed">
                     {content}
                 </p>
-                <p class="text-slate-500 dark:text-slate-400 text-xs font-normal leading-normal mt-auto pt-2">Source: {source}</p>
+                {source_html}
             </div>""")
     
     return "\n".join(html_parts)

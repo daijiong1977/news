@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Article Title</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+</head>
+<body class="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+<div class="flex flex-col h-screen bg-white dark:bg-background-dark">
+    <!-- Header -->
+    <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f0f3f4] dark:border-b-white/10 px-10 py-6">
+        <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-2xl text-primary">newspaper</span>
+            <h1 class="text-lg font-bold">NewsReader</h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <a class="text-sm text-slate-500 dark:text-slate-400 hover:text-primary" href="/main/index.html">
+                <span class="material-symbols-outlined inline mr-1">arrow_back</span>
+                Back to Main Page
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto flex flex-col">
+        <!-- Article Header -->
+        <div class="flex flex-wrap justify-between gap-3 p-4 border-b border-slate-200 dark:border-white/10">
+            <p class="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em] min-w-72 font-display">Article Title</p>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="pb-3">
+            <div class="flex border-b border-slate-200 dark:border-white/10 px-4 gap-8 overflow-x-auto">
+                <button data-tab="keywords" class="tab-button active flex flex-col items-center justify-center border-b-[3px] border-b-primary text-primary pb-[13px] pt-4 whitespace-nowrap">
+                    <p class="text-sm font-bold leading-normal tracking-[0.015em]">Full Article with Keywords</p>
+                </button>
+                <button data-tab="background" class="tab-button flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-slate-500 dark:text-slate-400 pb-[13px] pt-4 whitespace-nowrap">
+                    <p class="text-sm font-bold leading-normal tracking-[0.015em]">Background &amp; Analyze</p>
+                </button>
+                <button data-tab="quiz" class="tab-button flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-slate-500 dark:text-slate-400 pb-[13px] pt-4 whitespace-nowrap">
+                    <p class="text-sm font-bold leading-normal tracking-[0.015em]">Quiz</p>
+                </button>
+                <button data-tab="perspective" class="tab-button flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-slate-500 dark:text-slate-400 pb-[13px] pt-4 whitespace-nowrap">
+                    <p class="text-sm font-bold leading-normal tracking-[0.015em]">Perspective &amp; Discussion</p>
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="flex-1 overflow-y-auto">
+            <!-- Keywords Tab -->
+            <div id="keywords" class="tab-content active grid grid-cols-1 md:grid-cols-3 gap-6 p-4">
+                <div class="md:col-span-2 space-y-6">
+                    <div class="bg-white dark:bg-background-dark/50 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-white/10">
+                        <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4">Full Article</h2>
+                        <div class="text-slate-700 dark:text-slate-300 leading-relaxed space-y-4 text-lg/8" id="article-content">
+                            
+                        </div>
+                    </div>
+                </div>
+                <div class="md:col-span-1 space-y-6">
+                    <div class="bg-white dark:bg-background-dark/50 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-white/10">
+                        <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">Keywords</h3>
+                        <div class="space-y-4" id="keywords-list">
+                            <p class='text-slate-600 dark:text-slate-400'>No keywords available.</p>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-background-dark/50 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-white/10 text-center">
+                        <div class="flex items-center justify-center mb-4">
+                            <span class="material-symbols-outlined text-4xl text-primary">stadia_controller</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">Test Your Knowledge!</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">Think you've mastered the keywords? Play a quick game to find out.</p>
+                        <button onclick="document.querySelector('[data-tab=&quot;quiz&quot;]').click()" class="w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-5 bg-primary text-white gap-2 text-sm font-bold leading-normal tracking-[0.015em] flex hover:bg-primary/90">Play Keyword Game</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Background Tab -->
+            <div id="background" class="tab-content hidden grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
+                <div class="bg-white dark:bg-background-dark/50 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-white/10">
+                    <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4">Background Context</h2>
+                    <div class="text-slate-700 dark:text-slate-300 leading-relaxed space-y-4 text-lg/8" id="background-content">
+                        
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-background-dark/50 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-white/10">
+                    <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4">Article Structure Analysis</h2>
+                    <div class="text-slate-700 dark:text-slate-300 leading-relaxed space-y-4 text-lg/8" id="structure-content">
+                        
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-background-dark/50 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-white/10 col-span-full" x-data="{ expanded: false }">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">Full Article</h2>
+                        <button class="flex items-center gap-1 text-sm font-medium text-primary hover:underline" onclick="toggleShowMore(this)">
+                            <span class="show-more-text">Show More</span>
+                            <span class="material-symbols-outlined transition-transform duration-300">expand_more</span>
+                        </button>
+                    </div>
+                    <div class="text-slate-700 dark:text-slate-300 leading-relaxed space-y-4 text-lg/8 line-clamp-5 transition-all duration-500" id="background-full-article">
+                        
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Tab -->
+            <div id="quiz" class="tab-content hidden grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
+                <div class="md:col-span-1 space-y-6">
+                    <div class="bg-white dark:bg-background-dark/50 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-white/10 h-full">
+                        <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4">Article Snippet</h2>
+                        <div class="text-slate-700 dark:text-slate-300 leading-relaxed space-y-4 text-lg/8 h-[calc(100%-40px)] overflow-y-auto">
+                            
+                        </div>
+                    </div>
+                </div>
+                <div class="md:col-span-1 space-y-6">
+                    <div class="bg-white dark:bg-background-dark/50 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-white/10 space-y-6">
+                        <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">Test Your Knowledge</h2>
+                        <div id="quiz-questions" class="space-y-6">
+                            <p class='text-slate-600 dark:text-slate-400'>No quiz questions available.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Perspective Tab -->
+            <div id="perspective" class="tab-content hidden p-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <p class='text-slate-600 dark:text-slate-400'>No perspectives available.</p>
+                </div>
+                <div class="mt-10">
+                    <h2 class="text-slate-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5 font-display">What's Your Take?</h2>
+                    <div class="bg-white dark:bg-background-dark/50 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-white/10">
+                        <form class="flex flex-col gap-4">
+                            <label class="text-slate-600 dark:text-slate-300 text-sm font-medium" for="comment">Share your perspective or join the conversation.</label>
+                            <textarea class="w-full rounded-lg border-slate-300 dark:border-slate-600 bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-primary focus:ring-primary border p-3" id="comment" name="comment" placeholder="Write your comment here..." rows="4"></textarea>
+                            <button class="flex max-w-[200px] self-end cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-5 bg-primary text-white gap-2 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors" type="submit">Post Comment</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="mt-10 p-4">
+                    <details class="group">
+                        <summary class="flex items-center justify-between cursor-pointer p-4 rounded-lg bg-white dark:bg-background-dark/50 hover:bg-slate-50 dark:hover:bg-background-dark/70 list-none">
+                            <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200 font-display">Read Full Article</h3>
+                            <span class="material-symbols-outlined text-slate-500 dark:text-slate-400 transition-transform duration-300 group-open:rotate-180">expand_more</span>
+                        </summary>
+                        <div class="mt-4 p-6 bg-white dark:bg-background-dark/50 rounded-lg text-slate-700 dark:text-slate-300 leading-relaxed space-y-4">
+                            
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-solid border-t-[#f0f3f4] dark:border-t-white/10 px-10 py-4">
+        <div class="flex items-center justify-between">
+            <p class="text-sm text-slate-500 dark:text-slate-400">© 2024 NewsReader. All Rights Reserved.</p>
+            <div class="flex items-center gap-6">
+                <a class="text-sm text-slate-500 dark:text-slate-400 hover:text-primary" href="#">Privacy Policy</a>
+                <a class="text-sm text-slate-500 dark:text-slate-400 hover:text-primary" href="#">Terms of Service</a>
+                <a class="text-sm text-slate-500 dark:text-slate-400 hover:text-primary" href="#">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<script>
+    function toggleShowMore(button) {
+        const article = document.getElementById('background-full-article');
+        const isExpanded = !article.classList.contains('line-clamp-5');
+        
+        if (isExpanded) {
+            article.classList.add('line-clamp-5');
+            button.querySelector('.show-more-text').textContent = 'Show More';
+        } else {
+            article.classList.remove('line-clamp-5');
+            button.querySelector('.show-more-text').textContent = 'Show Less';
+        }
+    }
+
+    // Tab navigation
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const tabName = this.getAttribute('data-tab');
+            
+            // Remove active state from all tabs
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('border-b-primary', 'text-primary');
+                btn.classList.add('border-b-transparent', 'text-slate-500', 'dark:text-slate-400');
+            });
+            
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+                content.classList.remove('active');
+            });
+            
+            // Add active state to clicked tab
+            this.classList.remove('border-b-transparent', 'text-slate-500', 'dark:text-slate-400');
+            this.classList.add('border-b-primary', 'text-primary');
+            
+            // Show selected tab content
+            const tabContent = document.getElementById(tabName);
+            if (tabContent) {
+                tabContent.classList.remove('hidden');
+                tabContent.classList.add('active');
+            }
+        });
+    });
+
+    // Show More / Show Less functionality
+    document.querySelectorAll('.show-more-text').forEach(button => {
+        button.parentElement.addEventListener('click', function() {
+            const article = document.getElementById('background-full-article');
+            const isExpanded = article.classList.contains('line-clamp-5');
+            
+            if (isExpanded) {
+                article.classList.add('line-clamp-5');
+                button.textContent = 'Show More';
+            } else {
+                article.classList.remove('line-clamp-5');
+                button.textContent = 'Show Less';
+            }
+        });
+    });
+</script>
+</body>
+</html>

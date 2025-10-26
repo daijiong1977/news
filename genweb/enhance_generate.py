@@ -45,8 +45,8 @@ Path(PAYLOADS_DIR).mkdir(parents=True, exist_ok=True)
 # Difficulty level mapping
 DIFFICULTY_MAPPING = {
     'easy': 'Relax',
-    'mid': 'Enjoy',
-    'hard': 'Research'
+    'middle': 'Enjoy',
+    'high': 'Research'
 }
 
 
@@ -154,8 +154,8 @@ class ArticleLoader:
         # Map our level names to the actual keys in the response
         level_map = {
             'easy': 'easy',
-            'mid': 'middle',
-            'hard': 'high',
+            'middle': 'middle',
+            'high': 'high',
             'cn': 'zh'
         }
         
@@ -273,7 +273,7 @@ class JSONPayloadGenerator:
         
         # Create payloads for each category × difficulty combination
         for cat_name in ['News', 'Science', 'Fun']:
-            for level_key in ['easy', 'mid', 'hard', 'cn']:
+            for level_key in ['easy', 'middle', 'high', 'cn']:
                 articles = []
                 
                 cat_articles = articles_by_category.get(cat_name, [])
@@ -300,7 +300,7 @@ class JSONPayloadGenerator:
         for cat_name in ['News', 'Science', 'Fun']:
             cat_total = 0
             print(f"  📁 {cat_name}:")
-            for level_key in ['easy', 'mid', 'hard', 'cn']:
+            for level_key in ['easy', 'middle', 'high', 'cn']:
                 key = f'{cat_name}_{level_key}'
                 size = payload_sizes.get(key, 0)
                 cat_total += size
@@ -329,7 +329,7 @@ class HTMLGenerator:
             image_style = 'background-color: #e4e4e7;'
         
         return f'''<div class="flex flex-col gap-3 bg-card-light dark:bg-card-dark rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1" data-article-id="{article_id}">
-<div class="w-full bg-center bg-no-repeat aspect-video bg-cover" style='{image_style}'></div>
+<a href="../article_page/article.html?id={{{{id}}}}&level={{{{level}}}}" class="w-full bg-center bg-no-repeat aspect-video bg-cover cursor-pointer hover:opacity-90 transition-opacity" style='{image_style}'></a>
 <div class="flex flex-col gap-2 p-4 pt-2">
 <h3 class="text-lg font-bold leading-snug tracking-tight article-title">{{title}}</h3>
 <div class="flex items-center gap-2 text-xs text-subtle-light dark:text-subtle-dark">
@@ -338,6 +338,11 @@ class HTMLGenerator:
 <p>{{source}}</p>
 </div>
 <p class="text-subtle-light dark:text-subtle-dark text-sm font-normal leading-relaxed article-summary" style="overflow-wrap: break-word; word-break: break-word;">{{summary}}</p>
+<div class="flex justify-end mt-2">
+<a href="../article_page/article.html?id={{{{id}}}}&level={{{{level}}}}" class="text-primary hover:text-primary/80 font-semibold text-sm transition-colors">
+Activities →
+</a>
+</div>
 </div>
 </div>'''
 
@@ -401,9 +406,9 @@ def generate_website_enhanced():
         print(f"❌ Error reading template: {e}")
         return False
     
-    # Generate default cards (News + Enjoy/mid level)
+    # Generate default cards (News + Enjoy/middle level)
     print("\n🎨 Generating default article cards (News / Enjoy level)...")
-    default_level = 'mid'
+    default_level = 'middle'
     default_category = 'News'
     all_default_cards = []
     
@@ -421,7 +426,7 @@ def generate_website_enhanced():
     default_cards_html = ""
     for data in all_default_cards:
         card_html = f'''<div class="flex flex-col gap-3 bg-card-light dark:bg-card-dark rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1" data-article-id="{data['id']}">
-<div class="w-full bg-center bg-no-repeat aspect-video bg-cover" style="{'background-image: url(\'' + data['image_url'] + '\');' if data['image_url'] else 'background-color: #e4e4e7;'}"></div>
+<a href="../article_page/article.html?id={data['id']}&level=middle" class="w-full bg-center bg-no-repeat aspect-video bg-cover cursor-pointer hover:opacity-90 transition-opacity" style="{'background-image: url(\'' + data['image_url'] + '\');' if data['image_url'] else 'background-color: #e4e4e7;'}"></a>
 <div class="flex flex-col gap-2 p-4 pt-2">
 <h3 class="text-lg font-bold leading-snug tracking-tight article-title">{data['title']}</h3>
 <div class="flex items-center gap-2 text-xs text-subtle-light dark:text-subtle-dark">
@@ -430,6 +435,11 @@ def generate_website_enhanced():
 <p>{data['source']}</p>
 </div>
 <p class="text-subtle-light dark:text-subtle-dark text-sm font-normal leading-relaxed article-summary" style="overflow-wrap: break-word; word-break: break-word;">{data['summary']}</p>
+<div class="flex justify-end mt-2">
+<a href="../article_page/article.html?id={data['id']}&level=middle" class="text-primary hover:text-primary/80 font-semibold text-sm transition-colors">
+Activities →
+</a>
+</div>
 </div>
 </div>'''
         default_cards_html += card_html + "\n"
@@ -440,7 +450,28 @@ def generate_website_enhanced():
     dynamic_js = '''<script>
 // Dynamic article loading by category and difficulty level
 const PAYLOAD_BASE = '{PAYLOAD_BASE}';
+
+// Template for regular levels (with Activities link)
 const CARD_TEMPLATE = `<div class="flex flex-col gap-3 bg-card-light dark:bg-card-dark rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1" data-article-id="{{id}}">
+<a href="../article_page/article.html?id={{id}}&level={{levelKey}}" class="w-full bg-center bg-no-repeat aspect-video bg-cover cursor-pointer hover:opacity-90 transition-opacity" style="{{imageStyle}}"></a>
+<div class="flex flex-col gap-2 p-4 pt-2">
+<h3 class="text-lg font-bold leading-snug tracking-tight article-title">{{title}}</h3>
+<div class="flex items-center gap-2 text-xs text-subtle-light dark:text-subtle-dark">
+<p>{{time_ago}}</p>
+<span class="font-bold">·</span>
+<p>{{source}}</p>
+</div>
+<p class="text-subtle-light dark:text-subtle-dark text-sm font-normal leading-relaxed article-summary" style="overflow-wrap: break-word; word-break: break-word;">{{summary}}</p>
+<div class="flex justify-end mt-2">
+<a href="../article_page/article.html?id={{id}}&level={{levelKey}}" class="text-primary hover:text-primary/80 font-semibold text-sm transition-colors">
+Activities →
+</a>
+</div>
+</div>
+</div>`;
+
+// Template for CN level (no Activities link, no clickable image)
+const CARD_TEMPLATE_CN = `<div class="flex flex-col gap-3 bg-card-light dark:bg-card-dark rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1" data-article-id="{{id}}">
 <div class="w-full bg-center bg-no-repeat aspect-video bg-cover" style="{{imageStyle}}"></div>
 <div class="flex flex-col gap-2 p-4 pt-2">
 <h3 class="text-lg font-bold leading-snug tracking-tight article-title">{{title}}</h3>
@@ -455,8 +486,8 @@ const CARD_TEMPLATE = `<div class="flex flex-col gap-3 bg-card-light dark:bg-car
 
 const levelMap = {
   'Relax': 'easy',
-  'Enjoy': 'mid',
-  'Research': 'hard',
+  'Enjoy': 'middle',
+  'Research': 'high',
   'CN': 'cn'
 };
 
@@ -471,7 +502,7 @@ async function loadArticles(category, level) {
   
   // If in Chinese mode, override level to 'cn'
   let finalLevel = isChineseMode ? 'CN' : level;
-  const levelKey = levelMap[finalLevel] || 'mid';
+  const levelKey = levelMap[finalLevel] || 'middle';
   const categoryLower = category.toLowerCase();
   
   console.log(`Loading articles: ${category} / ${finalLevel} (${levelKey})`);
@@ -500,8 +531,12 @@ async function loadArticles(category, level) {
         ? `background-image: url('${article.image_url}');` 
         : 'background-color: #e4e4e7;';
       
-      const html = CARD_TEMPLATE
-        .replace('{{id}}', article.id)
+      // Use CN template if level is 'cn', otherwise use regular template
+      const template = (levelKey === 'cn') ? CARD_TEMPLATE_CN : CARD_TEMPLATE;
+      
+      const html = template
+        .replace(/{{id}}/g, article.id)
+        .replace(/{{levelKey}}/g, levelKey)
         .replace('{{imageStyle}}', imageStyle)
         .replace('{{title}}', escapeHtml(article.title))
         .replace('{{time_ago}}', article.time_ago)

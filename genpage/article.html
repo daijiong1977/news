@@ -1,50 +1,85 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="light" lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>${ARTICLE_TITLE}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <title>Article - NewsReader</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13a4ec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101c22",
+                        "positive": "#28a745",
+                        "neutral": "#6c757d",
+                        "negative": "#dc3545",
+                    },
+                    fontFamily: {
+                        "display": ["Newsreader", "serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
 </head>
-<body class="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">
-<div class="flex flex-col h-screen bg-white dark:bg-background-dark">
-    <!-- Header -->
-    <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f0f3f4] dark:border-b-white/10 px-10 py-6">
-        <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-2xl text-primary">newspaper</span>
-            <h1 class="text-lg font-bold">NewsReader</h1>
-        </div>
-        <div class="flex items-center gap-4">
-            <a class="text-sm text-slate-500 dark:text-slate-400 hover:text-primary" href="/main/index.html">
-                <span class="material-symbols-outlined inline mr-1">arrow_back</span>
-                Back to Main Page
-            </a>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="flex-1 overflow-y-auto flex flex-col">
-        <!-- Article Header -->
-        <div class="flex flex-wrap justify-between gap-3 p-4 border-b border-slate-200 dark:border-white/10">
-            <p class="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em] min-w-72 font-display">${ARTICLE_TITLE}</p>
-        </div>
-
-        <!-- Tab Navigation -->
-        <div class="pb-3">
-            <div class="flex border-b border-slate-200 dark:border-white/10 px-4 gap-8 overflow-x-auto">
-                <button data-tab="keywords" class="tab-button active flex flex-col items-center justify-center border-b-[3px] border-b-primary text-primary pb-[13px] pt-4 whitespace-nowrap">
-                    <p class="text-sm font-bold leading-normal tracking-[0.015em]">Full Article with Keywords</p>
-                </button>
-                <button data-tab="background" class="tab-button flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-slate-500 dark:text-slate-400 pb-[13px] pt-4 whitespace-nowrap">
-                    <p class="text-sm font-bold leading-normal tracking-[0.015em]">Background &amp; Analyze</p>
-                </button>
-                <button data-tab="quiz" class="tab-button flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-slate-500 dark:text-slate-400 pb-[13px] pt-4 whitespace-nowrap">
-                    <p class="text-sm font-bold leading-normal tracking-[0.015em]">Quiz</p>
-                </button>
-                <button data-tab="perspective" class="tab-button flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-slate-500 dark:text-slate-400 pb-[13px] pt-4 whitespace-nowrap">
-                    <p class="text-sm font-bold leading-normal tracking-[0.015em]">Perspective &amp; Discussion</p>
-                </button>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="flex justify-center w-full">
+    <div class="layout-content-container flex flex-col w-17/20 max-w-6xl flex-1">
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto flex flex-col">
+            <!-- Title Block with Back Button, Title, Tabs, and Image -->
+            <div class="px-4 pt-4 pb-3">
+            <div class="flex gap-4">
+                <!-- Left side: Back button, Title, and Tabs -->
+                <div class="flex-1 flex flex-col justify-between">
+                    <!-- Back Button (aligned with top of image) -->
+                    <div>
+                        <a class="text-sm text-slate-500 dark:text-slate-400 hover:text-primary inline-flex items-center" href="/main/index.html">
+                            <span class="material-symbols-outlined text-lg mr-1">arrow_back</span>
+                            Back to Main Page
+                        </a>
+                    </div>
+                    
+                    <!-- Title -->
+                    <div class="flex-1 py-2">
+                        <p class="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em] font-display">${ARTICLE_TITLE}</p>
+                    </div>
+                    
+                    <!-- Tab Navigation (aligned with bottom of image) -->
+                    <div class="flex border-b border-slate-200 dark:border-white/10 gap-8 overflow-x-auto">
+                        <button data-tab="keywords" class="tab-button active flex flex-col items-center justify-center border-b-[3px] border-b-primary text-primary pb-[13px] pt-4 whitespace-nowrap">
+                            <p class="text-sm font-bold leading-normal tracking-[0.015em]">Article&Keywords</p>
+                        </button>
+                        <button data-tab="background" class="tab-button flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-slate-500 dark:text-slate-400 pb-[13px] pt-4 whitespace-nowrap">
+                            <p class="text-sm font-bold leading-normal tracking-[0.015em]">Analyze</p>
+                        </button>
+                        <button data-tab="quiz" class="tab-button flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-slate-500 dark:text-slate-400 pb-[13px] pt-4 whitespace-nowrap">
+                            <p class="text-sm font-bold leading-normal tracking-[0.015em]">Quiz</p>
+                        </button>
+                        <button data-tab="perspective" class="tab-button flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-slate-500 dark:text-slate-400 pb-[13px] pt-4 whitespace-nowrap">
+                            <p class="text-sm font-bold leading-normal tracking-[0.015em]">Discussion</p>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Right side: Image -->
+                <div class="flex-shrink-0">
+                    <img id="article-image" src="" alt="Article Image" class="w-72 h-auto rounded-lg object-cover" style="display: none;" />
+                </div>
             </div>
         </div>
 
@@ -52,29 +87,30 @@
         <div class="flex-1 overflow-y-auto">
             <!-- Keywords Tab -->
             <div id="keywords" class="tab-content active grid grid-cols-1 md:grid-cols-3 gap-6 p-4">
-                <div class="md:col-span-2 space-y-6">
+                <div class="md:col-span-2 space-y-6" id="article-column">
                     <div class="bg-white dark:bg-background-dark/50 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-white/10">
                         <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4">Full Article</h2>
                         <div class="text-slate-700 dark:text-slate-300 leading-relaxed space-y-4 text-lg/8" id="article-content">
-                            ${ARTICLE_CONTENT}
+                            <p>Loading article...</p>
                         </div>
                     </div>
                 </div>
-                <div class="md:col-span-1 space-y-6">
+                <div class="md:col-span-1 space-y-6" id="keywords-column">
                     <div class="bg-white dark:bg-background-dark/50 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-white/10">
                         <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">Keywords</h3>
                         <div class="space-y-4" id="keywords-list">
-                            ${KEYWORDS_HTML}
+                            <p class="text-slate-600 dark:text-slate-400">Loading...</p>
                         </div>
                     </div>
-                    <div class="bg-white dark:bg-background-dark/50 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-white/10 text-center">
-                        <div class="flex items-center justify-center mb-4">
-                            <span class="material-symbols-outlined text-4xl text-primary">stadia_controller</span>
-                        </div>
-                        <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">Test Your Knowledge!</h3>
-                        <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">Think you've mastered the keywords? Play a quick game to find out.</p>
-                        <button onclick="document.querySelector('[data-tab=&quot;quiz&quot;]').click()" class="w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-5 bg-primary text-white gap-2 text-sm font-bold leading-normal tracking-[0.015em] flex hover:bg-primary/90">Play Keyword Game</button>
+                </div>
+                <!-- Game block - will be dynamically positioned -->
+                <div id="game-block" class="bg-white dark:bg-background-dark/50 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-white/10 text-center" style="display: none;">
+                    <div class="flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-4xl text-primary">stadia_controller</span>
                     </div>
+                    <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">Test Your Knowledge!</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">Think you've mastered the keywords? Play a quick game to find out.</p>
+                    <button onclick="startKeywordGame()" class="w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-5 bg-primary text-white gap-2 text-sm font-bold leading-normal tracking-[0.015em] flex hover:bg-primary/90">Play Keyword Game</button>
                 </div>
             </div>
 
@@ -83,13 +119,13 @@
                 <div class="bg-white dark:bg-background-dark/50 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-white/10">
                     <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4">Background Context</h2>
                     <div class="text-slate-700 dark:text-slate-300 leading-relaxed space-y-4 text-lg/8" id="background-content">
-                        ${BACKGROUND_CONTENT}
+                        <p>Loading background...</p>
                     </div>
                 </div>
                 <div class="bg-white dark:bg-background-dark/50 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-white/10">
                     <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4">Article Structure Analysis</h2>
                     <div class="text-slate-700 dark:text-slate-300 leading-relaxed space-y-4 text-lg/8" id="structure-content">
-                        ${ARTICLE_STRUCTURE}
+                        <p>Loading structure...</p>
                     </div>
                 </div>
                 <div class="bg-white dark:bg-background-dark/50 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-white/10 col-span-full" x-data="{ expanded: false }">
@@ -101,35 +137,43 @@
                         </button>
                     </div>
                     <div class="text-slate-700 dark:text-slate-300 leading-relaxed space-y-4 text-lg/8 line-clamp-5 transition-all duration-500" id="background-full-article">
-                        ${ARTICLE_CONTENT}
+                        <p>Loading article...</p>
                     </div>
                 </div>
             </div>
 
             <!-- Quiz Tab -->
-            <div id="quiz" class="tab-content hidden grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
-                <div class="md:col-span-1 space-y-6">
-                    <div class="bg-white dark:bg-background-dark/50 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-white/10 h-full">
-                        <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4">Article Snippet</h2>
-                        <div class="text-slate-700 dark:text-slate-300 leading-relaxed space-y-4 text-lg/8 h-[calc(100%-40px)] overflow-y-auto">
-                            ${ARTICLE_CONTENT}
-                        </div>
+            <div id="quiz" class="tab-content hidden grid grid-cols-1 md:grid-cols-2 gap-6 p-4 items-start">
+                <div class="bg-white dark:bg-background-dark/50 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-white/10" id="quiz-article-container">
+                    <div id="quiz-full-article" class="text-slate-700 dark:text-slate-300 leading-relaxed space-y-4 text-lg/8">
+                        <p>Loading article...</p>
                     </div>
                 </div>
-                <div class="md:col-span-1 space-y-6">
-                    <div class="bg-white dark:bg-background-dark/50 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-white/10 space-y-6">
-                        <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">Test Your Knowledge</h2>
-                        <div id="quiz-questions" class="space-y-6">
-                            ${QUIZ_HTML}
-                        </div>
+                <div class="bg-white dark:bg-background-dark/50 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-white/10 flex flex-col" id="quiz-questions-container">
+                    <div id="quiz-questions" class="space-y-4 overflow-y-auto pr-2 flex-1">
+                        <p>Loading questions...</p>
+                    </div>
+                    <div id="quiz-result" class="mt-4 hidden"></div>
+                    <div id="quiz-actions" class="mt-4 hidden">
+                        <button onclick="submitQuizAnswers()" class="w-full bg-primary text-white px-6 py-3 rounded-lg font-bold hover:bg-primary/90">
+                            Submit Answers
+                        </button>
+                    </div>
+                    <div id="quiz-retry" class="mt-4 hidden flex gap-4">
+                        <button onclick="retryQuiz()" class="flex-1 bg-primary text-white px-6 py-3 rounded-lg font-bold hover:bg-primary/90 flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined">refresh</span>
+                            Retry Quiz
+                        </button>
                     </div>
                 </div>
             </div>
 
             <!-- Perspective Tab -->
+
+            <!-- Perspective Tab -->
             <div id="perspective" class="tab-content hidden p-4">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                    ${PERSPECTIVES_HTML}
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6" id="perspectives-list">
+                    <p class="text-slate-600 dark:text-slate-400">Loading perspectives...</p>
                 </div>
                 <div class="mt-10">
                     <h2 class="text-slate-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5 font-display">What's Your Take?</h2>
@@ -147,8 +191,8 @@
                             <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200 font-display">Read Full Article</h3>
                             <span class="material-symbols-outlined text-slate-500 dark:text-slate-400 transition-transform duration-300 group-open:rotate-180">expand_more</span>
                         </summary>
-                        <div class="mt-4 p-6 bg-white dark:bg-background-dark/50 rounded-lg text-slate-700 dark:text-slate-300 leading-relaxed space-y-4">
-                            ${ARTICLE_CONTENT}
+                        <div id="perspective-full-article" class="mt-4 p-6 bg-white dark:bg-background-dark/50 rounded-lg text-slate-700 dark:text-slate-300 leading-relaxed space-y-4">
+                            <p>Loading article...</p>
                         </div>
                     </details>
                 </div>
@@ -229,6 +273,614 @@
             }
         });
     });
+
+    // ========== DYNAMIC JSON LOADING ==========
+    const urlParams = new URLSearchParams(window.location.search);
+    const articleId = urlParams.get('id');
+    const level = urlParams.get('level') || 'middle';
+
+    if (articleId) {
+        console.log('Loading article:', articleId, 'Level:', level);
+        loadArticleFromJSON();
+    }
+
+    async function loadArticleFromJSON() {
+        try {
+            const fetchPath = `/article_page/payload_${articleId}/${level}.json`;
+            console.log('Fetching:', fetchPath);
+            
+            const response = await fetch(fetchPath);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
+            const data = await response.json();
+            console.log('Data loaded:', data);
+            
+            // Update page title
+            document.title = data.title || 'Article';
+            document.querySelector('.text-4xl').textContent = data.title || 'Article';
+            
+            // Update article image
+            const imageUrl = data.image_url || '';
+            const articleImage = document.getElementById('article-image');
+            if (imageUrl) {
+                // Use mobile.webp - replace the extension, handling if _mobile is already there
+                let imagePath = imageUrl;
+                if (imagePath.includes('_mobile')) {
+                    // Already has _mobile, just ensure it ends with .webp
+                    imagePath = imagePath.replace(/\.(jpg|jpeg|png|webp)$/i, '.webp');
+                } else {
+                    // Add _mobile before extension
+                    imagePath = imagePath.replace(/\.(jpg|jpeg|png|webp)$/i, '_mobile.webp');
+                }
+                articleImage.src = imagePath;
+                articleImage.style.display = 'block';
+            } else {
+                articleImage.style.display = 'none';
+            }
+            
+            // Update article content and keywords
+            const content = data.summary || '';
+            const keywords = data.keywords || [];
+            
+            // Filter keywords that appear in the article
+            const articleText = content.toLowerCase();
+            const filteredKeywords = keywords.filter(kw => {
+                const term = (kw.term || kw.title || '').toLowerCase();
+                return articleText.includes(term);
+            });
+            
+            // Store for game
+            window.articleKeywords = filteredKeywords;
+            
+            // Highlight keywords in article text
+            let highlightedContent = content;
+            filteredKeywords.forEach(kw => {
+                const term = kw.term || kw.title;
+                const explanation = kw.explanation || kw.description || '';
+                // Create case-insensitive regex with word boundaries
+                const regex = new RegExp(`\\b(${term})\\b`, 'gi');
+                highlightedContent = highlightedContent.replace(regex, 
+                    `<span class="keyword-highlight font-semibold text-primary cursor-help border-b-2 border-primary/30" data-tooltip="${explanation.replace(/"/g, '&quot;')}">$1</span>`
+                );
+            });
+            
+            // Split by sentence or newline for better paragraph formatting
+            let paragraphs;
+            if (highlightedContent.includes('\n')) {
+                paragraphs = highlightedContent.split('\n').filter(p => p.trim());
+            } else {
+                // Split long text into sentences and group every 2-3 sentences as a paragraph
+                const sentences = highlightedContent.match(/[^.!?]+[.!?]+/g) || [highlightedContent];
+                paragraphs = [];
+                for (let i = 0; i < sentences.length; i += 3) {
+                    paragraphs.push(sentences.slice(i, i + 3).join(' ').trim());
+                }
+            }
+            document.getElementById('article-content').innerHTML = paragraphs.map(p => `<p>${p}</p>`).join('');
+            
+            // Update keywords list (only show keywords that appear in article)
+            if (filteredKeywords.length > 0) {
+                document.getElementById('keywords-list').innerHTML = filteredKeywords.map(kw => `
+                    <div>
+                        <p class="font-bold text-slate-900 dark:text-white">${kw.term || kw.title}</p>
+                        <p class="text-sm text-slate-600 dark:text-slate-400">${kw.explanation || kw.description || ''}</p>
+                    </div>
+                `).join('');
+            }
+            
+            // Add tooltip functionality
+            setTimeout(() => {
+                const highlights = document.querySelectorAll('.keyword-highlight');
+                highlights.forEach(el => {
+                    let tooltip = null;
+                    
+                    el.addEventListener('mouseenter', (e) => {
+                        const explanation = el.getAttribute('data-tooltip');
+                        tooltip = document.createElement('div');
+                        tooltip.className = 'fixed bg-slate-900 dark:bg-slate-700 text-white text-sm px-3 py-2 rounded-lg shadow-lg z-50 max-w-xs';
+                        tooltip.textContent = explanation;
+                        document.body.appendChild(tooltip);
+                        
+                        const rect = el.getBoundingClientRect();
+                        const tooltipRect = tooltip.getBoundingClientRect();
+                        
+                        // Position tooltip above the word
+                        let top = rect.top - tooltipRect.height - 8;
+                        let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+                        
+                        // Prevent overflow
+                        if (left < 8) left = 8;
+                        if (left + tooltipRect.width > window.innerWidth - 8) {
+                            left = window.innerWidth - tooltipRect.width - 8;
+                        }
+                        if (top < 8) {
+                            // If no room above, show below
+                            top = rect.bottom + 8;
+                        }
+                        
+                        tooltip.style.top = top + 'px';
+                        tooltip.style.left = left + 'px';
+                    });
+                    
+                    el.addEventListener('mouseleave', () => {
+                        if (tooltip) {
+                            tooltip.remove();
+                            tooltip = null;
+                        }
+                    });
+                });
+            }, 100);
+            
+            // Position game block under the shorter column
+            setTimeout(() => {
+                const articleColumn = document.getElementById('article-column');
+                const keywordsColumn = document.getElementById('keywords-column');
+                const gameBlock = document.getElementById('game-block');
+                
+                // Get the first child (the content box) of each column to measure
+                const articleContent = articleColumn.querySelector('.bg-white');
+                const keywordsContent = keywordsColumn.querySelector('.bg-white');
+                
+                const articleHeight = articleContent ? articleContent.offsetHeight : 0;
+                const keywordsHeight = keywordsContent ? keywordsContent.offsetHeight : 0;
+                
+                console.log('Article content height:', articleHeight, 'Keywords content height:', keywordsHeight);
+                
+                if (articleHeight < keywordsHeight) {
+                    // Article is shorter, add game block to article column
+                    articleColumn.appendChild(gameBlock);
+                    console.log('Game block added to article column (shorter)');
+                } else {
+                    // Keywords is shorter or equal, add game block to keywords column
+                    keywordsColumn.appendChild(gameBlock);
+                    console.log('Game block added to keywords column (shorter or equal)');
+                }
+                
+                gameBlock.style.display = 'block';
+            }, 500);
+            
+            // Update background with keyword highlighting - one sentence per paragraph
+            const bgContent = data.background_read || [];
+            let bgText = Array.isArray(bgContent) ? bgContent.join(' ') : bgContent;
+            
+            // Split into sentences (by period followed by space or end of string)
+            const sentences = bgText.split(/\.\s+/).filter(s => s.trim());
+            
+            // Highlight keywords in each sentence
+            const bgParagraphs = sentences.map(sentence => {
+                let highlightedSentence = sentence.trim();
+                if (!highlightedSentence.endsWith('.')) {
+                    highlightedSentence += '.';
+                }
+                
+                filteredKeywords.forEach(kw => {
+                    const term = kw.term || kw.title;
+                    const explanation = kw.explanation || kw.description || '';
+                    const regex = new RegExp(`\\b(${term})\\b`, 'gi');
+                    highlightedSentence = highlightedSentence.replace(regex, 
+                        `<span class="keyword-highlight font-semibold text-primary cursor-help border-b-2 border-primary/30" data-tooltip="${explanation.replace(/"/g, '&quot;')}">$1</span>`
+                    );
+                });
+                
+                return `<p>${highlightedSentence}</p>`;
+            }).join('');
+            
+            document.getElementById('background-content').innerHTML = bgParagraphs;
+            
+            // Update full article in background tab
+            document.getElementById('background-full-article').innerHTML = paragraphs.map(p => `<p>${p}</p>`).join('');
+            
+            // Update structure with keyword highlighting and table format
+            const structure = data.Article_Structure || [];
+            
+            // Parse structure - expecting format like "Who: ..., What: ..., Where: ..., Why: ..."
+            let structureHtml = '';
+            if (Array.isArray(structure) && structure.length > 0) {
+                const structText = structure.join(' ');
+                
+                // Try to parse Who/What/Where/Why/When/How
+                const elements = {
+                    'Who': '',
+                    'What': '',
+                    'Where': '',
+                    'When': '',
+                    'Why': '',
+                    'How': ''
+                };
+                
+                // Extract each element
+                Object.keys(elements).forEach(key => {
+                    // Match content after "Key:" until we hit another key or end of string
+                    const regex = new RegExp(`${key}:\\s*([^]*?)(?=\\s*(?:Who:|What:|Where:|When:|Why:|How:|$))`, 'i');
+                    const match = structText.match(regex);
+                    if (match) {
+                        let content = match[1].trim();
+                        
+                        // Remove any trailing key labels that might have been captured
+                        content = content.replace(/\s*(Who|What|Where|When|Why|How):\s*$/i, '').trim();
+                        
+                        // Highlight keywords in content
+                        filteredKeywords.forEach(kw => {
+                            const term = kw.term || kw.title;
+                            const explanation = kw.explanation || kw.description || '';
+                            const kwRegex = new RegExp(`\\b(${term})\\b`, 'gi');
+                            content = content.replace(kwRegex, 
+                                `<span class="keyword-highlight font-semibold text-primary cursor-help border-b-2 border-primary/30" data-tooltip="${explanation.replace(/"/g, '&quot;')}">$1</span>`
+                            );
+                        });
+                        elements[key] = content;
+                    }
+                });
+                
+                // Count how many elements we found
+                const foundElements = Object.values(elements).filter(v => v).length;
+                
+                // Only use table format if we have all 6 elements (Who/What/Where/When/Why/How)
+                if (foundElements === 6) {
+                    structureHtml = `
+                        <table class="w-full border-collapse">
+                            ${Object.entries(elements).filter(([_, value]) => value).map(([key, value]) => `
+                                <tr class="border-b border-slate-200 dark:border-slate-700">
+                                    <td class="py-3 pr-4 font-bold text-primary align-top w-24">${key}:</td>
+                                    <td class="py-3 text-slate-700 dark:text-slate-300">${value}</td>
+                                </tr>
+                            `).join('')}
+                        </table>
+                    `;
+                } else {
+                    // Fall back to paragraph format if not all elements present
+                    // Split into sentences
+                    const sentences = structText.split(/\.\s+/).filter(s => s.trim());
+                    
+                    const structParagraphs = sentences.map(sentence => {
+                        let highlightedSentence = sentence.trim();
+                        if (!highlightedSentence.endsWith('.')) {
+                            highlightedSentence += '.';
+                        }
+                        
+                        // Highlight special terms in green
+                        highlightedSentence = highlightedSentence.replace(/\b(Main Points?|Purpose|Methodology|Evidence|established)\b/gi, 
+                            '<span class="font-bold text-green-600 dark:text-green-400">$1</span>');
+                        
+                        // Highlight keywords
+                        filteredKeywords.forEach(kw => {
+                            const term = kw.term || kw.title;
+                            const explanation = kw.explanation || kw.description || '';
+                            const regex = new RegExp(`\\b(${term})\\b`, 'gi');
+                            highlightedSentence = highlightedSentence.replace(regex, 
+                                `<span class="keyword-highlight font-semibold text-primary cursor-help border-b-2 border-primary/30" data-tooltip="${explanation.replace(/"/g, '&quot;')}">$1</span>`
+                            );
+                        });
+                        
+                        return `<p>${highlightedSentence}</p>`;
+                    }).join('');
+                    
+                    structureHtml = structParagraphs;
+                }
+            } else {
+                const structText = Array.isArray(structure) ? structure.join(' ') : structure;
+                // Split into sentences for fallback
+                const sentences = structText.split(/\.\s+/).filter(s => s.trim());
+                
+                const structParagraphs = sentences.map(sentence => {
+                    let highlightedSentence = sentence.trim();
+                    if (!highlightedSentence.endsWith('.')) {
+                        highlightedSentence += '.';
+                    }
+                    
+                    // Highlight special terms in green
+                    highlightedSentence = highlightedSentence.replace(/\b(Main Points?|Purpose|Methodology|Evidence|established)\b/gi, 
+                        '<span class="font-bold text-green-600 dark:text-green-400">$1</span>');
+                    
+                    // Highlight keywords
+                    filteredKeywords.forEach(kw => {
+                        const term = kw.term || kw.title;
+                        const explanation = kw.explanation || kw.description || '';
+                        const regex = new RegExp(`\\b(${term})\\b`, 'gi');
+                        highlightedSentence = highlightedSentence.replace(regex, 
+                            `<span class="keyword-highlight font-semibold text-primary cursor-help border-b-2 border-primary/30" data-tooltip="${explanation.replace(/"/g, '&quot;')}">$1</span>`
+                        );
+                    });
+                    
+                    return `<p>${highlightedSentence}</p>`;
+                }).join('');
+                
+                structureHtml = structParagraphs;
+            }
+            
+            document.getElementById('structure-content').innerHTML = structureHtml;
+            
+            // Update quiz full article
+            document.getElementById('quiz-full-article').innerHTML = paragraphs.map(p => `<p>${p}</p>`).join('');
+            
+            // Update quiz questions - randomly select up to 5 questions and store them
+            const questions = data.questions || [];
+            if (questions.length > 0) {
+                // Randomly select up to 5 questions
+                const shuffledQuestions = [...questions].sort(() => Math.random() - 0.5);
+                const selectedQuestions = shuffledQuestions.slice(0, Math.min(5, questions.length));
+                
+                // Store questions globally for answer checking
+                window.quizQuestions = selectedQuestions.map(q => {
+                    const shuffledOptions = [...(q.options || [])].sort(() => Math.random() - 0.5);
+                    return {
+                        question: q.question,
+                        options: shuffledOptions,
+                        correctAnswer: q.correct_answer
+                    };
+                });
+                
+                renderQuizQuestions();
+                document.getElementById('quiz-actions').classList.remove('hidden');
+            }
+            
+            // Update perspectives
+            const perspectives = data.perspectives || [];
+            if (perspectives.length > 0) {
+                document.getElementById('perspectives-list').innerHTML = perspectives.map(p => {
+                    // Map perspective names to icons
+                    const perspectiveName = p.perspective || p.viewpoint || '';
+                    let icon = 'info';
+                    
+                    if (perspectiveName.toLowerCase().includes('positive')) icon = 'thumb_up';
+                    else if (perspectiveName.toLowerCase().includes('negative')) icon = 'thumb_down';
+                    else if (perspectiveName.toLowerCase().includes('neutral')) icon = 'horizontal_rule';
+                    else if (perspectiveName.toLowerCase().includes('organization')) icon = 'business';
+                    else if (perspectiveName.toLowerCase().includes('author')) icon = 'edit';
+                    else if (perspectiveName.toLowerCase().includes('education')) icon = 'school';
+                    else if (perspectiveName.toLowerCase().includes('publishing')) icon = 'library_books';
+                    
+                    return `
+                        <div class="flex flex-col gap-4 p-5 rounded-xl bg-white dark:bg-background-dark/50 shadow-sm border border-slate-200 dark:border-white/10">
+                            <div class="flex items-center gap-3">
+                                <div class="flex items-center justify-center size-10 rounded-full bg-primary/10 text-primary">
+                                    <span class="material-symbols-outlined">${icon}</span>
+                                </div>
+                                <p class="text-slate-900 dark:text-white text-lg font-bold font-display">${perspectiveName}</p>
+                            </div>
+                            <p class="text-slate-600 dark:text-slate-300 text-sm">${p.description || p.content || ''}</p>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            // Update full article in perspective tab
+            if (document.getElementById('perspective-full-article')) {
+                document.getElementById('perspective-full-article').innerHTML = paragraphs.map(p => `<p>${p}</p>`).join('');
+            }
+        } catch (error) {
+            console.error('Error loading article:', error);
+            document.querySelector('.text-4xl').textContent = 'Error loading article';
+            document.getElementById('article-content').innerHTML = '<p class="text-red-600">Failed to load article. Please check console for details.</p>';
+        }
+    }
+    
+    // ========== KEYWORD MATCHING GAME ==========
+    function startKeywordGame() {
+        const keywords = window.articleKeywords || [];
+        if (keywords.length === 0) {
+            alert('No keywords available to play the game.');
+            return;
+        }
+        
+        // Use all keywords if less than 5, otherwise randomly select 5
+        const shuffled = [...keywords].sort(() => Math.random() - 0.5);
+        const numWords = Math.min(keywords.length, 5);
+        const gameWords = shuffled.slice(0, numWords);
+        
+        // Create game modal
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4';
+        modal.innerHTML = `
+            <div class="bg-white dark:bg-slate-800 rounded-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Match Keywords with Meanings</h2>
+                    <button onclick="this.closest('.fixed').remove()" class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <p class="text-slate-600 dark:text-slate-400 mb-6">Match each keyword with its correct explanation:</p>
+                <div id="game-container" class="space-y-4">
+                    ${gameWords.map((kw, i) => {
+                        const term = kw.term || kw.title;
+                        return `
+                            <div class="flex gap-4 items-center" data-word-index="${i}">
+                                <div class="flex-1 bg-primary/10 text-primary font-bold px-4 py-3 rounded-lg text-center">
+                                    ${term}
+                                </div>
+                                <select class="flex-1 px-4 py-3 rounded-lg border-2 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white" data-answer="${i}">
+                                    <option value="">Select meaning...</option>
+                                    ${gameWords.map((opt, j) => `<option value="${j}">${opt.explanation || opt.description}</option>`).join('')}
+                                </select>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                <div class="mt-6 flex gap-4">
+                    <button onclick="checkGameAnswers()" class="flex-1 bg-primary text-white px-6 py-3 rounded-lg font-bold hover:bg-primary/90">
+                        Check Answers
+                    </button>
+                    <button onclick="this.closest('.fixed').remove()" class="flex-1 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white px-6 py-3 rounded-lg font-bold hover:bg-slate-300 dark:hover:bg-slate-600">
+                        Cancel
+                    </button>
+                </div>
+                <div id="game-result" class="mt-4 hidden"></div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    
+    function checkGameAnswers() {
+        const container = document.getElementById('game-container');
+        const rows = container.querySelectorAll('[data-word-index]');
+        let correct = 0;
+        let total = rows.length;
+        
+        rows.forEach(row => {
+            const select = row.querySelector('select');
+            const correctAnswer = select.getAttribute('data-answer');
+            const userAnswer = select.value;
+            
+            if (userAnswer === correctAnswer) {
+                correct++;
+                select.className = select.className.replace('border-slate-300', 'border-green-500').replace('border-slate-600', 'border-green-500');
+            } else {
+                select.className = select.className.replace('border-slate-300', 'border-red-500').replace('border-slate-600', 'border-red-500');
+            }
+        });
+        
+        const percentage = Math.round((correct / total) * 100);
+        const stars = Math.round((correct / total) * 5);
+        const starDisplay = '⭐'.repeat(stars) + '☆'.repeat(5 - stars);
+        
+        const result = document.getElementById('game-result');
+        result.className = 'mt-4 p-4 rounded-lg text-center';
+        if (correct === total) {
+            result.className += ' bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200';
+            result.innerHTML = `
+                <div class="text-4xl mb-2">${starDisplay}</div>
+                <div class="text-2xl font-bold mb-2">${percentage}%</div>
+                <div class="font-bold mb-4">Perfect! You got all ${total} correct! 🎉</div>
+            `;
+        } else {
+            result.className += ' bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200';
+            result.innerHTML = `
+                <div class="text-4xl mb-2">${starDisplay}</div>
+                <div class="text-2xl font-bold mb-2">${percentage}%</div>
+                <div class="font-bold mb-4">You got ${correct} out of ${total} correct. Keep learning!</div>
+            `;
+        }
+        result.classList.remove('hidden');
+        
+        // Replace the check/cancel buttons with retry/return
+        const buttonContainer = result.previousElementSibling;
+        buttonContainer.innerHTML = `
+            <button onclick="startKeywordGame(); this.closest('.fixed').remove();" class="flex-1 bg-primary text-white px-6 py-3 rounded-lg font-bold hover:bg-primary/90 flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined">refresh</span>
+                Retry
+            </button>
+            <button onclick="this.closest('.fixed').remove()" class="flex-1 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white px-6 py-3 rounded-lg font-bold hover:bg-slate-300 dark:hover:bg-slate-600 flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined">arrow_back</span>
+                Return
+            </button>
+        `;
+    }
+    
+    // ========== QUIZ FUNCTIONS ==========
+    function renderQuizQuestions() {
+        const labels = ['A', 'B', 'C', 'D'];
+        window.quizAnswers = new Array(window.quizQuestions.length).fill(null);
+        
+        document.getElementById('quiz-questions').innerHTML = window.quizQuestions.map((q, qIndex) => {
+            return `
+                <div class="space-y-2 pb-3 border-b border-slate-200 dark:border-slate-700 last:border-b-0">
+                    <p class="font-bold text-slate-900 dark:text-white text-sm">${qIndex + 1}. ${q.question}</p>
+                    <div class="space-y-1">
+                        ${q.options.map((opt, optIndex) => `
+                            <button 
+                                onclick="selectQuizAnswer(${qIndex}, '${opt.replace(/'/g, "\\'")}')" 
+                                class="quiz-option w-full text-left px-3 py-2 rounded-lg border-2 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-xs flex gap-2"
+                                data-question="${qIndex}"
+                                data-answer="${opt.replace(/"/g, '&quot;')}">
+                                <span class="font-bold text-primary">${labels[optIndex]}.</span>
+                                <span>${opt}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    function selectQuizAnswer(questionIndex, answer) {
+        window.quizAnswers[questionIndex] = answer;
+        
+        // Update UI to show selection
+        const buttons = document.querySelectorAll(`[data-question="${questionIndex}"]`);
+        buttons.forEach(btn => {
+            if (btn.getAttribute('data-answer') === answer) {
+                btn.classList.remove('border-slate-300', 'border-slate-600');
+                btn.classList.add('border-primary', 'bg-primary/10');
+            } else {
+                btn.classList.remove('border-primary', 'bg-primary/10');
+                btn.classList.add('border-slate-300', 'dark:border-slate-600');
+            }
+        });
+    }
+    
+    function submitQuizAnswers() {
+        let correct = 0;
+        const total = window.quizQuestions.length;
+        
+        window.quizQuestions.forEach((q, index) => {
+            const userAnswer = window.quizAnswers[index];
+            const isCorrect = userAnswer === q.correctAnswer;
+            
+            if (isCorrect) {
+                correct++;
+            }
+            
+            // Update UI to show correct/wrong
+            const buttons = document.querySelectorAll(`[data-question="${index}"]`);
+            buttons.forEach(btn => {
+                const btnAnswer = btn.getAttribute('data-answer');
+                btn.onclick = null; // Disable clicking
+                
+                if (btnAnswer === q.correctAnswer) {
+                    // Show correct answer in green
+                    btn.classList.remove('border-slate-300', 'border-slate-600', 'border-primary', 'border-red-500');
+                    btn.classList.add('border-green-500', 'bg-green-100', 'dark:bg-green-900/30');
+                } else if (btnAnswer === userAnswer && !isCorrect) {
+                    // Show wrong selection in red
+                    btn.classList.remove('border-slate-300', 'border-slate-600', 'border-primary');
+                    btn.classList.add('border-red-500', 'bg-red-100', 'dark:bg-red-900/30');
+                }
+            });
+        });
+        
+        // Show results
+        const percentage = Math.round((correct / total) * 100);
+        const stars = Math.round((correct / total) * 5);
+        const starDisplay = '⭐'.repeat(stars) + '☆'.repeat(5 - stars);
+        
+        const result = document.getElementById('quiz-result');
+        result.className = 'mt-4 p-4 rounded-lg text-center';
+        
+        if (correct === total) {
+            result.className += ' bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200';
+            result.innerHTML = `
+                <div class="text-4xl mb-2">${starDisplay}</div>
+                <div class="text-2xl font-bold mb-2">${percentage}%</div>
+                <div class="font-bold">Perfect! You got all ${total} correct! 🎉</div>
+            `;
+        } else {
+            result.className += ' bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200';
+            result.innerHTML = `
+                <div class="text-4xl mb-2">${starDisplay}</div>
+                <div class="text-2xl font-bold mb-2">${percentage}%</div>
+                <div class="font-bold">You got ${correct} out of ${total} correct.</div>
+            `;
+        }
+        result.classList.remove('hidden');
+        
+        // Hide submit button, show retry
+        document.getElementById('quiz-actions').classList.add('hidden');
+        document.getElementById('quiz-retry').classList.remove('hidden');
+    }
+    
+    function retryQuiz() {
+        // Hide result and retry button
+        document.getElementById('quiz-result').classList.add('hidden');
+        document.getElementById('quiz-retry').classList.add('hidden');
+        document.getElementById('quiz-actions').classList.remove('hidden');
+        
+        // Re-render questions with new randomization
+        renderQuizQuestions();
+    }
 </script>
+</div>
+</div>
 </body>
 </html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Article Activity - Background &amp; Analyze</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#13a4ec",
+              "background-light": "#f6f7f8",
+              "background-dark": "#101c22",
+              "positive": "#28a745",
+              "neutral": "#6c757d",
+              "negative": "#dc3545",
+            },
+            fontFamily: {
+              "display": ["Newsreader", "serif"]
+            },
+            borderRadius: {
+              "DEFAULT": "0.25rem",
+              "lg": "0.5rem",
+              "xl": "0.75rem",
+              "full": "9999px"
+            },
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<div class="flex flex-1 justify-center py-5">
+<div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+<main class="flex-1 px-4 py-8">
+<div class="flex flex-wrap justify-between gap-3 p-4">
+<p class="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em] min-w-72">The Future of Renewable Energy</p>
+<a class="flex items-center gap-2 self-start rounded-lg bg-white dark:bg-slate-800 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 shadow-sm border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700" href="#">
+<span class="material-symbols-outlined">arrow_back</span>
+                                Back to Main Page
+                            </a>
+</div>
+<div class="pb-3">
+<div class="flex border-b border-slate-200 dark:border-white/10 px-4 gap-8">
+<a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-slate-500 dark:text-slate-400 pb-[13px] pt-4" href="#">
+<p class="text-sm font-bold leading-normal tracking-[0.015em]">Full Article with Keywords</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-[3px] border-b-primary text-primary pb-[13px] pt-4" href="#">
+<p class="text-sm font-bold leading-normal tracking-[0.015em]">Background &amp; Analyze</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-slate-500 dark:text-slate-400 pb-[13px] pt-4" href="#">
+<p class="text-sm font-bold leading-normal tracking-[0.015em]">Quiz</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-slate-500 dark:text-slate-400 pb-[13px] pt-4" href="#">
+<p class="text-sm font-bold leading-normal tracking-[0.015em]">Perspective &amp; Discussion</p>
+</a>
+</div>
+</div>
+<div class="p-4 space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="bg-white dark:bg-background-dark/50 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-white/10">
+<h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4">Background Context</h2>
+<div class="text-slate-700 dark:text-slate-300 leading-relaxed space-y-4 text-lg/8">
+<p>The conversation around renewable energy is rooted in the industrial revolution, which was powered by fossil fuels like coal and oil. While these fuels drove unprecedented economic growth, their combustion released vast amounts of greenhouse gases, primarily carbon dioxide, into the atmosphere. This has led to global warming and climate change, characterized by rising sea levels, extreme weather events, and threats to biodiversity. The 1970s oil crisis first highlighted the economic and political vulnerabilities tied to a dependence on finite fossil fuels, sparking initial interest in alternative energy sources. Today, the urgency is amplified by scientific consensus on climate change, making the transition to renewables a global priority for environmental sustainability and energy independence.</p>
+</div>
+</div>
+<div class="bg-white dark:bg-background-dark/50 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-white/10">
+<h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4">Article Structure Analysis</h2>
+<div class="text-slate-700 dark:text-slate-300 leading-relaxed space-y-4 text-lg/8">
+<p>This article is structured as a classic problem-solution text. It begins by introducing the topic and its importance (the shift to renewables). The subsequent paragraphs elaborate on the solutions (solar, wind) before pivoting to the problems and challenges associated with them (intermittency, resource requirements). The final paragraph synthesizes these points, concluding that a multi-faceted, "holistic approach" is required. This structure effectively educates the reader by first presenting the positive aspects of the trend and then introducing the complexities, leading to a balanced and comprehensive conclusion.</p>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-background-dark/50 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-white/10" x-data="{ expanded: false }">
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">Full Article</h2>
+<button @click="expanded = !expanded" class="flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+<span x-text="expanded ? 'Show Less' : 'Show More'">Show More</span>
+<span :class="{ 'rotate-180': expanded }" class="material-symbols-outlined transition-transform duration-300">expand_more</span>
+</button>
+</div>
+<div :class="{ 'max-h-none': expanded }" class="text-slate-700 dark:text-slate-300 leading-relaxed space-y-4 text-lg/8 max-h-40 overflow-hidden transition-[max-height] duration-500 ease-in-out">
+<p>The global shift towards renewable energy represents one of the most significant transformations in the history of industrial society. Driven by the urgent need to combat climate change, enhance energy security, and foster sustainable economic growth, nations worldwide are increasingly investing in technologies such as solar, wind, hydro, and geothermal power.</p>
+<p>Solar power, once a niche technology, has seen exponential growth due to falling costs of photovoltaic (PV) panels and advancements in efficiency. Large-scale solar farms and rooftop installations are becoming commonplace, offering a clean, decentralized source of energy. Similarly, wind energy has matured into a major player in the electricity sector, with towering turbines dotting landscapes and coastlines, harnessing the kinetic energy of the wind to power millions of homes and businesses.</p>
+<p>However, the path to a fully renewable energy future is not without its obstacles. The intermittent nature of solar and wind power—the sun doesn't always shine, and the wind doesn't always blow—poses a significant challenge to grid stability. This necessitates the development of large-scale energy storage solutions, such as batteries and pumped-hydro storage, as well as smarter, more flexible grid management systems.</p>
+<p>Furthermore, the manufacturing of renewable energy components, including solar panels and wind turbines, requires significant resources and energy, and can have its own environmental footprint. The land use requirements for large-scale renewable projects can also conflict with agriculture, conservation, and community interests. Addressing these challenges requires a holistic approach that balances technological innovation with thoughtful policy, public investment, and international cooperation. As we move forward, the future of renewable energy will depend not only on our ability to innovate but also on our commitment to creating a just and equitable transition for all.</p>
+</div>
+</div>
+</div>
+</main>
+<footer class="flex items-center justify-between whitespace-nowrap border-t border-solid border-t-[#f0f3f4] dark:border-t-white/10 px-10 py-4">
+<p class="text-sm text-slate-500 dark:text-slate-400">© 2024 NewsReader. All Rights Reserved.</p>
+<div class="flex items-center gap-6">
+<a class="text-sm text-slate-500 dark:text-slate-400 hover:text-primary" href="#">Privacy Policy</a>
+<a class="text-sm text-slate-500 dark:text-slate-400 hover:text-primary" href="#">Terms of Service</a>
+<a class="text-sm text-slate-500 dark:text-slate-400 hover:text-primary" href="#">Contact Us</a>
+</div>
+</footer>
+</div>
+</div>
+</div>
+<script defer="" src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+<script defer="" src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</div>
+</body></html>
