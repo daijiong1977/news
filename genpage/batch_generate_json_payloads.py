@@ -11,11 +11,18 @@ import sqlite3
 from pathlib import Path
 from datetime import datetime
 import argparse
+import os
 
 
 def get_db_connection():
     """Get database connection."""
-    db_path = Path('/Users/jidai/news/articles.db')
+    # Try to find articles.db relative to script location
+    script_dir = Path(__file__).parent.parent
+    db_path = script_dir / 'articles.db'
+    
+    if not db_path.exists():
+        raise FileNotFoundError(f"Database not found at {db_path}")
+    
     conn = sqlite3.connect(str(db_path))
     conn.row_factory = sqlite3.Row
     return conn
@@ -123,7 +130,9 @@ def generate_payload_jsons(force=False):
         force: If True, regenerate all payloads. If False, only generate missing ones.
     """
     
-    output_base = Path('/Users/jidai/news/website/article_page')
+    # Use relative path from script location
+    script_dir = Path(__file__).parent.parent
+    output_base = script_dir / 'website' / 'article_page'
     
     # Get articles that need payload generation
     articles = get_pending_articles(force=force)
