@@ -311,6 +311,59 @@ class JSONPayloadGenerator:
         return payload_sizes
 
 
+def update_archive_dates(main_dir: str, current_payload_dir: str):
+    """Update archive_available_dates.json based on existing payload directories.
+    
+    Args:
+        main_dir: Path to website/main/
+        current_payload_dir: Path to the current payload directory being generated
+    """
+    # Pattern: payloads_YYYYMMDD_HHMMSS
+    pattern = re.compile(r'^payloads_(\d{8})_(\d{6})$')
+    
+    dates_dict = {}  # {date: [list of timestamps]}
+    
+    for item in Path(main_dir).iterdir():
+        if item.is_dir():
+            match = pattern.match(item.name)
+            if match:
+                date = match.group(1)
+                timestamp = match.group(2)
+                
+                if date not in dates_dict:
+                    dates_dict[date] = []
+                dates_dict[date].append(timestamp)
+    
+    # Sort timestamps for each date to get the latest
+    dates_data = []
+    for date in sorted(dates_dict.keys()):
+        timestamps = sorted(dates_dict[date], reverse=True)
+        latest_timestamp = timestamps[0]
+        
+        dates_data.append({
+            'date': date,
+            'latest_timestamp': latest_timestamp,
+            'directory': f'payloads_{date}_{latest_timestamp}',
+            'count': len(timestamps)
+        })
+    
+    # Create output structure
+    output = {
+        'generated_at': datetime.now().isoformat(),
+        'total_dates': len(dates_data),
+        'dates': [d['date'] for d in dates_data],
+        'details': dates_data
+    }
+    
+    # Write to CURRENT payload directory
+    output_file = os.path.join(current_payload_dir, 'archive_available_dates.json')
+    
+    with open(output_file, 'w', encoding='utf-8') as f:
+        json.dump(output, f, indent=2, ensure_ascii=False)
+    
+    print(f"  ✓ Archive index created: {len(dates_data)} dates available")
+
+
 class HTMLGenerator:
     """Generate lightweight HTML with embedded JavaScript for dynamic loading."""
     
@@ -388,7 +441,7 @@ def generate_website_enhanced():
         total_articles += len(articles)
         print(f"  - {cat_name} (ID: {cat_id}): {len(articles)} articles")
     
-    # Generate JSON payloads in versioned directory
+    # Generate JSON payloads in versioned directory (for backup/archive)
     print("\n📦 Generating JSON payloads...")
     versioned_payloads_dir = os.path.join(MAIN_DIR, f'payloads_{timestamp}')
     Path(versioned_payloads_dir).mkdir(parents=True, exist_ok=True)
@@ -396,6 +449,17 @@ def generate_website_enhanced():
     total_payload_size = sum(payload_sizes.values())
     print(f"  Total payload size: {total_payload_size/1024:.1f}KB")
     print(f"  Directory: payloads_{timestamp}/")
+    
+    # Create/update symlink to latest payloads
+    payloads_latest = os.path.join(MAIN_DIR, 'payloads_latest')
+    if os.path.islink(payloads_latest) or os.path.exists(payloads_latest):
+        os.remove(payloads_latest)
+    os.symlink(f'payloads_{timestamp}', payloads_latest)
+    print(f"  Symlink: payloads_latest -> payloads_{timestamp}/")
+    
+    # Update archive available dates
+    print("\n📅 Updating archive dates...")
+    update_archive_dates(MAIN_DIR, versioned_payloads_dir)
     
     # Read template
     print("\n📖 Reading template...")
@@ -426,7 +490,7 @@ def generate_website_enhanced():
     default_cards_html = ""
     for data in all_default_cards:
         card_html = f'''<div class="flex flex-col gap-3 bg-card-light dark:bg-card-dark rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1" data-article-id="{data['id']}">
-<a href="../article_page/article.html?id={data['id']}&level=middle" class="w-full bg-center bg-no-repeat aspect-video bg-cover cursor-pointer hover:opacity-90 transition-opacity" style="{'background-image: url(\'' + data['image_url'] + '\');' if data['image_url'] else 'background-color: #e4e4e7;'}"></a>
+<a href="./article_page/article.html?id={data['id']}&level=middle" class="w-full bg-center bg-no-repeat aspect-video bg-cover cursor-pointer hover:opacity-90 transition-opacity" style="{'background-image: url(\'' + data['image_url'] + '\');' if data['image_url'] else 'background-color: #e4e4e7;'}"></a>
 <div class="flex flex-col gap-2 p-4 pt-2">
 <h3 class="text-lg font-bold leading-snug tracking-tight article-title">{data['title']}</h3>
 <div class="flex items-center gap-2 text-xs text-subtle-light dark:text-subtle-dark">
@@ -436,7 +500,7 @@ def generate_website_enhanced():
 </div>
 <p class="text-subtle-light dark:text-subtle-dark text-sm font-normal leading-relaxed article-summary" style="overflow-wrap: break-word; word-break: break-word;">{data['summary']}</p>
 <div class="flex justify-end mt-2">
-<a href="../article_page/article.html?id={data['id']}&level=middle" class="text-primary hover:text-primary/80 font-semibold text-sm transition-colors">
+<a href="./article_page/article.html?id={data['id']}&level=middle" class="text-primary hover:text-primary/80 font-semibold text-sm transition-colors">
 Activities →
 </a>
 </div>
@@ -446,14 +510,14 @@ Activities →
     
     # Add JavaScript for dynamic loading with category + difficulty support
     print("\n⚙️  Injecting dynamic loading script...")
-    payload_base_path = f'./payloads_{timestamp}/'
+    payload_base_path = './main/payloads_latest/'
     dynamic_js = '''<script>
 // Dynamic article loading by category and difficulty level
 const PAYLOAD_BASE = '{PAYLOAD_BASE}';
 
 // Template for regular levels (with Activities link)
 const CARD_TEMPLATE = `<div class="flex flex-col gap-3 bg-card-light dark:bg-card-dark rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1" data-article-id="{{id}}">
-<a href="../article_page/article.html?id={{id}}&level={{levelKey}}" class="w-full bg-center bg-no-repeat aspect-video bg-cover cursor-pointer hover:opacity-90 transition-opacity" style="{{imageStyle}}"></a>
+<a href="./article_page/article.html?id={{id}}&level={{levelKey}}" class="w-full bg-center bg-no-repeat aspect-video bg-cover cursor-pointer hover:opacity-90 transition-opacity" style="{{imageStyle}}"></a>
 <div class="flex flex-col gap-2 p-4 pt-2">
 <h3 class="text-lg font-bold leading-snug tracking-tight article-title">{{title}}</h3>
 <div class="flex items-center gap-2 text-xs text-subtle-light dark:text-subtle-dark">
@@ -463,7 +527,7 @@ const CARD_TEMPLATE = `<div class="flex flex-col gap-3 bg-card-light dark:bg-car
 </div>
 <p class="text-subtle-light dark:text-subtle-dark text-sm font-normal leading-relaxed article-summary" style="overflow-wrap: break-word; word-break: break-word;">{{summary}}</p>
 <div class="flex justify-end mt-2">
-<a href="../article_page/article.html?id={{id}}&level={{levelKey}}" class="text-primary hover:text-primary/80 font-semibold text-sm transition-colors">
+<a href="./article_page/article.html?id={{id}}&level={{levelKey}}" class="text-primary hover:text-primary/80 font-semibold text-sm transition-colors">
 Activities →
 </a>
 </div>
@@ -487,8 +551,7 @@ const CARD_TEMPLATE_CN = `<div class="flex flex-col gap-3 bg-card-light dark:bg-
 const levelMap = {
   'Relax': 'easy',
   'Enjoy': 'middle',
-  'Research': 'high',
-  'CN': 'cn'
+  'Research': 'high'
 };
 
 // Track current selections
@@ -500,12 +563,11 @@ async function loadArticles(category, level) {
   // Always read current language mode from localStorage
   const isChineseMode = localStorage.getItem('language') === 'cn';
   
-  // If in Chinese mode, override level to 'cn'
-  let finalLevel = isChineseMode ? 'CN' : level;
-  const levelKey = levelMap[finalLevel] || 'middle';
+  // If in Chinese mode, use 'cn' level directly; otherwise map the level
+  const levelKey = isChineseMode ? 'cn' : (levelMap[level] || 'middle');
   const categoryLower = category.toLowerCase();
   
-  console.log(`Loading articles: ${category} / ${finalLevel} (${levelKey})`);
+  console.log(`Loading articles: ${category} / ${isChineseMode ? 'CN' : level} (${levelKey})`);
   console.log(`Chinese mode: ${isChineseMode}`);
   
   try {
@@ -666,8 +728,8 @@ document.addEventListener('DOMContentLoaded', function() {
     # Write main HTML file
     print("\n💾 Writing enhanced HTML...")
     
-    # Main index.html
-    output_path = os.path.join(MAIN_DIR, 'index.html')
+    # Main index.html at website root
+    output_path = os.path.join(WEBSITE_DIR, 'index.html')
     try:
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write(output_html)
@@ -678,7 +740,7 @@ document.addEventListener('DOMContentLoaded', function() {
         print(f"❌ Error writing main HTML: {e}")
         return False
     
-    # Timestamped backup
+    # Timestamped backup in main directory
     timestamped_path = os.path.join(MAIN_DIR, f'index_{timestamp}.html')
     try:
         with open(timestamped_path, 'w', encoding='utf-8') as f:
