@@ -121,8 +121,18 @@ class ArticleLoader:
             
             conn.close()
             
-            # Re-sort by pub_date DESC to get chronological order
-            all_articles.sort(key=lambda x: x['pub_date'], reverse=True)
+            # Re-sort by pub_date DESC with proper date parsing
+            # pub_date is in RFC format like "Fri, 24 Oct 2025 08:46:37 GMT"
+            def parse_pub_date(article):
+                try:
+                    pub_date_str = article.get('pub_date', '')
+                    # Parse RFC date string to datetime
+                    dt = parsedate_to_datetime(pub_date_str)
+                    return dt
+                except:
+                    return datetime.min  # If parsing fails, treat as oldest
+            
+            all_articles.sort(key=parse_pub_date, reverse=True)
             
             # Enrich with response data and images
             for article in all_articles:
