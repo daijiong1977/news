@@ -6,7 +6,28 @@
 
 **Status**: ✅ Production Ready  
 **Last Updated**: October 26, 2025  
-**Repository**: https://github.com/daijiong1977/news
+**Repository**: https://github.com/daijiong1977/news  
+**Production Site**: https://news.6ray.com
+
+---
+
+## Production Server Access
+
+```bash
+# SSH to production server
+ssh -i ~/Downloads/web1.pem ec2-user@18.223.121.227
+
+# Website directory
+cd /var/www/news
+
+# Pull latest code
+git pull origin en_gen_suc_2
+
+# Deploy updated HTML files
+cp webback/index.html website/
+cp webback/archive.html website/main/
+cp webback/article.html website/article_page/
+```
 
 ---
 
