@@ -6,7 +6,8 @@ Orchestrates the complete data pipeline (NO PURGE - run manually via cron):
 1. MINING: Collect articles from RSS feeds
 2. IMAGE HANDLING: Generate web and mobile versions
 3. DEEPSEEK: AI analysis and enrichment
-4. VERIFY: Validate results
+4. PAYLOADS: Generate JSON payloads for website
+5. VERIFY: Validate results
 
 Note: Purge/reset is separate (python3 tools/reset_all.py --force)
 
@@ -14,7 +15,8 @@ Usage:
     python3 pipeline.py --mine                       # Mining only
     python3 pipeline.py --images                     # Image optimization only
     python3 pipeline.py --deepseek                   # Deepseek processing only
-    python3 pipeline.py --full                       # Complete pipeline: mine + images + deepseek + verify
+    python3 pipeline.py --payloads                   # Generate all payloads (article + main)
+    python3 pipeline.py --full                       # Complete pipeline: mine + images + deepseek + payloads + verify
     python3 pipeline.py --full --dry-run             # Preview without making changes
     python3 pipeline.py --full -v                    # Verbose output all phases
 """
@@ -673,18 +675,110 @@ def phase_verification(dry_run=False, verbose=False):
     return True, results
 
 
+def phase_article_payloads(dry_run=False, verbose=False):
+    """
+    Generate article page payloads
+    """
+    print_header("ARTICLE PAGE PAYLOADS")
+    
+    results = {
+        'phase': 'article_payloads',
+        'start_time': datetime.now().isoformat(),
+        'status': 'pending'
+    }
+    
+    log_file = setup_logging("article_payloads")
+    
+    print_info("Generating article page payloads (payload_ARTICLEID/easy.json, middle.json, high.json)")
+    
+    cmd = [
+        sys.executable,
+        str(PROJECT_ROOT / "genpayload" / "batch_generate_json_payloads.py")
+    ]
+    
+    if verbose:
+        print_info(f"Command: {' '.join(cmd)}")
+    
+    success, stdout, stderr = run_command(
+        cmd,
+        "Generate article page payloads",
+        dry_run=dry_run,
+        verbose=verbose,
+        log_file=log_file,
+        timeout=600
+    )
+    
+    results['end_time'] = datetime.now().isoformat()
+    results['status'] = 'success' if success else 'failed'
+    results['log_file'] = str(log_file)
+    
+    if success:
+        print_success("Article page payloads generated successfully")
+    else:
+        print_error("Article page payload generation failed")
+        if stderr:
+            print_error(f"Error: {stderr[:500]}")
+    
+    return success, results
+
+
+def phase_main_payloads(dry_run=False, verbose=False):
+    """
+    Generate main page payloads
+    """
+    print_header("MAIN PAGE PAYLOADS")
+    
+    results = {
+        'phase': 'main_payloads',
+        'start_time': datetime.now().isoformat(),
+        'status': 'pending'
+    }
+    
+    log_file = setup_logging("main_payloads")
+    
+    print_info("Generating main page payloads (articles_CATEGORY_LEVEL.json × 13)")
+    
+    cmd = [
+        sys.executable,
+        str(PROJECT_ROOT / "genpayload" / "mainpayload_generate.py")
+    ]
+    
+    if verbose:
+        print_info(f"Command: {' '.join(cmd)}")
+    
+    success, stdout, stderr = run_command(
+        cmd,
+        "Generate main page payloads",
+        dry_run=dry_run,
+        verbose=verbose,
+        log_file=log_file,
+        timeout=600
+    )
+    
+    results['end_time'] = datetime.now().isoformat()
+    results['status'] = 'success' if success else 'failed'
+    results['log_file'] = str(log_file)
+    
+    if success:
+        print_success("Main page payloads generated successfully")
+    else:
+        print_error("Main page payload generation failed")
+        if stderr:
+            print_error(f"Error: {stderr[:500]}")
+    
+    return success, results
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Complete News Pipeline Orchestration",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Pipeline Phases:
-  1. PURGE       - Clean database and website files (--purge)
-  2. MINING      - Collect articles from RSS feeds (--mine)
-Pipeline Phases:
   1. MINING      - Collect articles from RSS feeds (--mine)
   2. IMAGE       - Generate web and mobile versions (--images)
   3. DEEPSEEK    - AI analysis and enrichment (--deepseek)
+  4. PAYLOADS    - Generate JSON payloads for website (--payloads)
 
 Note: Purge/reset is separate (run manually: python3 tools/reset_all.py --force)
 
@@ -698,8 +792,8 @@ Examples:
   # Mining only with custom articles per seed
   python3 pipeline.py --mine --articles-per-seed 3
 
-  # Image optimization after manual mining
-  python3 pipeline.py --images
+  # Generate payloads only (after manual deepseek processing)
+  python3 pipeline.py --payloads
 
   # Preview without making changes
   python3 pipeline.py --full --dry-run
@@ -718,8 +812,10 @@ Examples:
                        help="Process images (web + mobile)")
     parser.add_argument("--deepseek", action="store_true",
                        help="Process articles with Deepseek API")
+    parser.add_argument("--payloads", action="store_true",
+                       help="Generate website payloads (article + main page)")
     parser.add_argument("--full", action="store_true",
-                       help="Run complete pipeline: mine → images → deepseek → verify")
+                       help="Run complete pipeline: mine → images → deepseek → payloads → verify")
     parser.add_argument("--verify", action="store_true",
                        help="Verify pipeline results")
     parser.add_argument("--articles-per-seed", type=int, default=2,
@@ -732,8 +828,8 @@ Examples:
     args = parser.parse_args()
     
     # Validate arguments
-    if not any([args.mine, args.images, args.deepseek, args.full, args.verify]):
-        print_error("Please specify at least one phase: --mine, --images, --deepseek, --full, or --verify")
+    if not any([args.mine, args.images, args.deepseek, args.payloads, args.full, args.verify]):
+        print_error("Please specify at least one phase: --mine, --images, --deepseek, --payloads, --full, or --verify")
         parser.print_help()
         sys.exit(1)
     
@@ -778,6 +874,20 @@ Examples:
     if args.full or args.deepseek:
         success, results = phase_deepseek_with_retry(dry_run=args.dry_run, verbose=args.verbose, max_passes=2)
         pipeline_results['phases'].append(results)
+    
+    # Payload generation
+    if args.full or args.payloads:
+        # Article page payloads first
+        success, results = phase_article_payloads(dry_run=args.dry_run, verbose=args.verbose)
+        pipeline_results['phases'].append(results)
+        if not success and args.full:
+            print_warning("Article payload generation failed, but continuing...")
+        
+        # Main page payloads
+        success, results = phase_main_payloads(dry_run=args.dry_run, verbose=args.verbose)
+        pipeline_results['phases'].append(results)
+        if not success and args.full:
+            print_warning("Main payload generation failed, but continuing...")
     
     # Verification
     if args.full or args.verify:
