@@ -1,6 +1,6 @@
 # News Pipeline - Complete Documentation
 
-**Last Updated**: October 25, 2025
+**Last Updated**: October 26, 2025
 
 ## Overview
 
@@ -8,20 +8,22 @@ The News Pipeline is a fully automated system that:
 1. **Collects** articles from RSS feeds
 2. **Optimizes** images (web and mobile versions)
 3. **Analyzes** articles using Deepseek AI
-4. **Stores** results in database with detailed logging
+4. **Generates** JSON payloads for website
+5. **Stores** results in database with detailed logging
 
 The entire pipeline is orchestrated by `pipeline.py` which manages all phases and generates timestamped logs.
 
 ## Quick Start
 
 ```bash
-# Complete pipeline (mine + images + deepseek + verify)
-python3 pipeline.py --full --articles-per-seed 1
+# Complete pipeline (mine + images + deepseek + payloads + verify)
+python3 pipeline.py --full --articles-per-seed 3
 
 # Individual phases
 python3 pipeline.py --mine                    # Mining only
 python3 pipeline.py --images                  # Image optimization only
 python3 pipeline.py --deepseek                # Deepseek processing only
+python3 pipeline.py --payloads                # Generate website payloads only
 python3 pipeline.py --verify                  # Verification only
 
 # With options
@@ -60,7 +62,16 @@ python3 pipeline.py --full --dry-run                # Preview without changes
 └────────────────┬────────────────────┘
                  │
 ┌────────────────▼────────────────────┐
-│    PHASE 4: VERIFICATION            │
+│    PHASE 4: PAYLOAD GENERATION      │
+│  Article: batch_generate_json_      │
+│           payloads.py                │
+│  Main:    mainpayload_generate.py   │
+│  ✓ Article page JSONs (easy/mid/hi) │
+│  ✓ Main page JSONs (13 files)       │
+└────────────────┬────────────────────┘
+                 │
+┌────────────────▼────────────────────┐
+│    PHASE 5: VERIFICATION            │
 │  Final validation of results        │
 │  ✓ Count articles, images, mobile   │
 │  ✓ Report processing status         │
@@ -191,6 +202,8 @@ All logs are stored in `/Users/jidai/news/log/` directory
    - `phase_mining_YYYYMMDD_HHMMSS.log`
    - `phase_image_handling_YYYYMMDD_HHMMSS.log`
    - `phase_deepseek_YYYYMMDD_HHMMSS.log`
+   - `phase_article_payloads_YYYYMMDD_HHMMSS.log`
+   - `phase_main_payloads_YYYYMMDD_HHMMSS.log`
 
 2. **Pipeline results** (JSON):
    - `pipeline_results_YYYYMMDD_HHMMSS.json`
