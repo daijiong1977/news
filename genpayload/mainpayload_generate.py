@@ -255,10 +255,18 @@ class JSONPayloadGenerator:
         
         # Create payloads for each category × difficulty combination
         for cat_name in ['News', 'Science', 'Fun']:
+            print(f"\n  📄 {cat_name} category:")
+            cat_articles = articles_by_category.get(cat_name, [])
+            
+            # Print all articles in this category
+            if cat_articles:
+                print(f"    Articles in payload ({len(cat_articles)} total):")
+                for article in cat_articles:
+                    print(f"      - [{article['id']}] {article['title'][:60]}")
+            
             for level_key in ['easy', 'middle', 'high', 'cn']:
                 articles = []
                 
-                cat_articles = articles_by_category.get(cat_name, [])
                 if cat_articles:
                     for article in cat_articles:
                         article_data = JSONPayloadGenerator.generate_article_data(
