@@ -24,19 +24,19 @@ def main():
             print("-" * 90)
             
             cursor.execute("""
-                SELECT id, title, pubdate 
+                SELECT id, title, pub_date 
                 FROM articles 
                 WHERE source = ? 
-                ORDER BY pubdate DESC 
+                ORDER BY pub_date DESC 
                 LIMIT 3
             """, (source,))
             
             rows = cursor.fetchall()
             for i, row in enumerate(rows, 1):
                 title = row['title'][:65] + '...' if len(row['title']) > 65 else row['title']
-                pubdate = row['pubdate'][:10] if row['pubdate'] else 'N/A'
+                pub_date = row['pub_date'][:10] if row['pub_date'] else 'N/A'
                 print(f"  {i}. [ID: {row['id']}] {title}")
-                print(f"     Date: {pubdate}")
+                print(f"     Date: {pub_date}")
         
         conn.close()
         
