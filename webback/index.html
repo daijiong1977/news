@@ -173,6 +173,28 @@ Activities →
 </div>
 </div>
 </main>
+<!-- Archive Section -->
+<div class="flex justify-center py-8 px-4 border-t border-border-light dark:border-border-dark">
+<button id="archive-button" class="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 transition-colors shadow-md">
+<span class="material-symbols-outlined">calendar_month</span>
+<span>View Old News</span>
+</button>
+</div>
+<!-- Archive Calendar Modal -->
+<div id="archive-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center">
+<div class="bg-background-light dark:bg-background-dark rounded-xl shadow-2xl p-6 max-w-md w-full mx-4 border border-border-light dark:border-border-dark">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-xl font-bold text-text-light dark:text-text-dark">Select Archive Date</h3>
+<button id="close-modal" class="text-subtle-light dark:text-subtle-dark hover:text-text-light dark:hover:text-text-dark">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div id="calendar-dates" class="grid grid-cols-7 gap-2 text-center">
+<!-- Calendar will be populated here -->
+</div>
+<p class="text-xs text-subtle-light dark:text-subtle-dark text-center mt-4">Click on a date to view archived news</p>
+</div>
+</div>
 <footer class="flex flex-col gap-6 px-5 py-8 text-center mt-8 border-t border-border-light dark:border-border-dark">
 <div class="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
 <a class="text-subtle-light dark:text-subtle-dark text-sm font-medium leading-normal hover:text-primary dark:hover:text-primary transition-colors" href="#">About Us</a>
@@ -421,6 +443,119 @@ document.addEventListener('DOMContentLoaded', function() {
       loadArticles(currentCategory, currentLevel);
     }
   }, 100);
+});
+
+// Archive Calendar Modal
+document.addEventListener('DOMContentLoaded', async function() {
+  const archiveButton = document.getElementById('archive-button');
+  const modal = document.getElementById('archive-modal');
+  const closeModal = document.getElementById('close-modal');
+  const calendarDates = document.getElementById('calendar-dates');
+  
+  // Load available archive dates
+  let availableDates = [];
+  try {
+    const response = await fetch('./main/payloads_latest/archive_available_dates.json');
+    if (response.ok) {
+      const data = await response.json();
+      availableDates = data.dates || [];
+      console.log(`✓ Loaded ${availableDates.length} available archive dates`);
+    }
+  } catch (e) {
+    console.log('Could not load archive dates:', e);
+  }
+  
+  // Populate calendar
+  function populateCalendar() {
+    if (availableDates.length === 0) {
+      calendarDates.innerHTML = '<p class="col-span-7 text-center text-subtle-light dark:text-subtle-dark py-4">No archives available</p>';
+      return;
+    }
+    
+    // Group dates by month
+    const datesByMonth = {};
+    availableDates.forEach(dateStr => {
+      const year = dateStr.substring(0, 4);
+      const month = dateStr.substring(4, 6);
+      const day = dateStr.substring(6, 8);
+      const monthKey = `${year}-${month}`;
+      if (!datesByMonth[monthKey]) {
+        datesByMonth[monthKey] = [];
+      }
+      datesByMonth[monthKey].push({date: dateStr, day: parseInt(day)});
+    });
+    
+    // Show most recent month
+    const months = Object.keys(datesByMonth).sort().reverse();
+    const currentMonth = months[0];
+    const dates = datesByMonth[currentMonth];
+    
+    // Month header
+    const [year, month] = currentMonth.split('-');
+    const monthName = new Date(year, parseInt(month) - 1, 1).toLocaleDateString('en-US', {month: 'long', year: 'numeric'});
+    
+    calendarDates.innerHTML = `<div class="col-span-7 text-center font-bold mb-2 text-text-light dark:text-text-dark">${monthName}</div>`;
+    
+    // Weekday headers
+    ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
+      calendarDates.innerHTML += `<div class="text-xs font-semibold text-subtle-light dark:text-subtle-dark py-1">${day}</div>`;
+    });
+    
+    // Get first day of month
+    const firstDay = new Date(year, parseInt(month) - 1, 1).getDay();
+    
+    // Add empty cells for days before month starts
+    for (let i = 0; i < firstDay; i++) {
+      calendarDates.innerHTML += '<div></div>';
+    }
+    
+    // Get days in month
+    const daysInMonth = new Date(year, parseInt(month), 0).getDate();
+    
+    // Add day cells
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateStr = `${year}${month}${day.toString().padStart(2, '0')}`;
+      const hasArchive = dates.some(d => d.day === day);
+      
+      if (hasArchive) {
+        calendarDates.innerHTML += `
+          <button class="archive-date p-2 rounded-lg bg-primary text-white font-semibold hover:bg-primary/80 transition-colors" data-date="${dateStr}">
+            ${day}
+          </button>`;
+      } else {
+        calendarDates.innerHTML += `<div class="p-2 text-subtle-light dark:text-subtle-dark">${day}</div>`;
+      }
+    }
+    
+    // Add click handlers to date buttons
+    document.querySelectorAll('.archive-date').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const date = this.getAttribute('data-date');
+        window.location.href = `./main/archive.html?date=${date}`;
+      });
+    });
+  }
+  
+  // Open modal
+  archiveButton.addEventListener('click', function() {
+    populateCalendar();
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  });
+  
+  // Close modal
+  closeModal.addEventListener('click', function() {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  });
+  
+  // Close on outside click
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+  });
 });
 </script>
 </body></html>
