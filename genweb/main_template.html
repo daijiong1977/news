@@ -34,8 +34,8 @@
 <button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-wide shadow-sm hover:bg-primary/90 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 dark:focus:ring-offset-background-dark">
 <span class="truncate">Subscribe</span>
 </button>
-<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark text-sm font-bold leading-normal tracking-wide hover:bg-border-light dark:hover:bg-border-dark transition-colors">
-<span class="truncate">CN</span>
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark text-sm font-bold leading-normal tracking-wide hover:bg-border-light dark:hover:bg-border-dark transition-colors" id="cn-toggle">
+<span class="truncate" id="cn-button-label">CN</span>
 </button>
 </div>
 </header>
@@ -56,7 +56,7 @@
 <div class="relative">
 <select class="appearance-none cursor-pointer rounded-lg h-10 pl-4 pr-8 bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark text-sm font-bold leading-normal tracking-wide hover:bg-border-light dark:hover:bg-border-dark transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50">
 <option>Relax</option>
-<option>Enjoy</option>
+<option selected>Enjoy</option>
 <option>Research</option>
 </select>
 <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-subtle-light dark:text-subtle-dark">
@@ -104,6 +104,12 @@ document.addEventListener('DOMContentLoaded', function() {
         document.documentElement.classList.add('dark');
     } else {
         document.documentElement.classList.remove('dark');
+    }
+    // Ensure language defaults to English. Override any non-'en' value so
+    // the site starts in English by default (user can toggle to CN manually).
+    const savedLang = localStorage.getItem('language');
+    if (savedLang !== 'en') {
+        localStorage.setItem('language', 'en');
     }
 });
 </script>

@@ -191,11 +191,26 @@ class JSONPayloadGenerator:
     """Generate JSON payloads for each difficulty level."""
     
     @staticmethod
-    def generate_article_data(article: Dict, level: str = 'easy', category: str = '') -> Dict:
-        """Generate JSON data for a single article."""
+    def generate_article_data(article: Dict, level: str = 'easy', category: str = '', for_payload: bool = False) -> Dict:
+        """Generate JSON data for a single article.
+        
+        Args:
+            article: Article data from database
+            level: Difficulty level
+            category: Article category
+            for_payload: If True, adjust paths for payload subdirectory
+        """
         article_id = article['id']
         source = article.get('source', 'News Source')
         image_url = article.get('image', '')
+        
+        # Adjust image path for payloads subdirectory (only when for_payload=True)
+        # Images are at ../article_image/ from /main/
+        # But payloads are in /main/payloads/
+        # So from payloads, images are at ../../article_image/
+        if for_payload and image_url and image_url.startswith('../'):
+            image_url = image_url.replace('../', '../../', 1)  # Convert ../foo to ../../foo
+        
         response = article.get('response', {})
         pub_date = article.get('pub_date', '')
         
@@ -241,38 +256,57 @@ class JSONPayloadGenerator:
         }
     
     @staticmethod
-    def generate_payloads(articles_by_category: Dict, output_dir: str) -> Dict[str, int]:
-        """Generate JSON payload files for each difficulty level.
+    def generate_payloads(articles_by_category: Dict, output_dir: str, timestamp: str = '') -> Dict[str, int]:
+        """Generate JSON payload files for each category + difficulty level combination.
         
-        Returns: Dict with level names and file sizes
+        Structure: articles_<category>_<level>.json
+        Example: articles_news_mid.json, articles_science_easy.json, etc.
+        
+        Args:
+            articles_by_category: Dictionary mapping category names to article lists
+            output_dir: Directory to write payload files (versioned by timestamp)
+            timestamp: Timestamp string (YYYYMMDD_HHMMSS) for directory versioning
+        
+        Returns: Dict with payload names and file sizes
         """
         payload_sizes = {}
         
-        for level_key in ['easy', 'mid', 'hard', 'cn']:
-            all_articles = []
-            
-            # Order: News, Science, Fun
-            for cat_name in ['News', 'Science', 'Fun']:
+        # Create payloads for each category × difficulty combination
+        for cat_name in ['News', 'Science', 'Fun']:
+            for level_key in ['easy', 'mid', 'hard', 'cn']:
+                articles = []
+                
                 cat_articles = articles_by_category.get(cat_name, [])
                 if cat_articles:
                     for article in cat_articles:
                         article_data = JSONPayloadGenerator.generate_article_data(
-                            article, level_key, cat_name
+                            article, level_key, cat_name, for_payload=True
                         )
-                        all_articles.append(article_data)
-            
-            # Write payload file
-            payload_file = os.path.join(output_dir, f'articles_{level_key}.json')
-            try:
-                with open(payload_file, 'w', encoding='utf-8') as f:
-                    json.dump({'articles': all_articles}, f, ensure_ascii=False, indent=0)
+                        articles.append(article_data)
                 
-                file_size = os.path.getsize(payload_file)
-                payload_sizes[level_key] = file_size
+                # Write payload file: articles_<category>_<level>.json
+                payload_file = os.path.join(output_dir, f'articles_{cat_name.lower()}_{level_key}.json')
+                try:
+                    with open(payload_file, 'w', encoding='utf-8') as f:
+                        json.dump({'articles': articles}, f, ensure_ascii=False, indent=0)
+                    
+                    file_size = os.path.getsize(payload_file)
+                    payload_sizes[f'{cat_name}_{level_key}'] = file_size
+                except Exception as e:
+                    print(f"❌ Error writing payload for {cat_name}/{level_key}: {e}")
+        
+        # Summary
+        print("  Payloads created:")
+        for cat_name in ['News', 'Science', 'Fun']:
+            cat_total = 0
+            print(f"  📁 {cat_name}:")
+            for level_key in ['easy', 'mid', 'hard', 'cn']:
+                key = f'{cat_name}_{level_key}'
+                size = payload_sizes.get(key, 0)
+                cat_total += size
                 level_display = DIFFICULTY_MAPPING.get(level_key, level_key)
-                print(f"  ✓ {level_display} ({level_key}): {len(all_articles)} articles, {file_size/1024:.1f}KB")
-            except Exception as e:
-                print(f"❌ Error writing payload for {level_key}: {e}")
+                print(f"    - {level_display}: {size/1024:.1f}KB")
+            print(f"    Total: {cat_total/1024:.1f}KB")
         
         return payload_sizes
 
@@ -309,12 +343,15 @@ class HTMLGenerator:
 
 
 def generate_website_enhanced():
-    """Generate website with dynamic payload loading."""
-    print("\n" + "=" * 70)
-    print("🚀 ENHANCED WEBSITE GENERATOR - DYNAMIC PAYLOAD LOADING")
-    print("=" * 70 + "\n")
+    """Generate enhanced website with timestamped payloads."""
+    print("=" * 70)
+    print("🚀 ENHANCED WEBSITE GENERATOR (with Timestamped Payloads)")
+    print("=" * 70)
     
-    print("📚 Loading articles...")
+    # Generate timestamp at the start
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    print(f"\n⏰ Generation timestamp: {timestamp}")
+    
     loader = ArticleLoader(DB_PATH, RESPONSES_DIR, IMAGES_DIR)
     
     # Get categories with processed articles
@@ -346,11 +383,14 @@ def generate_website_enhanced():
         total_articles += len(articles)
         print(f"  - {cat_name} (ID: {cat_id}): {len(articles)} articles")
     
-    # Generate JSON payloads
+    # Generate JSON payloads in versioned directory
     print("\n📦 Generating JSON payloads...")
-    payload_sizes = JSONPayloadGenerator.generate_payloads(articles_by_category, PAYLOADS_DIR)
+    versioned_payloads_dir = os.path.join(MAIN_DIR, f'payloads_{timestamp}')
+    Path(versioned_payloads_dir).mkdir(parents=True, exist_ok=True)
+    payload_sizes = JSONPayloadGenerator.generate_payloads(articles_by_category, versioned_payloads_dir, timestamp)
     total_payload_size = sum(payload_sizes.values())
     print(f"  Total payload size: {total_payload_size/1024:.1f}KB")
+    print(f"  Directory: payloads_{timestamp}/")
     
     # Read template
     print("\n📖 Reading template...")
@@ -361,19 +401,20 @@ def generate_website_enhanced():
         print(f"❌ Error reading template: {e}")
         return False
     
-    # Generate default cards (Enjoy/mid level)
-    print("\n🎨 Generating default article cards (Enjoy level)...")
+    # Generate default cards (News + Enjoy/mid level)
+    print("\n🎨 Generating default article cards (News / Enjoy level)...")
     default_level = 'mid'
+    default_category = 'News'
     all_default_cards = []
     
-    for cat_name in ['News', 'Science', 'Fun']:
-        cat_articles = articles_by_category.get(cat_name, [])
-        if cat_articles:
-            for article in cat_articles:
-                article_data = JSONPayloadGenerator.generate_article_data(
-                    article, default_level, cat_name
-                )
-                all_default_cards.append(article_data)
+    # Only include News category for default view
+    cat_articles = articles_by_category.get(default_category, [])
+    if cat_articles:
+        for article in cat_articles:
+            article_data = JSONPayloadGenerator.generate_article_data(
+                article, default_level, default_category
+            )
+            all_default_cards.append(article_data)
     
     # Generate HTML cards for default level
     # Embed the default cards directly
@@ -393,13 +434,12 @@ def generate_website_enhanced():
 </div>'''
         default_cards_html += card_html + "\n"
     
-    print(f"  ✓ Generated {len(all_default_cards)} default cards")
-    
-    # Add JavaScript for dynamic loading
+    # Add JavaScript for dynamic loading with category + difficulty support
     print("\n⚙️  Injecting dynamic loading script...")
+    payload_base_path = f'./payloads_{timestamp}/'
     dynamic_js = '''<script>
-// Dynamic article loading by difficulty level
-const PAYLOAD_BASE = './payloads/';
+// Dynamic article loading by category and difficulty level
+const PAYLOAD_BASE = '{PAYLOAD_BASE}';
 const CARD_TEMPLATE = `<div class="flex flex-col gap-3 bg-card-light dark:bg-card-dark rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1" data-article-id="{{id}}">
 <div class="w-full bg-center bg-no-repeat aspect-video bg-cover" style="{{imageStyle}}"></div>
 <div class="flex flex-col gap-2 p-4 pt-2">
@@ -420,20 +460,39 @@ const levelMap = {
   'CN': 'cn'
 };
 
-async function loadArticles(levelName) {
-  const levelKey = levelMap[levelName] || 'mid';
-  console.log(`Loading articles for level: ${levelName} (${levelKey})`);
+// Track current selections
+let currentCategory = 'News';
+let currentLevel = 'Enjoy';
+let isChineseMode = localStorage.getItem('language') === 'cn';
+
+async function loadArticles(category, level) {
+  // Always read current language mode from localStorage
+  const isChineseMode = localStorage.getItem('language') === 'cn';
+  
+  // If in Chinese mode, override level to 'cn'
+  let finalLevel = isChineseMode ? 'CN' : level;
+  const levelKey = levelMap[finalLevel] || 'mid';
+  const categoryLower = category.toLowerCase();
+  
+  console.log(`Loading articles: ${category} / ${finalLevel} (${levelKey})`);
+  console.log(`Chinese mode: ${isChineseMode}`);
   
   try {
-    const response = await fetch(`${PAYLOAD_BASE}articles_${levelKey}.json`);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const payloadFile = `${PAYLOAD_BASE}articles_${categoryLower}_${levelKey}.json`;
+    console.log(`Fetching: ${payloadFile}`);
+    
+    const response = await fetch(payloadFile);
+    if (!response.ok) throw new Error(`HTTP ${response.status} loading ${payloadFile}`);
     
     const data = await response.json();
     const articles = data.articles || [];
     
     // Render articles
     const grid = document.querySelector('.grid');
-    if (!grid) return;
+    if (!grid) {
+      console.error('Grid element not found');
+      return;
+    }
     
     grid.innerHTML = '';
     articles.forEach(article => {
@@ -452,9 +511,13 @@ async function loadArticles(levelName) {
       grid.innerHTML += html;
     });
     
-    console.log(`✓ Loaded ${articles.length} articles for ${levelName}`);
+    console.log(`✓ Loaded ${articles.length} articles for ${category}/${finalLevel}`);
   } catch (error) {
     console.error(`Error loading articles: ${error.message}`);
+    const grid = document.querySelector('.grid');
+    if (grid) {
+      grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: red;">Error loading articles. Check browser console.</div>`;
+    }
   }
 }
 
@@ -464,16 +527,98 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-// Hook into difficulty dropdown
+// Hook into category tabs and difficulty dropdown
 document.addEventListener('DOMContentLoaded', function() {
+  // Category tabs
+  const tabs = document.querySelectorAll('a[href="#"]');
+  tabs.forEach((tab, index) => {
+    const categories = ['News', 'Science', 'Fun'];
+    if (index < 3) {
+      tab.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Update active tab styling
+        tabs.forEach((t, i) => {
+          if (i < 3) {
+            if (i === index) {
+              t.classList.add('border-b-primary', 'text-primary');
+              t.classList.remove('border-b-transparent', 'text-subtle-light', 'dark:text-subtle-dark');
+            } else {
+              t.classList.remove('border-b-primary', 'text-primary');
+              t.classList.add('border-b-transparent', 'text-subtle-light', 'dark:text-subtle-dark');
+            }
+          }
+        });
+        
+        currentCategory = categories[index];
+        loadArticles(currentCategory, currentLevel);
+      });
+    }
+  });
+  
+  // Difficulty dropdown
   const select = document.querySelector('select');
   if (select) {
     select.addEventListener('change', function() {
-      loadArticles(this.value);
+      currentLevel = this.value;
+      loadArticles(currentCategory, currentLevel);
     });
   }
+  
+  // CN Language Toggle Button
+  const cnButton = document.getElementById('cn-toggle');
+  if (cnButton) {
+    function updateCNButtonStyle() {
+      const isChinese = localStorage.getItem('language') === 'cn';
+      const label = document.getElementById('cn-button-label');
+      const select = document.querySelector('select');
+      
+      if (isChinese) {
+        // In Chinese mode: button shows "EN" (to switch to English)
+        cnButton.classList.remove('bg-card-light', 'dark:bg-card-dark', 'text-text-light', 'dark:text-text-dark');
+        cnButton.classList.add('bg-primary', 'text-white');
+        if (label) label.textContent = 'EN';
+        // Hide difficulty dropdown in CN mode
+        if (select) select.style.display = 'none';
+      } else {
+        // In English mode: button shows "CN" (to switch to Chinese)
+        cnButton.classList.remove('bg-primary', 'text-white');
+        cnButton.classList.add('bg-card-light', 'dark:bg-card-dark', 'text-text-light', 'dark:text-text-dark');
+        if (label) label.textContent = 'CN';
+        // Show difficulty dropdown in English mode
+        if (select) select.style.display = '';
+      }
+    }
+    
+    // Initialize CN button style
+    updateCNButtonStyle();
+    // Ensure articles reflect current language on initial load
+    loadArticles(currentCategory, currentLevel);
+    
+    // CN button click handler
+    cnButton.addEventListener('click', function(e) {
+      e.preventDefault();
+      const currentMode = localStorage.getItem('language');
+      const newMode = currentMode === 'cn' ? 'en' : 'cn';
+      localStorage.setItem('language', newMode);
+      console.log(`CN mode toggled to: ${newMode}`);
+      updateCNButtonStyle();
+      isChineseMode = (newMode === 'cn');
+      loadArticles(currentCategory, currentLevel);
+    });
+  }
+  
+  // Listen for CN mode changes (external changes to localStorage)
+  const observer = setInterval(function() {
+    const newCNMode = localStorage.getItem('language') === 'cn';
+    if (newCNMode !== isChineseMode) {
+      isChineseMode = newCNMode;
+      console.log(`CN mode changed to: ${isChineseMode}`);
+      loadArticles(currentCategory, currentLevel);
+    }
+  }, 100);
 });
-</script>'''
+</script>'''.replace("const PAYLOAD_BASE = '{PAYLOAD_BASE}';", f"const PAYLOAD_BASE = '{payload_base_path}';")
     
     # Replace the grid content in template
     pattern = r'<div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">[\s\S]*?<!-- Article cards go here -->[\s\S]*?</div>\s*</main>'
@@ -485,7 +630,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     # Write main HTML file
     print("\n💾 Writing enhanced HTML...")
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
     
     # Main index.html
     output_path = os.path.join(MAIN_DIR, 'index.html')

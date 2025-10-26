@@ -32,6 +32,28 @@
 - Maintain clean git history with meaningful commit messages
 - Test locally before pushing to production server
 
+### 6. Git & Deployment Operations ⚠️ **CRITICAL**
+**NEVER DO ANY OF THESE WITHOUT EXPLICIT PERMISSION:**
+- ❌ **NO git commits** to local repository
+- ❌ **NO git pushes** to GitHub remote
+- ❌ **NO deployments to EC2** server
+- ❌ **NO scp/ssh operations** to EC2
+- ❌ **NO file transfers** to EC2
+
+**ALWAYS:**
+- ✅ Ask for explicit permission first
+- ✅ Explain what you plan to do
+- ✅ Wait for "yes" or "proceed" before executing
+- ✅ Test locally ONLY before asking permission
+- ✅ Keep all changes local until approved
+
+**Example workflow:**
+1. Make changes locally
+2. Test changes locally
+3. Tell user: "I've tested X locally. Ready to commit/push/deploy. Should I proceed?"
+4. **WAIT for user approval**
+5. Only execute after explicit "yes"
+
 ## Standard Workflow
 
 1. **Receive request** → Clarify if needed
