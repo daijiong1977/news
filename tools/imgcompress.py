@@ -294,7 +294,7 @@ def process_directory(input_dir, web=False, mobile=False, dry_run=False, verbose
             if dry_run:
                 print(f"  [DRY-RUN] Would resize for web: {img_file} → {img_file}")
             else:
-                success, orig_size, new_size = resize_image_web(img_file, verbose=verbose)
+                success, orig_size, new_size = resize_image_web(img_file, img_file, verbose=verbose)
                 if success:
                     total_web_size += new_size
         
