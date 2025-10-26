@@ -404,7 +404,7 @@ def generate_payloads_only():
     total_articles = 0
     
     for cat_id, cat_name in categories:
-        articles = loader.get_articles_by_category(cat_id, per_source_limit=3)
+        articles = loader.get_articles_by_category(cat_id, limit=6, max_per_source=4)
         articles_by_category[cat_name] = articles
         total_articles += len(articles)
         print(f"  - {cat_name} (ID: {cat_id}): {len(articles)} articles")
