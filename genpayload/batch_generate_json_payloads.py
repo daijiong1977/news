@@ -156,6 +156,13 @@ def generate_payload_jsons(force=False):
         # Load the deepseek response
         try:
             response_path = Path(response_file_path)
+            
+            # Convert old path (website/responses) to new path (website/article_responses)
+            response_path_str = str(response_path)
+            if 'website/responses/' in response_path_str:
+                response_path_str = response_path_str.replace('website/responses/', 'website/article_responses/')
+                response_path = Path(response_path_str)
+            
             if not response_path.is_absolute():
                 # If relative path stored in DB, make it absolute
                 response_path = Path('/Users/jidai/news') / response_path
