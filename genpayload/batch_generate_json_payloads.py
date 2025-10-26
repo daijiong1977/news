@@ -15,7 +15,7 @@ import os
 
 # Directory configuration - must match where Deepseek saves responses
 BASE_DIR = Path(__file__).parent.parent
-RESPONSE_DIR = BASE_DIR / 'website' / 'article_responses'
+RESPONSE_DIR = BASE_DIR / 'website' / 'article_response'
 
 def get_db_connection():
     """Get database connection."""
@@ -157,10 +157,10 @@ def generate_payload_jsons(force=False):
         try:
             response_path = Path(response_file_path)
             
-            # Convert old path (website/responses) to new path (website/article_responses)
+            # Convert old path (website/responses) to new path (website/article_response)
             response_path_str = str(response_path)
             if 'website/responses/' in response_path_str:
-                response_path_str = response_path_str.replace('website/responses/', 'website/article_responses/')
+                response_path_str = response_path_str.replace('website/responses/', 'website/article_response/')
                 response_path = Path(response_path_str)
             
             if not response_path.is_absolute():

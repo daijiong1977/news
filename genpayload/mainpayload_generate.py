@@ -27,7 +27,7 @@ from typing import List, Dict, Optional
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB_PATH = os.path.join(BASE_DIR, 'articles.db')
-RESPONSES_DIR = os.path.join(BASE_DIR, 'website', 'article_responses')
+RESPONSES_DIR = os.path.join(BASE_DIR, 'website', 'article_response')
 IMAGES_DIR = os.path.join(BASE_DIR, 'website', 'article_image')
 MAIN_DIR = os.path.join(BASE_DIR, 'website', 'main')
 
