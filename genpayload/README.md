@@ -86,15 +86,19 @@ python3 genpayload/batch_generate_json_payloads.py --dry-run
 
 **Output Example:**
 ```
-website/responses/payload_2025102601/
+```
+
+**Output Example:**
+```
+website/article_responses/payload_2025102601/
 ├── easy.json
 ├── middle.json
 └── high.json
 
-website/responses/payload_2025102602/
+website/article_responses/payload_2025102602/
 ├── easy.json
 ├── middle.json
-└── high.json
+```
 ```
 
 **When to run:**
@@ -188,7 +192,7 @@ python3 genpayload/mainpayload_generate.py
 ### Main Page Payloads
 - `articles` - Article metadata (title, source, category)
 - `article_images` - Image locations
-- Deepseek response files in `website/responses/`
+- Deepseek response files in `website/article_responses/`
 
 ### Article Page Payloads
 - `articles` - Article metadata
@@ -215,10 +219,11 @@ ls -la website/main/payloads_latest
 
 **Check:**
 1. Article exists in database: `sqlite3 articles.db "SELECT id, title FROM articles;"`
-2. Deepseek response exists: `ls website/responses/response_<articleid>.json`
+2. Deepseek response exists: `ls website/article_responses/response_<articleid>.json`
 3. Article has all difficulty levels in database
 
 ### Archive dates not showing
+```
 
 **Check:**
 1. `archive_available_dates.json` exists in payload directory
