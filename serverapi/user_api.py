@@ -723,6 +723,89 @@ def export_subscriptions():
         conn.close()
 
 
+@app.route('/api/admin/subscriptions/<user_id>/reading-style', methods=['PUT'])
+@require_auth
+def update_subscription_reading_style(user_id):
+    """
+    Update subscription reading style (admin only)
+    
+    Headers:
+        X-Admin-Password: admin password
+    
+    Body:
+        {
+            "reading_style": "relax|enjoy|research|chinese"
+        }
+    """
+    data = request.json or {}
+    reading_style = data.get('reading_style')
+    
+    if reading_style not in ['relax', 'enjoy', 'research', 'chinese']:
+        return jsonify({'error': 'Invalid reading style'}), 400
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        # Check if user exists
+        cursor.execute('SELECT email FROM user_subscriptions WHERE user_id = ?', (user_id,))
+        user = cursor.fetchone()
+        
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        
+        # Update reading style
+        cursor.execute('''
+            UPDATE user_subscriptions
+            SET reading_style = ?, updated_at = ?
+            WHERE user_id = ?
+        ''', (reading_style, int(time.time()), user_id))
+        
+        conn.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': f'Reading style updated to {reading_style}',
+            'email': user['email']
+        })
+        
+    finally:
+        conn.close()
+
+
+@app.route('/api/admin/subscriptions/<user_id>', methods=['DELETE'])
+@require_auth
+def delete_subscription(user_id):
+    """
+    Delete a subscription (admin only)
+    
+    Headers:
+        X-Admin-Password: admin password
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        # Get user email before deletion
+        cursor.execute('SELECT email FROM user_subscriptions WHERE user_id = ?', (user_id,))
+        user = cursor.fetchone()
+        
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        
+        # Delete user
+        cursor.execute('DELETE FROM user_subscriptions WHERE user_id = ?', (user_id,))
+        conn.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': f'User {user["email"]} deleted successfully'
+        })
+        
+    finally:
+        conn.close()
+
+
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
@@ -1108,21 +1191,29 @@ def get_cron_status():
         result = subprocess.run(['crontab', '-l'], capture_output=True, text=True)
         crontab_content = result.stdout
         
-        # Look for pipeline cron job
+        # Look for pipeline cron job (check both script names)
         for line in crontab_content.split('\n'):
-            if 'run_pipeline.sh' in line and not line.strip().startswith('#'):
-                # Parse cron schedule (e.g., "0 13 * * *")
+            if ('run_pipeline.sh' in line or 'run_pipeline_cron.sh' in line) and not line.strip().startswith('#'):
+                # Parse cron schedule (e.g., "0 13 * * *" or "15 12 * * *")
                 parts = line.split()
                 if len(parts) >= 5:
                     minute = parts[0]
                     hour = parts[1]
                     
-                    # Extract articles_per_seed from command line (if present)
+                    # Extract articles_per_seed from command line
+                    # Format: run_pipeline_cron.sh 3  OR  --articles-per-seed 3
                     articles_per_seed = 3  # default
                     if '--articles-per-seed' in line:
                         idx = line.index('--articles-per-seed')
                         next_part = line[idx:].split()[1]
                         articles_per_seed = int(next_part)
+                    elif 'run_pipeline_cron.sh' in line:
+                        # Extract argument after script name (e.g., "run_pipeline_cron.sh 3")
+                        script_parts = line.split('run_pipeline_cron.sh')
+                        if len(script_parts) > 1:
+                            args = script_parts[1].strip().split()
+                            if args and args[0].isdigit():
+                                articles_per_seed = int(args[0])
                     
                     return jsonify({
                         'enabled': True,
@@ -1377,6 +1468,110 @@ if __name__ == '__main__':
     print(f"CORS: {'Enabled' if CORS_ENABLED else 'Disabled'}")
     print(f"Port: 5001")
     print("=" * 70)
+    
+    # ============================================
+    # ADMIN API ENDPOINTS
+    # ============================================
+    
+    @app.route('/api/admin/users', methods=['GET'])
+    def admin_get_users():
+        """Get all users (admin only)"""
+        # Check admin password
+        admin_password = request.headers.get('X-Admin-Password')
+        if admin_password != 'didadi':
+            return jsonify({'error': 'Unauthorized'}), 401
+        
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                SELECT user_id, email, name, reading_style, verified, created_at
+                FROM user_subscriptions
+                ORDER BY created_at DESC
+            ''')
+            
+            users = []
+            for row in cursor.fetchall():
+                users.append({
+                    'user_id': row[0],
+                    'email': row[1],
+                    'name': row[2],
+                    'reading_style': row[3],
+                    'verified': bool(row[4]),
+                    'created_at': row[5]
+                })
+            
+            conn.close()
+            return jsonify({'success': True, 'users': users})
+        
+        except Exception as e:
+            print(f"❌ Error fetching users: {e}")
+            return jsonify({'error': str(e)}), 500
+    
+    @app.route('/api/admin/users/<user_id>/reading-style', methods=['PUT'])
+    def admin_update_reading_style(user_id):
+        """Update user's reading style (admin only)"""
+        # Check admin password
+        admin_password = request.headers.get('X-Admin-Password')
+        if admin_password != 'didadi':
+            return jsonify({'error': 'Unauthorized'}), 401
+        
+        try:
+            data = request.json
+            reading_style = data.get('reading_style')
+            
+            if reading_style not in ['relax', 'enjoy', 'research', 'chinese']:
+                return jsonify({'error': 'Invalid reading style'}), 400
+            
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                UPDATE user_subscriptions
+                SET reading_style = ?
+                WHERE user_id = ?
+            ''', (reading_style, user_id))
+            
+            conn.commit()
+            conn.close()
+            
+            return jsonify({'success': True, 'message': f'Reading style updated to {reading_style}'})
+        
+        except Exception as e:
+            print(f"❌ Error updating reading style: {e}")
+            return jsonify({'error': str(e)}), 500
+    
+    @app.route('/api/admin/users/<user_id>', methods=['DELETE'])
+    def admin_delete_user(user_id):
+        """Delete a user (admin only)"""
+        # Check admin password
+        admin_password = request.headers.get('X-Admin-Password')
+        if admin_password != 'didadi':
+            return jsonify({'error': 'Unauthorized'}), 401
+        
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            
+            # Get user email before deletion
+            cursor.execute('SELECT email FROM user_subscriptions WHERE user_id = ?', (user_id,))
+            user = cursor.fetchone()
+            
+            if not user:
+                conn.close()
+                return jsonify({'error': 'User not found'}), 404
+            
+            # Delete user
+            cursor.execute('DELETE FROM user_subscriptions WHERE user_id = ?', (user_id,))
+            conn.commit()
+            conn.close()
+            
+            return jsonify({'success': True, 'message': f'User {user[0]} deleted'})
+        
+        except Exception as e:
+            print(f"❌ Error deleting user: {e}")
+            return jsonify({'error': str(e)}), 500
     
     # Run server on port 5001 (replacing old HTML server)
     app.run(host='0.0.0.0', port=5001, debug=True)
