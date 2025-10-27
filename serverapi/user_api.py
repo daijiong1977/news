@@ -1187,8 +1187,8 @@ def get_cron_status():
     import subprocess
     
     try:
-        # Check if cron job exists
-        result = subprocess.run(['crontab', '-l'], capture_output=True, text=True)
+        # Check if cron job exists (check ec2-user's crontab, not root's)
+        result = subprocess.run(['crontab', '-l', '-u', 'ec2-user'], capture_output=True, text=True)
         crontab_content = result.stdout
         
         # Look for pipeline cron job (check both script names)
@@ -1275,14 +1275,14 @@ def enable_cron():
         return jsonify({'error': 'Articles per seed must be between 1 and 10'}), 400
     
     try:
-        # Get current crontab
-        result = subprocess.run(['crontab', '-l'], capture_output=True, text=True)
+        # Get current crontab (ec2-user's crontab)
+        result = subprocess.run(['crontab', '-l', '-u', 'ec2-user'], capture_output=True, text=True)
         current_crontab = result.stdout
         
         # Remove existing pipeline cron job
         lines = []
         for line in current_crontab.split('\n'):
-            if 'run_pipeline.sh' not in line or line.strip().startswith('#'):
+            if ('run_pipeline.sh' not in line and 'run_pipeline_cron.sh' not in line) or line.strip().startswith('#'):
                 if line.strip():  # Keep non-empty lines
                     lines.append(line)
         
@@ -1308,9 +1308,9 @@ def enable_cron():
         
         lines.append(cron_line)
         
-        # Write new crontab
+        # Write new crontab (to ec2-user's crontab)
         new_crontab = '\n'.join(lines) + '\n'
-        subprocess.run(['crontab', '-'], input=new_crontab, text=True, check=True)
+        subprocess.run(['crontab', '-u', 'ec2-user', '-'], input=new_crontab, text=True, check=True)
         
         return jsonify({
             'success': True,
@@ -1340,15 +1340,15 @@ def disable_cron():
     import subprocess
     
     try:
-        # Get current crontab
-        result = subprocess.run(['crontab', '-l'], capture_output=True, text=True)
+        # Get current crontab (ec2-user's crontab)
+        result = subprocess.run(['crontab', '-l', '-u', 'ec2-user'], capture_output=True, text=True)
         current_crontab = result.stdout
         
         # Remove pipeline cron job
         lines = []
         removed = False
         for line in current_crontab.split('\n'):
-            if 'run_pipeline.sh' in line and not line.strip().startswith('#'):
+            if ('run_pipeline.sh' in line or 'run_pipeline_cron.sh' in line) and not line.strip().startswith('#'):
                 removed = True
                 continue  # Skip this line
             if line.strip():
@@ -1357,9 +1357,9 @@ def disable_cron():
         if not removed:
             return jsonify({'error': 'No cron job found to disable'}), 404
         
-        # Write new crontab
+        # Write new crontab (to ec2-user's crontab)
         new_crontab = '\n'.join(lines) + '\n' if lines else ''
-        subprocess.run(['crontab', '-'], input=new_crontab, text=True, check=True)
+        subprocess.run(['crontab', '-u', 'ec2-user', '-'], input=new_crontab, text=True, check=True)
         
         return jsonify({
             'success': True,
