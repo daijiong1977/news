@@ -80,6 +80,23 @@ def get_article_content(article_id):
         return None
 
 
+def delete_problematic_article(article_id):
+    """Delete an article that cannot be processed due to unfixable JSON errors."""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        cursor.execute("DELETE FROM articles WHERE id = ?", (article_id,))
+        conn.commit()
+        conn.close()
+        
+        print(f"  ✓ Deleted problematic article {article_id} from database")
+        return True
+    except Exception as e:
+        print(f"  ❌ ERROR deleting article {article_id}: {e}")
+        return False
+
+
 def load_prompt_template():
     """Load the detailed prompt from prompts.md."""
     try:
@@ -193,7 +210,12 @@ def call_deepseek_api(user_prompt, api_key, article_id=None):
         
         # Now try to parse as JSON
         try:
-            response_json = json.loads(content)
+            # Fix common DeepSeek JSON formatting issues
+            # Pattern: " "key": should be "key":
+            import re
+            cleaned_content = re.sub(r'" "([^"]+)":', r'"\1":', content)
+            
+            response_json = json.loads(cleaned_content)
             print("  ✓ Successfully parsed API response as JSON")
             
             # Clean up raw response file on successful parse
@@ -215,6 +237,12 @@ def call_deepseek_api(user_prompt, api_key, article_id=None):
                 start = max(0, e.pos - 100)
                 end = min(len(content), e.pos + 100)
                 print(f"  Around error (chars {start}-{end}): {content[start:end]}")
+            
+            # Delete the problematic article to prevent blocking
+            if article_id:
+                print(f"  ⚠️  Deleting article {article_id} to prevent blocking future runs...")
+                delete_problematic_article(article_id)
+            
             return None
             
     except requests.exceptions.RequestException as e:
