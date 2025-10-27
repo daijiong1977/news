@@ -12,6 +12,7 @@ Flask backend for user subscription management and admin panel.
 **Endpoints:**
 
 #### Public Endpoints:
+- `GET /api/device/generate` - Generate unique device_id for tracking (works for anonymous users)
 - `POST /api/user/register` - Register new user with emailapi bootstrap
 - `POST /api/user/token` - Recover bootstrap token by email
 - `POST /api/user/sync-stats` - Sync user statistics (requires X-User-Token header)
@@ -200,6 +201,28 @@ The test script will:
 - Return exit code 0 if all tests pass
 
 ### Manual Testing
+
+### Test Device ID Generation
+
+```bash
+# Generate device_id (works for anonymous users)
+curl -X GET http://localhost:5001/api/device/generate
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "device_id": "news-a1b2c3d4e5f6g7h8i9j0"
+}
+```
+
+**Usage:**
+- Called automatically on first page load
+- Stored in localStorage as `news_device_id`
+- Used for anonymous user tracking
+- Required for user registration (sent to emailapi)
+- Enables offline token regeneration
 
 ### Test Registration
 

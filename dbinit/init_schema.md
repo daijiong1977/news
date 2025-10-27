@@ -273,6 +273,7 @@ CREATE TABLE user_subscriptions (
                 email TEXT UNIQUE NOT NULL,
                 name TEXT NOT NULL,
                 reading_style TEXT CHECK(reading_style IN ('relax', 'enjoy', 'research', 'chinese')),
+                device_id TEXT UNIQUE,
                 bootstrap_token TEXT,
                 bootstrap_failed INTEGER DEFAULT 0,
                 subscription_status TEXT DEFAULT 'pending' CHECK(subscription_status IN ('pending', 'active', 'cancelled')),
@@ -287,9 +288,11 @@ CREATE TABLE user_subscriptions (
 **Migration Notes (2025-10-26):**
 - New table for user subscription system
 - `reading_style` matches frontend dropdown options (relax/enjoy/research/chinese)
+- `device_id` stores unique 16+ character identifier for offline token generation and user tracking
 - `bootstrap_token` stores API key from emailapi.6ray.com/client/bootstrap
 - `bootstrap_failed` flags when emailapi is unavailable (fallback to local token)
 - `verified` tracks email verification status (0=pending, 1=verified)
+- `device_id` serves as stable identifier independent of email, allows token regeneration offline
 
 ### user_stats_sync
 ```

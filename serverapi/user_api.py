@@ -67,6 +67,29 @@ def require_auth(f):
 # PUBLIC ENDPOINTS
 # =============================================================================
 
+@app.route('/api/device/generate', methods=['GET'])
+def generate_device_id():
+    """
+    Generate a unique device_id for tracking (works for anonymous users too)
+    
+    Returns a 20-character unique identifier that can be used for:
+    - Anonymous user tracking
+    - Offline token generation
+    - User identification without email
+    
+    Response:
+        {
+            "device_id": "news-a1b2c3d4e5f6g7h8i9j0"
+        }
+    """
+    device_id = f"news-{uuid.uuid4().hex[:20]}"
+    
+    return jsonify({
+        'success': True,
+        'device_id': device_id
+    })
+
+
 @app.route('/api/user/register', methods=['POST'])
 def register_user():
     """
@@ -125,21 +148,22 @@ def register_user():
             })
         
         # Call emailapi bootstrap
-        device_id = f"news-user-{email}"
+        # Generate device_id: must be 16+ chars, unique per user
+        device_id = f"news-{uuid.uuid4().hex[:20]}"
         bootstrap_token = None
         bootstrap_failed = 0
         
         try:
             response = requests.post(
                 f'{EMAIL_API_URL}/client/bootstrap',
-                json={'device_id': device_id, 'display_name': name},
+                json={'email': email, 'device_id': device_id},
                 timeout=5
             )
             if response.status_code == 200:
                 bootstrap_token = response.json().get('api_key')
-                print(f"✅ Bootstrap successful for {email}")
+                print(f"✅ Bootstrap successful for {email}: {bootstrap_token}")
             else:
-                print(f"⚠️  Bootstrap returned {response.status_code} for {email}")
+                print(f"⚠️  Bootstrap returned {response.status_code} for {email}: {response.text}")
                 bootstrap_failed = 1
         except Exception as e:
             print(f"⚠️  Bootstrap failed: {e}")
@@ -156,10 +180,10 @@ def register_user():
         
         cursor.execute('''
             INSERT INTO user_subscriptions (
-                user_id, email, name, reading_style, bootstrap_token,
+                user_id, email, name, reading_style, device_id, bootstrap_token,
                 bootstrap_failed, subscription_status, verified, created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, 'pending', 0, ?, ?)
-        ''', (user_id, email, name, reading_style, bootstrap_token, 
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', 0, ?, ?)
+        ''', (user_id, email, name, reading_style, device_id, bootstrap_token, 
               bootstrap_failed, timestamp, timestamp))
         
         # Send verification email if bootstrap succeeded
