@@ -21,18 +21,26 @@ class UserManager {
      * Initialize user manager
      */
     async init() {
-        // Load user data from localStorage
-        this.loadUserData();
-        this.loadStats();
-        
-        // Get or generate device_id (for anonymous tracking)
-        await this.ensureDeviceId();
-        
-        // Check if user is verified (from email link)
-        this.checkVerificationStatus();
-        
-        // Initialize UI
-        this.initializeUI();
+        try {
+            console.log('📊 Loading user data...');
+            // Load user data from localStorage
+            this.loadUserData();
+            this.loadStats();
+            
+            console.log('🔑 Ensuring device_id...');
+            // Get or generate device_id (for anonymous tracking)
+            await this.ensureDeviceId();
+            
+            console.log('✉️ Checking verification status...');
+            // Check if user is verified (from email link)
+            this.checkVerificationStatus();
+            
+            console.log('🎨 Initializing UI...');
+            // Initialize UI
+            this.initializeUI();
+        } catch (error) {
+            console.error('❌ Error in init():', error);
+        }
     }
     
     /**
@@ -120,25 +128,37 @@ class UserManager {
      * Initialize UI elements
      */
     initializeUI() {
-        // Create registration modal
-        this.createRegistrationModal();
-        
-        // Create sync button (if registered)
-        if (this.isRegistered()) {
-            this.createSyncButton();
-        } else {
-            this.createRegisterButton();
+        try {
+            console.log('📱 Initializing UI...');
+            
+            // Create registration modal
+            this.createRegistrationModal();
+            console.log('✅ Modal created');
+            
+            // Create sync button (if registered)
+            if (this.isRegistered()) {
+                console.log('👤 User is registered, creating sync button');
+                this.createSyncButton();
+            } else {
+                console.log('👤 User not registered, creating register button');
+                this.createRegisterButton();
+            }
+            
+            // Create user info display
+            this.updateUserInfo();
+            console.log('✅ UI initialized successfully');
+        } catch (error) {
+            console.error('❌ Error initializing UI:', error);
         }
-        
-        // Create user info display
-        this.updateUserInfo();
     }
     
     /**
      * Create registration modal HTML
      */
     createRegistrationModal() {
-        const modalHtml = `
+        try {
+            console.log('📋 Creating registration modal...');
+            const modalHtml = `
             <div id="user-registration-modal" class="user-modal" style="display: none;">
                 <div class="user-modal-content">
                     <span class="user-modal-close">&times;</span>
@@ -196,12 +216,13 @@ class UserManager {
         const button = document.createElement('button');
         button.id = 'register-button';
         button.className = 'user-register-btn';
-        button.innerHTML = '📧 Subscribe';
+        button.innerHTML = '📧';
+        button.title = 'Subscribe to Newsletter';
         button.addEventListener('click', () => this.openModal());
         
-        // Add to page (customize placement based on your layout)
-        const header = document.querySelector('header') || document.body;
-        header.appendChild(button);
+        // Add to body as floating action button
+        document.body.appendChild(button);
+        console.log('✅ Register button created');
     }
     
     /**
@@ -211,12 +232,13 @@ class UserManager {
         const button = document.createElement('button');
         button.id = 'sync-button';
         button.className = 'user-sync-btn';
-        button.innerHTML = '🔄 Sync';
+        button.innerHTML = '🔄';
         button.title = 'Sync your activity to cloud';
         button.addEventListener('click', () => this.syncStats());
         
-        const header = document.querySelector('header') || document.body;
-        header.appendChild(button);
+        // Add to body as floating action button
+        document.body.appendChild(button);
+        console.log('✅ Sync button created');
     }
     
     /**
@@ -472,8 +494,10 @@ class UserManager {
 // Initialize user manager when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
+        console.log('🚀 Initializing UserManager...');
         window.userManager = new UserManager();
     });
 } else {
+    console.log('🚀 Initializing UserManager (DOM already loaded)...');
     window.userManager = new UserManager();
 }

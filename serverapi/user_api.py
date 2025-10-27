@@ -5,7 +5,7 @@ Created: 2025-10-26
 Purpose: Minimal backend API for user registration, token recovery, and stats sync
 """
 
-from flask import Flask, request, jsonify, redirect
+from flask import Flask, request, jsonify, redirect, session
 from flask_cors import CORS
 import sqlite3
 import uuid
@@ -16,6 +16,7 @@ from pathlib import Path
 import os
 
 app = Flask(__name__)
+app.secret_key = os.getenv('FLASK_SECRET_KEY', 'dev-secret-key-change-in-production-didadi-2025')
 
 # CORS Configuration (optional - for future GitHub Pages migration)
 # Uncomment and configure when deploying statistics to GitHub Pages
@@ -61,6 +62,75 @@ def require_auth(f):
         return f(*args, **kwargs)
     decorated_function.__name__ = f.__name__
     return decorated_function
+
+
+def require_session_auth(f):
+    """Decorator for session-authenticated admin endpoints"""
+    def decorated_function(*args, **kwargs):
+        if not session.get('authenticated'):
+            return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+        return f(*args, **kwargs)
+    decorated_function.__name__ = f.__name__
+    return decorated_function
+
+
+# =============================================================================
+# AUTHENTICATION ENDPOINTS
+# =============================================================================
+
+@app.route('/api/auth/login', methods=['POST'])
+def admin_login():
+    """
+    Admin login endpoint (creates session)
+    
+    Request body:
+        {
+            "password": "admin_password"
+        }
+    
+    Response:
+        {
+            "success": true
+        }
+    """
+    data = request.get_json()
+    password = data.get('password')
+    
+    if password == ADMIN_PASSWORD:
+        session['authenticated'] = True
+        session.permanent = True  # Keep session across browser restarts
+        return jsonify({'success': True})
+    else:
+        return jsonify({'success': False, 'error': 'Invalid password'}), 401
+
+
+@app.route('/api/auth/logout', methods=['POST'])
+def admin_logout():
+    """
+    Admin logout endpoint (clears session)
+    
+    Response:
+        {
+            "success": true
+        }
+    """
+    session.pop('authenticated', None)
+    return jsonify({'success': True})
+
+
+@app.route('/api/auth/check', methods=['GET'])
+def check_auth():
+    """
+    Check if user is authenticated
+    
+    Response:
+        {
+            "authenticated": true/false
+        }
+    """
+    return jsonify({
+        'authenticated': session.get('authenticated', False)
+    })
 
 
 # =============================================================================
@@ -358,6 +428,136 @@ def sync_user_stats():
         conn.close()
 
 
+@app.route('/api/user/delete', methods=['POST'])
+def delete_user_subscription():
+    """
+    Delete user subscription and all associated data
+    
+    Headers:
+        X-User-Token: bootstrap_token
+    
+    Request body:
+        {
+            "confirm": "DELETE"
+        }
+    
+    Response:
+        {
+            "success": true,
+            "message": "Subscription deleted successfully"
+        }
+    """
+    token = request.headers.get('X-User-Token')
+    data = request.json
+    confirm = data.get('confirm') if data else None
+    
+    if not token:
+        return jsonify({
+            'success': False,
+            'error': 'Missing X-User-Token header'
+        }), 400
+    
+    if confirm != 'DELETE':
+        return jsonify({
+            'success': False,
+            'error': 'Must confirm deletion with "DELETE"'
+        }), 400
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        # Find user by token
+        user = cursor.execute(
+            'SELECT user_id, email, name FROM user_subscriptions WHERE bootstrap_token = ?',
+            (token,)
+        ).fetchone()
+        
+        if not user:
+            return jsonify({'success': False, 'error': 'Invalid token'}), 401
+        
+        user_id = user['user_id']
+        email = user['email']
+        name = user['name']
+        
+        # Delete from user_stats_sync first (foreign key constraint)
+        cursor.execute('DELETE FROM user_stats_sync WHERE user_id = ?', (user_id,))
+        
+        # Delete user subscription
+        cursor.execute('DELETE FROM user_subscriptions WHERE user_id = ?', (user_id,))
+        
+        conn.commit()
+        
+        print(f"🗑️  Deleted subscription for {name} ({email}) - User ID: {user_id}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Subscription deleted successfully'
+        })
+        
+    except Exception as e:
+        conn.rollback()
+        print(f"❌ Error deleting subscription: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        conn.close()
+
+
+@app.route('/api/user/info', methods=['GET'])
+def get_user_info():
+    """
+    Get user information by token (for auto-login after verification)
+    
+    Headers:
+        X-User-Token: bootstrap_token
+    
+    Response:
+        {
+            "success": true,
+            "user_id": "uuid",
+            "name": "User Name",
+            "email": "user@example.com",
+            "reading_style": "enjoy",
+            "verified": true
+        }
+    """
+    token = request.headers.get('X-User-Token')
+    
+    if not token:
+        return jsonify({
+            'success': False,
+            'error': 'Missing X-User-Token header'
+        }), 400
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        # Find user by token
+        user = cursor.execute('''
+            SELECT user_id, name, email, reading_style, verified
+            FROM user_subscriptions
+            WHERE bootstrap_token = ?
+        ''', (token,)).fetchone()
+        
+        if not user:
+            return jsonify({'success': False, 'error': 'Invalid token'}), 401
+        
+        return jsonify({
+            'success': True,
+            'user_id': user['user_id'],
+            'name': user['name'],
+            'email': user['email'],
+            'reading_style': user['reading_style'],
+            'verified': bool(user['verified'])
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        conn.close()
+
+
 @app.route('/api/verify', methods=['GET'])
 def verify_email():
     """
@@ -407,8 +607,8 @@ def verify_email():
         
         print(f"✅ Email verified for {user['email']}")
         
-        # Redirect to main page with success message
-        return redirect('https://news.6ray.com/?verified=true')
+        # Redirect to main page with success message AND token for auto-login
+        return redirect(f'https://news.6ray.com/?verified=true&token={token}')
         
     except Exception as e:
         conn.rollback()
