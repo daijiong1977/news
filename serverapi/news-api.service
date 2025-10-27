@@ -1,0 +1,19 @@
+[Unit]
+Description=News User API Server
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/var/www/news
+Environment="EMAIL_API_URL=https://emailapi.6ray.com"
+Environment="ADMIN_PASSWORD=didadi"
+Environment="ENABLE_CORS=false"
+ExecStart=/usr/bin/python3 /var/www/news/serverapi/user_api.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

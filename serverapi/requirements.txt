@@ -1,0 +1,11 @@
+# Server API Dependencies
+# Install with: pip install -r requirements.txt
+
+# Flask web framework
+Flask==3.0.0
+
+# CORS support (optional - for GitHub Pages migration)
+Flask-CORS==4.0.0
+
+# HTTP requests for emailapi bootstrap
+requests==2.31.0

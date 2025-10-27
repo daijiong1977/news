@@ -265,3 +265,47 @@ CREATE TABLE response (
 - Added `payload_directory` - Path to the payload directory (e.g., 'payload_2025102501')
 
 ````
+
+### user_subscriptions
+```
+CREATE TABLE user_subscriptions (
+                user_id TEXT PRIMARY KEY,
+                email TEXT UNIQUE NOT NULL,
+                name TEXT NOT NULL,
+                reading_style TEXT CHECK(reading_style IN ('relax', 'enjoy', 'research', 'chinese')),
+                bootstrap_token TEXT,
+                bootstrap_failed INTEGER DEFAULT 0,
+                subscription_status TEXT DEFAULT 'pending' CHECK(subscription_status IN ('pending', 'active', 'cancelled')),
+                verified INTEGER DEFAULT 0,
+                created_at INTEGER NOT NULL,
+                updated_at INTEGER NOT NULL
+            )
+```
+
+**Purpose:** Email newsletter subscription management with emailapi bootstrap integration
+
+**Migration Notes (2025-10-26):**
+- New table for user subscription system
+- `reading_style` matches frontend dropdown options (relax/enjoy/research/chinese)
+- `bootstrap_token` stores API key from emailapi.6ray.com/client/bootstrap
+- `bootstrap_failed` flags when emailapi is unavailable (fallback to local token)
+- `verified` tracks email verification status (0=pending, 1=verified)
+
+### user_stats_sync
+```
+CREATE TABLE user_stats_sync (
+                user_id TEXT PRIMARY KEY,
+                stats_json TEXT NOT NULL,
+                last_sync INTEGER NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES user_subscriptions(user_id)
+            )
+```
+
+**Purpose:** Optional cloud backup of user activity statistics (localStorage primary, DB secondary)
+
+**Migration Notes (2025-10-26):**
+- New table for user-initiated stats synchronization
+- `stats_json` stores complete activity data as JSON (words completed, quiz scores, etc.)
+- `last_sync` tracks when user last manually synced their data
+- Data stored in browser localStorage primarily, this table is backup only
+- Minimal server load: sync only when user clicks "Sync" button
