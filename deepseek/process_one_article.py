@@ -154,6 +154,10 @@ def call_deepseek_api(user_prompt, api_key, article_id=None):
         'model': 'deepseek-chat',
         'messages': [
             {
+                'role': 'system',
+                'content': 'You are a JSON-only API. You MUST respond with pure, valid JSON that can be parsed by json.loads(). Do NOT include markdown formatting, code blocks, or any explanatory text. Start your response with { and end with }.'
+            },
+            {
                 'role': 'user',
                 'content': user_prompt
             }

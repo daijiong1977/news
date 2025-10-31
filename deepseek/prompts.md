@@ -1,5 +1,12 @@
 # Article Analysis Prompt
 
+⚠️ CRITICAL: You MUST respond with VALID JSON ONLY - NO MARKDOWN, NO CODE BLOCKS, NO EXTRA TEXT ⚠️
+
+⚠️ DO NOT use ``` markdown code fences or any other formatting ⚠️
+⚠️ Your entire response must be parseable by json.loads() ⚠️
+⚠️ Start with { and end with } ⚠️
+⚠️ Do NOT add any text before or after the JSON ⚠️
+
 Analyze the following article and provide JSON output matching this exact structure:
 
 {
@@ -71,10 +78,20 @@ CHINESE (zh):
 - Summary: 200-300 word Chinese summary
 
 UNIVERSAL REQUIREMENTS:
+- ⚠️ CRITICAL: Return ONLY pure JSON - start with { and end with }
+- ⚠️ NO markdown formatting, NO ``` code blocks, NO explanatory text
+- ⚠️ Your response must be directly parseable by Python's json.loads()
 - Output ONLY valid JSON, no markdown
 - Keywords must have "term" and "explanation" fields
 - Questions need "question", "options" (4 choices), "correct_answer"
 - All text must be properly closed strings with no unterminated quotes
 - No trailing commas
+- Use straight quotes " not curly quotes "" 
+- Options must be a JSON array: ["option1", "option2", "option3", "option4"]
+- Do NOT escape the options array into a string
+- Close arrays properly: }] not }"]
 - Article_Structure for easy: array of 4 strings (WHO, WHAT, WHERE, WHY)
 - Article_Structure for middle/high: array with 1 element containing full analysis text (100-150 words)
+
+⚠️ FINAL WARNING: If your response contains any markdown formatting (```json, ```, etc.) or cannot be parsed by json.loads(), it will be rejected. Start with { and end with } ⚠️
+
