@@ -860,6 +860,153 @@ def get_feeds():
         conn.close()
 
 
+@app.route('/api/admin/feeds', methods=['POST'])
+@require_auth
+def add_feed():
+    """
+    Add a new RSS feed (admin only)
+    
+    Headers:
+        X-Admin-Password: admin password
+    
+    Body:
+        {
+            "feed_name": str,
+            "feed_url": str,
+            "category_id": int,
+            "enable": bool (optional, default True)
+        }
+    
+    Response:
+        {"message": "Feed added successfully", "feed_id": int}
+    """
+    data = request.get_json()
+    
+    feed_name = data.get('feed_name')
+    feed_url = data.get('feed_url')
+    category_id = data.get('category_id')
+    enable = data.get('enable', True)
+    
+    if not feed_name or not feed_url or not category_id:
+        return jsonify({'error': 'feed_name, feed_url, and category_id are required'}), 400
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute('''
+            INSERT INTO feeds (feed_name, feed_url, category_id, enable)
+            VALUES (?, ?, ?, ?)
+        ''', (feed_name, feed_url, category_id, 1 if enable else 0))
+        
+        conn.commit()
+        feed_id = cursor.lastrowid
+        
+        return jsonify({
+            'message': 'Feed added successfully',
+            'feed_id': feed_id
+        }), 201
+        
+    except sqlite3.IntegrityError as e:
+        return jsonify({'error': 'Feed already exists or invalid category_id'}), 400
+    finally:
+        conn.close()
+
+
+@app.route('/api/admin/feeds/<int:feed_id>', methods=['PUT'])
+@require_auth
+def update_feed(feed_id):
+    """
+    Update an existing RSS feed (admin only)
+    
+    Headers:
+        X-Admin-Password: admin password
+    
+    Body:
+        {
+            "feed_name": str (optional),
+            "feed_url": str (optional),
+            "category_id": int (optional),
+            "enable": int (0 or 1, optional)
+        }
+    
+    Response:
+        {"message": "Feed updated successfully"}
+    """
+    data = request.get_json()
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        # Build dynamic UPDATE query based on provided fields
+        update_fields = []
+        params = []
+        
+        if 'feed_name' in data:
+            update_fields.append('feed_name = ?')
+            params.append(data['feed_name'])
+        
+        if 'feed_url' in data:
+            update_fields.append('feed_url = ?')
+            params.append(data['feed_url'])
+        
+        if 'category_id' in data:
+            update_fields.append('category_id = ?')
+            params.append(data['category_id'])
+        
+        if 'enable' in data:
+            update_fields.append('enable = ?')
+            params.append(1 if data['enable'] else 0)
+        
+        if not update_fields:
+            return jsonify({'error': 'No fields to update'}), 400
+        
+        params.append(feed_id)
+        query = f"UPDATE feeds SET {', '.join(update_fields)} WHERE feed_id = ?"
+        
+        cursor.execute(query, params)
+        conn.commit()
+        
+        if cursor.rowcount == 0:
+            return jsonify({'error': 'Feed not found'}), 404
+        
+        return jsonify({'message': 'Feed updated successfully'}), 200
+        
+    except sqlite3.IntegrityError:
+        return jsonify({'error': 'Invalid category_id or duplicate feed'}), 400
+    finally:
+        conn.close()
+
+
+@app.route('/api/admin/feeds/<int:feed_id>', methods=['DELETE'])
+@require_auth
+def delete_feed(feed_id):
+    """
+    Delete an RSS feed (admin only)
+    
+    Headers:
+        X-Admin-Password: admin password
+    
+    Response:
+        {"message": "Feed deleted successfully"}
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute('DELETE FROM feeds WHERE feed_id = ?', (feed_id,))
+        conn.commit()
+        
+        if cursor.rowcount == 0:
+            return jsonify({'error': 'Feed not found'}), 404
+        
+        return jsonify({'message': 'Feed deleted successfully'}), 200
+        
+    finally:
+        conn.close()
+
+
 @app.route('/api/admin/categories', methods=['GET'])
 @require_auth
 def get_categories():
