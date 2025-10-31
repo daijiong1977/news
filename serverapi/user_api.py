@@ -894,10 +894,13 @@ def add_feed():
     cursor = conn.cursor()
     
     try:
+        from datetime import datetime
+        current_time = datetime.now().isoformat()
+        
         cursor.execute('''
-            INSERT INTO feeds (feed_name, feed_url, category_id, enable)
-            VALUES (?, ?, ?, ?)
-        ''', (feed_name, feed_url, category_id, 1 if enable else 0))
+            INSERT INTO feeds (feed_name, feed_url, category_id, enable, created_at)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (feed_name, feed_url, category_id, 1 if enable else 0, current_time))
         
         conn.commit()
         feed_id = cursor.lastrowid
