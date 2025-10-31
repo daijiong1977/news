@@ -211,9 +211,14 @@ def call_deepseek_api(user_prompt, api_key, article_id=None):
         # Now try to parse as JSON
         try:
             # Fix common DeepSeek JSON formatting issues
-            # Pattern: " "key": should be "key":
             import re
+            
+            # Pattern 1: " "key": should be "key":
             cleaned_content = re.sub(r'" "([^"]+)":', r'"\1":', content)
+            
+            # Pattern 2: }"] should be }]  (extra quote before closing array)
+            # Example: "correct_answer": "value"}"] → "correct_answer": "value"}]
+            cleaned_content = re.sub(r'\}"\]', r'}]', cleaned_content)
             
             response_json = json.loads(cleaned_content)
             print("  ✓ Successfully parsed API response as JSON")
