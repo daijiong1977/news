@@ -394,15 +394,32 @@ def process_batch():
     print(f"Articles: {unprocessed}")
     print(f"{'='*70}\n")
     
+    succeeded = []
+    failed = []
+    
     for idx, article_id in enumerate(unprocessed, 1):
         print(f"\n[{idx}/{len(unprocessed)}] Processing article {article_id}...\n")
-        process_single_article(article_id)
+        try:
+            process_single_article(article_id, batch_mode=True)
+            succeeded.append(article_id)
+        except Exception as e:
+            print(f"  ❌ Failed to process article {article_id}: {e}")
+            failed.append(article_id)
         print("\n" + "-"*70)
     
-    print(f"\n✓ Batch processing complete! Processed {len(unprocessed)} article(s)\n")
+    # Summary
+    print(f"\n{'='*70}")
+    print(f"Batch Processing Summary:")
+    print(f"  ✓ Succeeded: {len(succeeded)} articles")
+    if succeeded:
+        print(f"    {succeeded}")
+    print(f"  ✗ Failed: {len(failed)} articles")
+    if failed:
+        print(f"    {failed}")
+    print(f"{'='*70}\n")
 
 
-def process_single_article(article_id):
+def process_single_article(article_id, batch_mode=False):
     """Process a single article."""
     
     print(f"\n{'='*70}")
@@ -413,6 +430,8 @@ def process_single_article(article_id):
     print("Step 0: Getting API key from database...")
     api_key = get_api_key()
     if not api_key:
+        if batch_mode:
+            raise Exception("Failed to get API key")
         sys.exit(1)
     print(f"  ✓ API key retrieved")
     
@@ -420,6 +439,8 @@ def process_single_article(article_id):
     print("\nStep 1: Fetching article from database...")
     article = get_article_content(article_id)
     if not article:
+        if batch_mode:
+            raise Exception("Failed to fetch article from database")
         sys.exit(1)
     print(f"  ✓ Fetched: {article['title'][:60]}...")
     
@@ -427,6 +448,8 @@ def process_single_article(article_id):
     print("\nStep 2: Loading prompt template...")
     prompt_template = load_prompt_template()
     if not prompt_template:
+        if batch_mode:
+            raise Exception("Failed to load prompt template")
         sys.exit(1)
     print(f"  ✓ Loaded {len(prompt_template)} characters of prompt")
     
@@ -434,6 +457,8 @@ def process_single_article(article_id):
     print("\nStep 3: Loading response template...")
     response_template = load_response_template()
     if not response_template:
+        if batch_mode:
+            raise Exception("Failed to load response template")
         sys.exit(1)
     print(f"  ✓ Template structure ready")
     
@@ -447,8 +472,12 @@ def process_single_article(article_id):
     response_json = call_deepseek_api(user_prompt, api_key, article_id)
     if not response_json:
         print("  ❌ API call failed - skipping this article")
-        print("  ℹ️  Next run will retry this article")
-        sys.exit(0)  # Exit 0 (success) so batch continues
+        if batch_mode:
+            print("  ℹ️  Continuing to next article...")
+            raise Exception("API call failed or returned invalid JSON")
+        else:
+            print("  ℹ️  Next run will retry this article")
+            sys.exit(0)  # Exit 0 (success) so pipeline continues
     print(f"  ✅ API call successful - received response")
     
     # Step 6: Validate response structure
@@ -460,8 +489,12 @@ def process_single_article(article_id):
     output_file = save_response(article_id, response_json)
     if not output_file:
         print("  ❌ Failed to save response - skipping this article")
-        print("  ℹ️  Next run will retry this article")
-        sys.exit(0)  # Exit 0 so batch continues
+        if batch_mode:
+            print("  ℹ️  Continuing to next article...")
+            raise Exception("Failed to save response file")
+        else:
+            print("  ℹ️  Next run will retry this article")
+            sys.exit(0)  # Exit 0 so pipeline continues
     
     # Step 8: Update database immediately
     print("\nStep 8: Updating database...")
