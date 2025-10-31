@@ -1313,6 +1313,151 @@ def get_article_detail(article_id):
 
 
 # ============================================================================
+# BACKUP & RESTORE ENDPOINTS
+# ============================================================================
+
+@app.route('/api/admin/backups', methods=['GET'])
+@require_auth
+def list_backups():
+    """
+    List all database backups (admin only)
+    
+    Headers:
+        X-Admin-Password: admin password
+    
+    Response:
+        [{filename, size, created}, ...]
+    """
+    import os
+    from pathlib import Path
+    
+    try:
+        backups_dir = Path(__file__).parent.parent / 'backups'
+        if not backups_dir.exists():
+            return jsonify([])
+        
+        backups = []
+        for file in backups_dir.glob('articles.db.*'):
+            if file.is_file():
+                stat = file.stat()
+                backups.append({
+                    'filename': file.name,
+                    'size': stat.st_size,
+                    'created': stat.st_mtime * 1000  # Convert to milliseconds for JavaScript
+                })
+        
+        # Sort by creation time, newest first
+        backups.sort(key=lambda x: x['created'], reverse=True)
+        return jsonify(backups)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/admin/backups/create', methods=['POST'])
+@require_auth
+def create_backup():
+    """
+    Create a new database backup (admin only)
+    
+    Headers:
+        X-Admin-Password: admin password
+    
+    Response:
+        {"message": "Backup created successfully", "filename": str}
+    """
+    import shutil
+    from datetime import datetime
+    
+    try:
+        db_path = Path(__file__).parent.parent / 'articles.db'
+        backups_dir = Path(__file__).parent.parent / 'backups'
+        backups_dir.mkdir(exist_ok=True)
+        
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        backup_filename = f'articles.db.{timestamp}'
+        backup_path = backups_dir / backup_filename
+        
+        shutil.copy2(db_path, backup_path)
+        
+        return jsonify({
+            'message': 'Backup created successfully',
+            'filename': backup_filename
+        }), 201
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/admin/backups/<filename>/restore', methods=['POST'])
+@require_auth
+def restore_backup(filename):
+    """
+    Restore database from a backup (admin only)
+    
+    Headers:
+        X-Admin-Password: admin password
+    
+    Response:
+        {"message": "Database restored successfully"}
+    """
+    import shutil
+    from datetime import datetime
+    
+    try:
+        db_path = Path(__file__).parent.parent / 'articles.db'
+        backups_dir = Path(__file__).parent.parent / 'backups'
+        backup_path = backups_dir / filename
+        
+        if not backup_path.exists():
+            return jsonify({'error': 'Backup file not found'}), 404
+        
+        # Create a safety backup of current database first
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        safety_backup = backups_dir / f'articles.db.before_restore_{timestamp}'
+        shutil.copy2(db_path, safety_backup)
+        
+        # Restore the backup
+        shutil.copy2(backup_path, db_path)
+        
+        return jsonify({
+            'message': f'Database restored successfully from {filename}'
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/admin/backups/<filename>', methods=['DELETE'])
+@require_auth
+def delete_backup(filename):
+    """
+    Delete a backup file (admin only)
+    
+    Headers:
+        X-Admin-Password: admin password
+    
+    Response:
+        {"message": "Backup deleted successfully"}
+    """
+    try:
+        backups_dir = Path(__file__).parent.parent / 'backups'
+        backup_path = backups_dir / filename
+        
+        if not backup_path.exists():
+            return jsonify({'error': 'Backup file not found'}), 404
+        
+        backup_path.unlink()
+        
+        return jsonify({
+            'message': 'Backup deleted successfully'
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+# ============================================================================
 # CRON JOB MANAGEMENT ENDPOINTS
 # ============================================================================
 
